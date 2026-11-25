@@ -5,6 +5,8 @@ extends Control
 ## 480x270 scaling ratio, and 5-tier AudioBusLayout immediately on first Windows launch
 ## (resolving DDL-015 before Stage 05 Visual & Streaming Prototype coding begins).
 
+const PROTOTYPE_SCENE_PATH: String = "res://world/rimlands_prototype.tscn"
+
 @onready var _status_label: Label = $SafeMargin/FramePanel/ContentPad/Layout/DiagnosticsLabel
 
 
@@ -13,6 +15,17 @@ func _ready() -> void:
 	var report: String = _build_diagnostics_report()
 	_status_label.text = report
 	print("\n" + report + "\n")
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey:
+		var key_ev: InputEventKey = event as InputEventKey
+		if key_ev.pressed and not key_ev.echo:
+			if key_ev.keycode == KEY_ENTER or key_ev.keycode == KEY_SPACE:
+				GameState.set_phase(&"m01_prototype")
+				var err: Error = get_tree().change_scene_to_file(PROTOTYPE_SCENE_PATH)
+				if err != OK:
+					push_warning("Could not open Milestone 01 prototype: %d" % err)
 
 
 func _build_diagnostics_report() -> String:
@@ -34,6 +47,15 @@ func _build_diagnostics_report() -> String:
 	if not missing_buses.is_empty():
 		bus_status = "MISSING: %s" % ", ".join(missing_buses)
 
+	var placeholder_count: int = AssetPaths.get_placeholder_count()
+	var total_assets: int = AssetPaths.get_total_tracked_assets()
+	var art_status: String = (
+		"TEMP DEBUG PLACEHOLDERS (%d/%d) — Visual Gate Pending"
+		% [placeholder_count, total_assets]
+		if placeholder_count > 0
+		else "Production Art Loaded (0/%d placeholders)" % total_assets
+	)
+
 	var lines: PackedStringArray = PackedStringArray([
 		"PROJECT   : %s — %s" % [GameState.PROJECT_TITLE, GameState.PLANET_DESIGNATION],
 		"GODOT VER : %s (%s)" % [version_str, os_name],
@@ -54,7 +76,8 @@ func _build_diagnostics_report() -> String:
 			GameState.BASE_TILE_SIZE_PX,
 		],
 		"AUDIO BUS : %s" % bus_status,
-		"STATUS    : Production Bootstrap OK — Ready for Stage 05 Visual Prototype Gate",
+		"ART GATE  : %s" % art_status,
+		"NEXT STEP : Press [ENTER] or [SPACE] to launch Milestone 01 Prototype",
 	])
 	return "\n".join(lines)
 

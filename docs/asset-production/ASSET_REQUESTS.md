@@ -1,299 +1,352 @@
 # *VERDANT SIGNAL* — Production Asset Requests & Delivery Manifest
 
 > **Governing Standard**: Mandatory Asset Request & Specification Protocol (active for every production milestone).  
-> **Visual & Technical Lock**: Oblique 3/4 Top-Down Painterly Pixel Art · **`480×270`** native viewport (`960×540` `2×` window) · **`16×16`** tile foundation · **`16×24`** Dr. Mara Lin footprint · **`Nearest`** texture filtering (`mipmaps = false`, zero mixels) · **Godot `4.7.2-stable` `GL Compatibility`** (Intel HD Graphics 3000 minimum target — keep alpha layers clean, avoid excessive per-pixel overdraw!).  
-> **Palette Authority**: All hex ramps below strictly obey the WCAG-verified 5-Band color scripts in [`docs/concept/data/biomes.json`](../concept/data/biomes.json) and [`docs/concept/14-art-direction-and-pixel-art-bible.md`](../concept/14-art-direction-and-pixel-art-bible.md).
+> **Specification Audit Status**: **v2.0 (Audited & Mathematically Verified)** — All `AST-001`–`AST-007` frame grids, atlas coordinates, pixel-overlap checks, `TileSet` terrain configurations, directional mirroring rules, and Godot `Sprite2D` local offsets have been formally audited before artwork production.  
+> **Visual & Technical Lock**: Oblique 3/4 Top-Down Painterly Pixel Art · **`480×270`** native viewport (`960×540` `2×` window) · **`16×16`** tile foundation · **`16×24`** Dr. Mara Lin footprint · **`Nearest`** texture filtering (`mipmaps = false`, zero mixels) · **Godot `4.7.2-stable` `GL Compatibility`** (Intel HD Graphics 3000 minimum target).  
+> **Palette Authority**: All hex ramps strictly obey [`docs/concept/data/biomes.json`](../concept/data/biomes.json) and [`docs/concept/14-art-direction-and-pixel-art-bible.md`](../concept/14-art-direction-and-pixel-art-bible.md).
 
 ---
 
-## 1. Asset Status Workflow & Approval Gate
+## 1. Specification Audit Changelog (v1.0 -> v2.0 Corrections Resolved)
 
-Every asset progresses strictly through six tracked states:
+| Asset ID | Audit Finding in v1.0 | Resolution Applied in v2.0 |
+| :---: | --- | --- |
+| `AST-001` | Row ranges were summarized (`00–03`, etc.) without a cell-by-cell flat index map (`0..95`), unused cell map, or formal directional-mirroring policy. | Added complete `6×16` (`96`-cell) frame-by-frame table (`64` populated + `32` explicit unused transparent cells), proved `Sprite2D.offset = Vector2(0, -10)`, and formally **rejected horizontal mirroring (`flip_h`)** due to Mara's asymmetrical pack strap, right-hip lens holster, and top-left 45° key light. |
+| `AST-002` | Cols `4–7`, Row `0` overlapped between dry-sand variants and shoreline autotiles; animated water frames were stacked vertically across Rows `6` and `7` rather than horizontal pairs; missing Godot `TileSet` terrain bitmask spec. | Rebuilt into a **100% non-overlapping `12×8` (`96`-cell) coordinate map** (`18` `TERRAIN_MODE_MATCH_CORNERS` Wang tiles + `12` shallow tidal + `6` decals + `18` cliffs + `12` deep-water shelf + `6` explicit unused cells + `12` horizontal `2`-frame `animation_columns=2` water/foam pairs). |
+| `AST-003` | Ecotone transitions, trail autotiles, and stream tiles lacked an exact `(col, row)` coordinate map and `TileSet` terrain mode specification. | Rebuilt into a **100% non-overlapping `12×6` (`72`-cell) coordinate map** (`18` `TERRAIN_MODE_MATCH_CORNERS` moss->sand ecotone tiles + `16` full 4-bit `TERRAIN_MODE_MATCH_SIDES` trail tiles + `6` decals + `18` mossy terraces + `14` creek bank & `2`-frame horizontal stream tiles). |
+| `AST-004` | Lacked exact Godot node assembly, local `Sprite2D.offset` proof, canopy z-ordering vs Y-sort architecture, and trunk/canopy fade seam collar. | Specified exact shared origin `(24, 72)`, proven `offset = Vector2(0, -32)` on both `TrunkSprite` and `CanopySprite` (`z_index = 20, z_as_relative = false`) under one `StaticBody2D`, mandatory **`4 px` trunk-behind-canopy overlap collar (`y = 32..36`)**, and exact foot collider + `CanopyFadeArea` bounds. |
+| `AST-005` | Missing explicit `Rect2` bounds, unused cell listing, and `Sprite2D.offset` proof. | Verified `4×4` (`16×32` cells = `64×128 px`) with `10` active cells, `6` explicit unused cells, zero overlap, and `offset = Vector2(0, -14)`. |
+| `AST-006` | Bottom-right `32×16` rectangle `(64, 48, 32, 16)` was unmentioned in the `96×64` atlas; missing per-region `Sprite2D.offset` math. | Mathematically partitioned all `6144 px²` (`5` prop `Rect2`s + explicit `(64, 48, 32, 16)` `UNUSED / TRANSPARENT` cell) with verified `Sprite2D.offset` values for every prop. |
+| `AST-007` | Missing per-frame oval bounds check inside `32×32` cells to verify zero clipping on largest shadow/pulse frames. | Verified all `12` `32×32` cells (`11` active + `1` explicit unused cell `(3,0)`), bounded largest shadow (`30×14`) and pulse (`30×15`) with `>= 1 px` transparent margin, and verified `offset = Vector2.ZERO`. |
+
+---
+
+## 2. Asset Status Workflow & Approval Gate
+
+Every production asset progresses strictly through six tracked states:
 `Requested` -> `In Production` -> `Received` -> `Integrated` -> `Tested` -> `Approved`
 
 **Mandatory Intake Verification (on Receipt)**:
-1. Inspect exact pixel dimensions, alpha transparency, frame grid alignment, and seam continuity via `tools/asset_inspector.py` + direct visual review (`read_file`).
-2. Report any deviation from spec before integrating; never overwrite an `Approved` asset without explicit user approval.
-3. Place inside the mapped `game/assets/` subfolder, verify `.import` (`Nearest`, `Mipmaps Off`, `Lossless`), test inside the target Godot scene on Windows, and advance status here.
+1. Inspect exact pixel dimensions, alpha transparency, frame grid alignment, unused-cell cleanliness, and seam continuity via `tools/asset_inspector.py` + direct visual review (`read_file`).
+2. Report any deviation from spec before integrating; never overwrite an `Approved` asset without explicit user permission.
+3. Place inside the mapped `game/assets/` subfolder, verify `.import` (`Nearest`, `Mipmaps Off`, `Lossless`), test inside the target Godot scene on actual Windows hardware, and advance status here.
 
 ---
 
-## 2. Master Asset Delivery Manifest (Current Status)
+## 3. Master Production Asset Delivery Manifest
 
 | Asset ID | Filename | Milestone | Category | Target Godot Destination | Priority | Status |
-| --- | --- | :---: | --- | --- | :---: | :---: |
-| `AST-000` | `icon.svg` | M00 (Bootstrap) | Project Icon | `game/assets/icon.svg` | Critical | **Integrated** *(Pending Windows visual sign-off)* |
-| `AST-001` | `char_mara_lin_sheet.png` | M01 (Visual & Movement Prototype) | Character Sprite Sheet | `game/assets/characters/player/char_mara_lin_sheet.png` | **Critical** | **Requested** |
-| `AST-002` | `env_amber_coast_ground_tileset.png` | M01 (Visual & Movement Prototype) | Core Ground Tileset | `game/assets/world/tilesets/env_amber_coast_ground_tileset.png` | **Critical** | **Requested** |
-| `AST-003` | `env_singing_canopy_ground_tileset.png` | M01 (Visual & Movement Prototype) | Core Ground Tileset | `game/assets/world/tilesets/env_singing_canopy_ground_tileset.png` | **Critical** | **Requested** |
-| `AST-004` | `prop_singing_reedwood_tree_sheet.png` | M01 (Visual & Movement Prototype) | Multi-Tile Tree & Canopy | `game/assets/world/props/prop_singing_reedwood_tree_sheet.png` | **Critical** | **Requested** |
-| `AST-005` | `prop_rimlands_flora_sheet.png` | M01 (Visual & Movement Prototype) | Starter Flora Props | `game/assets/world/flora/prop_rimlands_flora_sheet.png` | **High** | **Requested** |
-| `AST-006` | `prop_drop_pod_landmark_sheet.png` | M01 (Visual & Movement Prototype) | Hero Landmark Prop | `game/assets/world/landmarks/prop_drop_pod_landmark_sheet.png` | **High** | **Requested** |
-| `AST-007` | `fx_shadows_ripples_lens_sheet.png` | M01 (Visual & Movement Prototype) | Ground Shadows & VFX | `game/assets/vfx/fx_shadows_ripples_lens_sheet.png` | **High** | **Requested** |
-| `AST-008` | `sfx_rimlands_core_pack` (`10` `.ogg`/`.wav` clips) | M01/M02 (Feel & Audio Gate) | Surface Footsteps & Lens SFX | `game/audio/sfx/` | **Optional** *(High for M02)* | **Requested** |
+| :---: | --- | :---: | --- | --- | :---: | :---: |
+| `AST-000` | `icon.svg` | M00 | Project Icon | `game/assets/icon.svg` | Critical | **Integrated** *(Pending Windows visual sign-off)* |
+| `AST-001` | `char_mara_lin_sheet.png` | M01 | Character Sprite Sheet (`96×384`) | `game/assets/characters/player/char_mara_lin_sheet.png` | **Critical** | **Requested** *(Spec v2.0 Audited)* |
+| `AST-002` | `env_amber_coast_ground_tileset.png` | M01 | Core Ground Tileset (`192×128`) | `game/assets/world/tilesets/env_amber_coast_ground_tileset.png` | **Critical** | **Requested** *(Spec v2.0 Audited)* |
+| `AST-003` | `env_singing_canopy_ground_tileset.png` | M01 | Core Ground Tileset (`192×96`) | `game/assets/world/tilesets/env_singing_canopy_ground_tileset.png` | **Critical** | **Requested** *(Spec v2.0 Audited)* |
+| `AST-004` | `prop_singing_reedwood_tree_sheet.png` | M01 | Multi-Tile Tree & Canopy (`96×160`) | `game/assets/world/props/prop_singing_reedwood_tree_sheet.png` | **Critical** | **Requested** *(Spec v2.0 Audited)* |
+| `AST-005` | `prop_rimlands_flora_sheet.png` | M01 | Starter Flora Props (`64×128`) | `game/assets/world/flora/prop_rimlands_flora_sheet.png` | **High** | **Requested** *(Spec v2.0 Audited)* |
+| `AST-006` | `prop_drop_pod_landmark_sheet.png` | M01 | Hero Landmark Prop (`96×64`) | `game/assets/world/landmarks/prop_drop_pod_landmark_sheet.png` | **High** | **Requested** *(Spec v2.0 Audited)* |
+| `AST-007` | `fx_shadows_ripples_lens_sheet.png` | M01 | Ground Shadows & VFX (`128×96`) | `game/assets/vfx/fx_shadows_ripples_lens_sheet.png` | **High** | **Requested** *(Spec v2.0 Audited)* |
+| `AST-008` | `sfx_rimlands_core_pack` (`10` `.ogg`/`.wav`) | M01/M02 | Surface Footsteps & Lens SFX | `game/audio/sfx/` | **Optional** *(High for M02)* | **Requested** |
+
+### Temporary Debug Placeholder Registry (NEVER Counts as Production Art)
+
+> Per Rule 6 (*Do Not Block Progress Unnecessarily*), Milestone 01 engineering uses isolated, explicitly labeled debug geometry stored strictly under `game/assets/debug_placeholders/`. Every placeholder matches the **exact v2.0 audited dimensions and cell coordinates** so swapping final artwork requires zero code rewrite. **The Stage 05 Visual Prototype Gate CANNOT pass until every `DEBUG_PLACEHOLDER` below is replaced by approved production artwork and verified on Windows hardware.**
+
+| Replaces | Temporary Debug File (Non-Final) | Dimensions |
+| :---: | --- | :---: |
+| `AST-001` | `game/assets/debug_placeholders/debug_placeholder_char_mara_lin_sheet.png` | `96 × 384 px` |
+| `AST-002` | `game/assets/debug_placeholders/debug_placeholder_env_amber_coast_ground_tileset.png` | `192 × 128 px` |
+| `AST-003` | `game/assets/debug_placeholders/debug_placeholder_env_singing_canopy_ground_tileset.png` | `192 × 96 px` |
+| `AST-004` | `game/assets/debug_placeholders/debug_placeholder_prop_singing_reedwood_tree_sheet.png` | `96 × 160 px` |
+| `AST-005` | `game/assets/debug_placeholders/debug_placeholder_prop_rimlands_flora_sheet.png` | `64 × 128 px` |
+| `AST-006` | `game/assets/debug_placeholders/debug_placeholder_prop_drop_pod_landmark_sheet.png` | `96 × 64 px` |
+| `AST-007` | `game/assets/debug_placeholders/debug_placeholder_fx_shadows_ripples_lens_sheet.png` | `128 × 96 px` |
 
 ---
 
-## 3. Shared Visual Consistency & Viewport Constraints (Apply to ALL M01 Assets)
+## 4. Shared Visual Consistency & Viewport Constraints (Apply to ALL M01 Assets)
 
-- **Key Light Direction**: Locked **top-left (~45°)** warm golden-amber sunlight (*Aurelia-K* dwarf star) across all Milestone 01 daylight art. Shadows hue-shift toward cool slate-teal (`#2D423E` / `#1C485C`), never flat muddy black or grey.
-- **No Mixels / Strict `1:1` Pixel Density**: Every pixel in characters, tiles, trees, landmarks, and VFX MUST match the exact same `1×` logical grid (`16×16` base tiles inside `480×270` viewport). Never mix higher-res strokes or anti-aliased brushes!
-- **Living-Painting Readability Rule**: Keep Band 3 playable ground (`#B89A6C` sand, `#6F8A68` moss/forest floor) low-noise and painterly with soft organic gradients so Dr. Mara Lin (`16×24`, ~9% of screen height) reads effortlessly in motion without visual clutter.
-- **Seamless Neighbors (M01 Ecosystem Continuity)**:
-  - `env_amber_coast_ground_tileset.png` and `env_singing_canopy_ground_tileset.png` MUST share identical sand-to-grass border edge values (`#B89A6C` -> `#97AF7E` -> `#6F8A68`) so coastal beaches melt organically into the Reedwood forest without straight grid seams.
-  - `prop_singing_reedwood_tree_sheet.png` lower trunk roots MUST color-blend cleanly onto `#6F8A68` / `#3D5444` forest floor tiles, while overhead canopies use clean opaque/semi-cutout pixel silhouettes (avoid soft blurred drop-shadows to stay crisp and Intel HD 3000-friendly).
-
----
-
-## 4. Milestone 01 — Stage 05 Visual & Movement Prototype Gate (Exact Asset Specifications)
-
-> **Why These Exact 8 Assets Are Needed Next**: Milestone 01 validates *VERDANT SIGNAL*'s core visual identity and technical feasibility on Windows (`Godot 4.7.2` + `GL Compatibility` on Intel HD Graphics 3000): crisp `480×270` scaling on `1366×768`, `16×24` character legibility across bright sand AND shaded forest, tall canopy walk-behind cutaway occlusion, non-grid painterly shoreline/forest tiling, and live `60 FPS` `3×3` `TileMapLayer` streaming.
+- **Key Light Direction**: Locked **top-left (~45°)** warm golden-amber sunlight (*Aurelia-K* dwarf star). Shadows hue-shift cool (`#2D423E` / `#1C485C`), never flat muddy grey/black.
+- **No Mixels / Strict `1:1` Pixel Density**: Every pixel matches the `1×` logical grid (`16×16` tiles inside `480×270` viewport; scaled `2×` to `960×540` window). Zero anti-aliased brushes, zero Gaussian blur, zero mixed resolutions.
+- **Living-Painting Readability Rule**: Keep Band 3 playable ground (`#B89A6C` sand, `#6F8A68` moss) calm and painterly so Dr. Mara Lin (`16×24`, ~9% of screen height) pops cleanly in motion across both sunlit beach and shaded canopy.
+- **Intel HD Graphics 3000 (`GL Compatibility`) Constraint**: Avoid excessive stacked alpha blur layers; rely on crisp opaque pixel silhouettes and lightweight single-quad overlays.
+- **Seamless Neighbors**:
+  - `AST-003` ragged moss edges (`#6F8A68` / `#97AF7E`) composite directly over `AST-002` dry sand (`#B89A6C`) on `EcotoneOverlayLayer` (`z_index = 0`, above `GroundLayer`).
+  - `AST-004` lower tree roots ground onto `#6F8A68` / `#3D5444` forest floor tiles; `AST-006` drop-pod sand collar blends directly into `#B89A6C` / `#7C6549` coastal sand.
 
 ---
 
-### `AST-001` — `char_mara_lin_sheet.png`
+## 5. Audited Milestone 01 Asset Specifications (v2.0 — Zero Ambiguity)
+
+---
+
+### `AST-001` — `char_mara_lin_sheet.png` (**Priority: Critical**)
+
 1. **Asset Name**: `char_mara_lin_sheet.png`
-2. **Purpose**: Primary playable protagonist (**Dr. Mara Lin**) for locomotion, crouch-stealth, and Acoustic Field Lens aiming/scanning in the Milestone 01 prototype and Vertical Slice.
-3. **Visual Description**: Solitary human xenobotanist in a practical, weathered expedition field suit engineered for **dual-polarity readability** across both bright sand (`#B89A6C`) and deep reedwood shade (`#47695E`):
-   - Weathered ivory-white helmet dome & upper shoulder shell (`#F4EFE2`, shaded `#C9D0C8`) so she pops cleanly in dark forests.
-   - Deep charcoal-navy rugged trousers, boots, belt & compact field backpack (`#202A36`, shaded `#12161C`) so she pops cleanly on sunlit ochre sand.
-   - Warm terracotta-orange expedition strap/pack trim (`#FF6B3D`) and small glowing amber-gold visor/chest lens indicator (`#FFB838`) for immediate eye-tracking.
-   - Soft, crisp dark-navy selective outline (`#12161C`) — avoid muddy pure black boxes.
+2. **Purpose**: Primary playable protagonist (**Dr. Mara Lin**) for 8-direction movement, crouch-stealth, Y-sort readability, and Acoustic Field Lens scanning.
+3. **Visual Description**: Solitary human xenobotanist engineered for **dual-polarity readability** on both sunlit ochre sand (`#B89A6C`) and deep reedwood shade (`#47695E`):
+   - Weathered ivory-white helmet crown & upper jacket (`#F4EFE2`, shade `#C9D0C8`) for forest readability.
+   - Deep charcoal-navy rugged trousers, boots & field backpack (`#202A36`, shade `#12161C`) for bright-sand readability.
+   - **Asymmetrical Equipment Details (Why Mirroring Is Forbidden)**: Diagonal burnt-orange terracotta strap (`#FF6B3D`) running from Mara's left shoulder to right hip, **right-hip Acoustic Field Lens holster**, **right-handed Field Lens raise during `lens_scan_*`**, and glowing amber-gold visor/lens accent (`#FFB838`).
+   - Crisp selective dark-navy outline (`#12161C`).
 4. **Dimensions**:
-   - **Per Frame**: `16 × 24 px` (single character height ~`20–22 px` inside the `16×24` cell, leaving `2 px` top headroom for bobbing and `1–2 px` side clearance).
-   - **Total Sprite Sheet**: **`96 × 384 px`** (`6` columns × `16` rows, zero padding/spacing between cells).
-5. **Perspective**: Oblique 3/4 Top-Down (head/shoulders slightly angled from above, feet clearly grounded on the bottom baseline).
-6. **Style**: Painterly indie pixel art (*Hyper Light Drifter* × *Eastward* silhouette clarity), clean pixel clusters, zero mixels, zero soft anti-aliasing, warm top-left key light.
-7. **Animation (Single Combined Sprite Sheet — Transparent Background)**:
-   - **Layout**: `6` columns × `16` rows (`16×24` per cell -> `96×384 px` total). Unused trailing cells in shorter rows stay fully transparent.
-   - **Directions**: `4` dedicated directions (`down`, `up`, `right`, `left`) — separate `left` and `right` rows prevent backpack/tool asymmetry mirroring artifacts.
-   - **Exact Row-by-Row Frame Order & Playback**:
-     - Row `00` (`idle_down`): `4` frames (Cols `0–3`), subtle breathing & pack shift, `5 FPS`, looping.
-     - Row `01` (`idle_up`): `4` frames (Cols `0–3`), `5 FPS`, looping.
-     - Row `02` (`idle_right`): `4` frames (Cols `0–3`), `5 FPS`, looping.
-     - Row `03` (`idle_left`): `4` frames (Cols `0–3`), `5 FPS`, looping.
-     - Row `04` (`walk_down`): `6` frames (Cols `0–5`), crisp natural stride (`contact-down-pass-contact-down-pass`), `10 FPS`, looping.
-     - Row `05` (`walk_up`): `6` frames (Cols `0–5`), `10 FPS`, looping.
-     - Row `06` (`walk_right`): `6` frames (Cols `0–5`), `10 FPS`, looping.
-     - Row `07` (`walk_left`): `6` frames (Cols `0–5`), `10 FPS`, looping.
-     - Row `08` (`crouch_walk_down`): `4` frames (Cols `0–3`), lowered hunched careful stealth posture (~`17 px` tall), `7 FPS`, looping.
-     - Row `09` (`crouch_walk_up`): `4` frames (Cols `0–3`), `7 FPS`, looping.
-     - Row `10` (`crouch_walk_right`): `4` frames (Cols `0–3`), `7 FPS`, looping.
-     - Row `11` (`crouch_walk_left`): `4` frames (Cols `0–3`), `7 FPS`, looping.
-     - Row `12` (`lens_scan_down`): `2` frames (Cols `0–1`), raising Acoustic Field Lens with subtle amber visor glow pulse (`#FFB838`), `4 FPS`, looping while held.
-     - Row `13` (`lens_scan_up`): `2` frames (Cols `0–1`), `4 FPS`, looping while held.
-     - Row `14` (`lens_scan_right`): `2` frames (Cols `0–1`), `4 FPS`, looping while held.
-     - Row `15` (`lens_scan_left`): `2` frames (Cols `0–1`), `4 FPS`, looping while held.
-8. **Transparency**: Required (`RGBA` 32-bit PNG, fully transparent background; zero baked floor shadow — shadow comes from `AST-007` so elevation/water reflections behave cleanly!).
-9. **Pivot / Origin**: Bottom-center at **`(8, 22)`** inside each `16×24` frame (feet planted squarely on row `y = 22` so Y-sorting against trees and rocks aligns pixel-accurately).
-10. **Variations**: `4` directional views × `4` animation states (`16` rows total on one sheet).
-11. **Godot Integration**:
-    - Target Path: `game/assets/characters/player/char_mara_lin_sheet.png`
-    - Node Type: `Sprite2D` (`hframes = 6`, `vframes = 16`, `offset = Vector2(0, -10)`) driven by `AnimationPlayer` (or `AnimatedSprite2D` using `AtlasTexture`) inside `CharacterBody2D` on `YSortWorldLayer`.
-    - Import Settings: `Compress = Lossless`, `Mipmaps = Off`, `Filter = Nearest` (project default).
-12. **Priority**: **Critical** (required to test real `16×24` silhouette legibility, contrast, and canopy occlusion in Milestone 01).
-
----
-
-### `AST-002` — `env_amber_coast_ground_tileset.png`
-1. **Asset Name**: `env_amber_coast_ground_tileset.png`
-2. **Purpose**: Primary ground, curved shoreline, shallow tidal water, and low coastal rock-ledge tileset for **Biome 01 — Amber Kelp Littoral** (crash-landing zone).
-3. **Visual Description**: Painterly warm alien littoral coastline under golden sunlight:
-   - Dry & damp ochre sand (`#B89A6C` base, `#D7BE91` sunlit ripples, `#9B7F58` wet shoreline band, `#7C6549` tidal pebbles/shadows).
-   - Translucent teal coastal water (`#367E8A` shallow turquoise, `#1C485C` deeper water edge, crisp `#C9DCE3` 1 px organic sea-foam edges).
-   - Layered weathered coastal sandstone/basalt low cliffs (`#7E9AA2` sunlit top rim, `#566B73` vertical rock face, `#2D423E` base shadow).
-   - **Anti-Grid Rule**: Avoid repetitive checkerboard sand noise; keep 70% of center sand tiles calm & smooth with subtle organic wind ripples, putting crisp detail along curved shore bevels and sparse shell/pebble variants.
-4. **Dimensions**:
-   - **Tile Size**: `16 × 16 px` exact grid.
-   - **Total Atlas Dimensions**: **`192 × 128 px`** (`12` columns × `8` rows, `0 px` padding — Godot `TileSetAtlasSource` `use_texture_padding = true` handles seam protection cleanly).
-5. **Perspective**: Oblique 3/4 Top-Down (cliff vertical faces clearly visible on southern/front edges, top walkable faces angled gently downward).
-6. **Style**: Painterly pixel art, hue-shifted warm-to-cool ramps, zero harsh black tile borders, seamlessly tileable across repeating ground/water cells.
-7. **Animation**: Static terrain tileset PLUS `2`-frame gentle shoreline foam / water shimmer rows included cleanly in the bottom rows:
-   - **Exact Atlas Grid Map (`12 cols × 8 rows`)**:
-     - Rows `0–2`, Cols `0–3` (`4×3`): `12` core dry-sand autotile pieces + `4` subtle sand-ripple/pebble variation tiles (Cols `4–7`, Row `0`).
-     - Rows `0–2`, Cols `4–11`: Curved **Dry Sand -> Wet Sand -> Shallow Water** shoreline autotile set (outer corners, inner corners, straight N/S/E/W curved bevels — `16` tiles minimum).
-     - Rows `3–5`, Cols `0–5`: **Low Coastal Rock Ledge / Cliff** autotile set (top cap, front vertical rock face `16–32 px` visual drop, left/right cliff corners, inner notches).
-     - Rows `3–5`, Cols `6–11`: **Shallow Tidal Pool & Submerged Sandbars** (walkable knee-deep water tiles + wet dark-ochre mud/shell borders for *Drift-Wreck Cove* Low Tide!).
-     - Row `6`, Cols `0–7`: **Animated Water Surface & Foam Frame A** (`4` shallow water shimmer + `4` N/S/E/W foam edge tiles).
-     - Row `7`, Cols `0–7`: **Animated Water Surface & Foam Frame B** (matching `2 FPS` gentle surf loop with Row `6`; remaining cells Cols `8–11` reserved for organic beach pebbles, driftwood, and washed-up kelp decals).
-8. **Transparency**: Required (`RGBA` 32-bit PNG; transparent outside curved shoreline edges, cliff overlays, and beach decals so layers composite cleanly on stacked `TileMapLayer` nodes!).
-9. **Pivot / Origin**: Standard `TileMapLayer` cell center `(8, 8)` per `16×16` tile.
-10. **Variations**: `4` seamless dry sand floor variants, `2` animated water shimmer frames, `4` beach debris/pebble decals.
-11. **Godot Integration**:
-    - Target Path: `game/assets/world/tilesets/env_amber_coast_ground_tileset.png`
-    - Node Type: `TileSetAtlasSource` (`texture_region_size = Vector2i(16, 16)`, `use_texture_padding = true`) across `WaterBaseLayer`, `GroundLayer` (with `custom_data("surface_type") = "sand" | "shallow_water"`), `CliffWallCollisionLayer` (`physics_quadrant_size = 16`), and `GroundDecalShadowLayer`.
-    - Import Settings: `Compress = Lossless`, `Mipmaps = Off`, `Filter = Nearest`.
-12. **Priority**: **Critical** (foundation of the Milestone 01 playable coastline & `TileMapLayer` streaming benchmark).
-
----
-
-### `AST-003` — `env_singing_canopy_ground_tileset.png`
-1. **Asset Name**: `env_singing_canopy_ground_tileset.png`
-2. **Purpose**: Ground terrain, moss borders, root-lined forest paths, and seamless sand-to-forest ecotone transition tiles for **Biome 02 — Singing Reedwood Canopy**.
-3. **Visual Description**: Lush, painterly olive-sage alien woodland floor (`#6F8A68` base moss/leaf litter, `#97AF7E` warm sun-dappled patches, `#3D5444` deep canopy floor shadows, `#47695E` cool background moss edges) paired with pale golden-ochre worn footpath dirt (`#B89A6C` / `#8C7757`) and shallow forest creek water (`#4B8B82`).
-   - **Mandatory Neighbor Seamlessness**: Ecotone transition tiles MUST connect cleanly on their outer transparent edges to `env_amber_coast_ground_tileset.png`'s `#B89A6C` ochre sand so coastal grass tufts overlap beach sand naturally!
-4. **Dimensions**:
-   - **Tile Size**: `16 × 16 px` exact grid.
-   - **Total Atlas Dimensions**: **`192 × 96 px`** (`12` columns × `6` rows, `0 px` padding).
-5. **Perspective**: Oblique 3/4 Top-Down matching `AST-002` identically.
-6. **Style**: Painterly pixel art, soft low-noise turf clusters (never noisy 1 px grass static!), cohesive hue-shifted teal-olive shadows matching `AST-002`.
-7. **Animation**: Static tileset (ambient forest movement comes from `AST-004` tree sway & `AST-005` swaying flora!).
-   - **Exact Atlas Grid Map (`12 cols × 6 rows`)**:
-     - Rows `0–2`, Cols `0–3`: `4` seamless olive-sage moss base floor tiles + `8` **Forest Floor -> Coastal Sand** ragged organic edge transition tiles (overlapping grass tufts & exposed reed roots!).
-     - Rows `0–2`, Cols `4–11`: **Root-Lined Dirt Trail** autotile set (straight, curved corners, junctions, worn clearing patches).
-     - Rows `3–5`, Cols `0–5`: **Elevated Mossy Forest Terrace / Root-Bank Ledge** (matching `AST-002` cliff height grammar for multi-tier glades!).
-     - Rows `3–5`, Cols `6–11`: **Forest Stream Bank (`#4B8B82`) & Ground Decals** (fallen hollow reed segments, dappled sun-spot decals, clover/lichen moss patches, stepping stones).
-8. **Transparency**: Required (`RGBA` 32-bit PNG; transparent outside organic transition edges, root overhangs, and ground decals).
-9. **Pivot / Origin**: Standard `TileMapLayer` cell center `(8, 8)` per `16×16` tile.
-10. **Variations**: `4` calm base turf variants + `6` organic ground litter/root decals.
-11. **Godot Integration**:
-    - Target Path: `game/assets/world/tilesets/env_singing_canopy_ground_tileset.png`
-    - Node Type: `TileSetAtlasSource` (`16×16`, `use_texture_padding = true`) on `GroundLayer` (`custom_data("surface_type") = "reedwood_floor"`), `CliffWallCollisionLayer`, and `GroundDecalShadowLayer`.
-    - Import Settings: `Compress = Lossless`, `Mipmaps = Off`, `Filter = Nearest`.
-12. **Priority**: **Critical** (required to test dual-polarity contrast and seamless biome transitions in Milestone 01).
-
----
-
-### `AST-004` — `prop_singing_reedwood_tree_sheet.png`
-1. **Asset Name**: `prop_singing_reedwood_tree_sheet.png`
-2. **Purpose**: Signature towering alien tree (**Singing Reedwood**, *Arundo sonoris*) proving our "small astronaut in sweeping painted nature" scale AND testing **walk-behind translucent canopy fadeaways** in Oblique 3/4 Top-Down!
-3. **Visual Description**: Cathedral-tall, slender, slightly fluted hollow reed-tree (`~3.3×` Dr. Mara Lin's height!):
-   - **Lower Trunk & Buttress Roots**: Pale warm-ochre / weathered driftwood-olive segmented hollow reed column (`#9B8F74` sunlit left ridge, `#5F6652` mid-bark, `#313D36` deep shadow) featuring **distinct carved vertical dark wind-slits** (`#1B2624`) along the upper trunk that catch faint golden internal resonance glow (`#FFB838`) when wind passes through! Root flare grips `#3D5444` mossy ground cleanly.
-   - **Upper Feathery Canopy Crown**: Sweeping painterly layered fronds/plumes in muted seafoam-sage (`#97AF7E` sunlit crown tips, `#6F8A68` mid-fronds, `#47695E` deep underside shade, `#2D423E` shadow recesses) arching organically outward.
-   - **Critical Layer Split**: Each tree is split cleanly across two adjacent columns — **Lower Trunk/Roots** (solid Y-sorted collision trunk) and **Overhead Canopy Crown** (placed on `CanopyWeatherOverlayLayer` so it smoothly fades translucent when Mara walks behind it without fading the grounded trunk!).
-4. **Dimensions**:
-   - **Per Cell**: `48 × 80 px` (spanning `3 × 5` world tiles!).
-   - **Total Sheet Dimensions**: **`96 × 160 px`** (`2` columns × `2` rows, `0 px` padding).
-5. **Perspective**: Oblique 3/4 Top-Down (roots grounded cleanly near bottom, tall fluted trunk rising vertically, feathery canopy overhanging upward and slightly forward).
-6. **Style**: Painterly pixel clusters (think Ghibli foliage depth in crisp `1×` pixel art — lush layered silhouette masses, never random single-pixel leaf noise!).
-7. **Animation**: Static split-layer sprite sheet (gentle organic wind sway & storm-bending driven cleanly via our lightweight Stage 05 `pixel_wind_sway.gdshader` — Intel HD 3000 friendly!).
-   - **Exact Sheet Layout (`2 cols × 2 rows`, `48×80` per cell -> `96×160 px`)**:
-     - Row `0`, Col `0`: **Variant A — Lower Fluted Trunk & Grounded Roots** (trunk base sits at `y = 66..76`, upper trunk cuts cleanly behind canopy).
-     - Row `0`, Col `1`: **Variant A — Overhead Canopy Crown** (registered pixel-for-pixel at the EXACT same `48×80` canvas coordinates as Col `0` so stacking Col `1` directly over Col `0` assembles the complete seamless tree!).
-     - Row `1`, Col `0`: **Variant B — Slightly Leaning Twin-Stem Fluted Trunk & Roots** (breaks visual repetition in groves).
-     - Row `1`, Col `1`: **Variant B — Matching Overhead Canopy Crown** (pixel-registered to Row `1`, Col `0`).
-8. **Transparency**: Required (`RGBA` 32-bit PNG, fully transparent outside trunk/canopy silhouettes; zero baked ground shadow).
-9. **Pivot / Origin**: Trunk base bottom-center at **`(24, 72)`** inside each `48×80` cell (both Col `0` and Col `1` share identical `(24, 72)` registration!).
-10. **Variations**: `2` distinct tree silhouettes × `2` registered layers (`trunk` + `canopy`).
-11. **Godot Integration**:
-    - Target Path: `game/assets/world/props/prop_singing_reedwood_tree_sheet.png`
-    - Node Type: Reusable `StaticBody2D` scene (`YSortWorldLayer`) with trunk `Sprite2D` + compact foot `CollisionShape2D` (`16×10 px` capsule at trunk base) + canopy `Sprite2D` (`z_index` / `CanopyWeatherOverlayLayer` + `Area2D` on `layer_8="canopy_occluder"` triggering smooth `0.35` alpha cutaway fade when Mara enters behind it).
-    - Import Settings: `Compress = Lossless`, `Mipmaps = Off`, `Filter = Nearest`.
-12. **Priority**: **Critical** (essential for Milestone 01's scale check, Y-sorting, and canopy-occlusion verification!).
-
----
-
-### `AST-005` — `prop_rimlands_flora_sheet.png`
-1. **Asset Name**: `prop_rimlands_flora_sheet.png`
-2. **Purpose**: Interactive starter botanical props populating the Milestone 01 coastline & reedwood edge (`Amber Tide-Kelp`, `Mirror Glasswort`, `Sun-Drop Bulb`, `Cordage Frond`).
-3. **Visual Description**: Four unmistakable alien plant silhouettes anchored in `amber_kelp_coast` and `singing_canopy` palettes:
-   - **Amber Tide-Kelp (`fl_01`)**: Tall translucent golden-amber ribbon kelp (`#E49836` mid, `#FFC648` sunlit rim, `#8C5320` wet stem base) rising from coastal shallows/wet sand.
-   - **Mirror Glasswort (`fl_02`)**: Compact crystalline sea-glass succulent cluster (`#C9DCE3` specular tips, `#7E9AA2` translucent stalks, `#367E8A` wet shadow) hugging sandy coves.
-   - **Sun-Drop Bulb (`fl_04`)**: Warm bulbous forest-edge shrub with glowing honey-gold nectar petals (`#FFB838` / `#FFE047` open bloom inside `#47695E` cupped sepals; closed tight olive bud at night!).
-   - **Cordage Frond (`fl_05`)**: Broad tough woven-ribbed fern fronds (`#6F8A68` / `#97AF7E` fibrous veins, `#3D5444` base).
-4. **Dimensions**:
-   - **Per Cell**: `16 × 32 px` uniform cell grid (shorter `16×16` ground plants occupy the bottom half `y = 16..31` cleanly!).
-   - **Total Sheet Dimensions**: **`64 × 128 px`** (`4` columns × `4` rows, `0 px` padding).
+   - **Per Frame**: **`16 × 24 px`** (standing figure occupies `x = 2..13`, `y = 2..22`, leaving `2 px` headroom for walk bobbing and `1 px` bottom safety row `y = 23`).
+   - **Total Sprite Sheet**: **`96 × 384 px`** (`6` columns × `16` rows = `96` cells, `0 px` padding/spacing).
 5. **Perspective**: Oblique 3/4 Top-Down.
-6. **Style**: Painterly pixel art, distinct readable shapes even in grayscale, crisp dark-tinted bases grounding into sand/moss.
-7. **Animation & Exact Sheet Layout (`4 cols × 4 rows`, `16×32` per cell -> `64×128 px`, transparent PNG)**:
-   - Row `0`, Cols `0–3`: **`Amber Tide-Kelp`** — `4`-frame gentle sea-breeze sway cycle (`4 FPS`, looping).
-   - Row `1`, Cols `0–1`: **`Mirror Glasswort`** — `2` static shape variations (Cols `2–3` transparent).
-   - Row `2`, Cols `0–1`: **`Sun-Drop Bulb`** — Col `0`: *Daytime Open Blooming State*, Col `1`: *Nighttime Closed Bud State* (Cols `2–3` transparent).
-   - Row `3`, Cols `0–1`: **`Cordage Frond`** — `2` static clump variations (Cols `2–3` transparent).
-8. **Transparency**: Required (`RGBA` 32-bit PNG, transparent background).
-9. **Pivot / Origin**: Bottom-center at **`(8, 30)`** inside each `16×32` cell for accurate Y-sorting.
-10. **Variations**: `4` distinct flora species covering `10` total frames/variants on one clean sheet.
+6. **Style**: Painterly indie pixel art (*Hyper Light Drifter* × *Eastward* silhouette clarity), warm top-left 45° key light, zero mixels.
+7. **Animation & Exact Frame-by-Frame Sheet Layout (`96 × 384 px`, Single Sheet, Transparent PNG)**:
+   - **Directional Mirroring Policy**: **HORIZONTAL MIRRORING (`flip_h`) IS EXPLICITLY DISALLOWED.** Because Mara's diagonal strap, right-hip lens holster, right-hand scan posture, and top-left 45° sunlight are asymmetrical, `right` and `left` MUST be individually drawn across dedicated rows.
+   - **Cell Accounting**: **`64` populated frames** + **`32` explicitly unused fully-transparent cells (`RGBA = 0,0,0,0`)** = `96` total cells (`hframes = 6, vframes = 16`).
+
+| Row | Animation Name | Direction | Frame Count | Populated Cols | Flat `Sprite2D.frame` Indices | Unused Transparent Cols | Playback |
+| :---: | --- | :---: | :---: | :---: | :---: | :---: | :---: |
+| `00` | `idle_down` | Down (South) | `4` | `0, 1, 2, 3` | `0, 1, 2, 3` | `4, 5` (indices `4, 5`) | `5 FPS`, Loop |
+| `01` | `idle_up` | Up (North) | `4` | `0, 1, 2, 3` | `6, 7, 8, 9` | `4, 5` (indices `10, 11`) | `5 FPS`, Loop |
+| `02` | `idle_right` | Right (East) | `4` | `0, 1, 2, 3` | `12, 13, 14, 15` | `4, 5` (indices `16, 17`) | `5 FPS`, Loop |
+| `03` | `idle_left` | Left (West) | `4` | `0, 1, 2, 3` | `18, 19, 20, 21` | `4, 5` (indices `22, 23`) | `5 FPS`, Loop |
+| `04` | `walk_down` | Down (South) | `6` | `0, 1, 2, 3, 4, 5` | `24, 25, 26, 27, 28, 29` | *None* | `10 FPS`, Loop |
+| `05` | `walk_up` | Up (North) | `6` | `0, 1, 2, 3, 4, 5` | `30, 31, 32, 33, 34, 35` | *None* | `10 FPS`, Loop |
+| `06` | `walk_right` | Right (East) | `6` | `0, 1, 2, 3, 4, 5` | `36, 37, 38, 39, 40, 41` | *None* | `10 FPS`, Loop |
+| `07` | `walk_left` | Left (West) | `6` | `0, 1, 2, 3, 4, 5` | `42, 43, 44, 45, 46, 47` | *None* | `10 FPS`, Loop |
+| `08` | `crouch_walk_down` | Down (South) | `4` | `0, 1, 2, 3` | `48, 49, 50, 51` | `4, 5` (indices `52, 53`) | `7 FPS`, Loop |
+| `09` | `crouch_walk_up` | Up (North) | `4` | `0, 1, 2, 3` | `54, 55, 56, 57` | `4, 5` (indices `58, 59`) | `7 FPS`, Loop |
+| `10` | `crouch_walk_right` | Right (East) | `4` | `0, 1, 2, 3` | `60, 61, 62, 63` | `4, 5` (indices `64, 65`) | `7 FPS`, Loop |
+| `11` | `crouch_walk_left` | Left (West) | `4` | `0, 1, 2, 3` | `66, 67, 68, 69` | `4, 5` (indices `70, 71`) | `7 FPS`, Loop |
+| `12` | `lens_scan_down` | Down (South) | `2` | `0, 1` | `72, 73` | `2, 3, 4, 5` (`74..77`) | `4 FPS`, Loop |
+| `13` | `lens_scan_up` | Up (North) | `2` | `0, 1` | `78, 79` | `2, 3, 4, 5` (`80..83`) | `4 FPS`, Loop |
+| `14` | `lens_scan_right` | Right (East) | `2` | `0, 1` | `84, 85` | `2, 3, 4, 5` (`86..89`) | `4 FPS`, Loop |
+| `15` | `lens_scan_left` | Left (West) | `2` | `0, 1` | `90, 91` | `2, 3, 4, 5` (`92..95`) | `4 FPS`, Loop |
+
+   - **Walk Cycle Frame Order (`walk_*`, 6 frames)**: `Col 0` Left-foot contact -> `Col 1` Down recoil (`+1 px` lower) -> `Col 2` Passing -> `Col 3` Right-foot contact -> `Col 4` Down recoil (`+1 px` lower) -> `Col 5` Passing.
+   - **Crouch Walk Posture (`crouch_walk_*`, 4 frames)**: Hunched silhouette ~`17 px` tall (`y = 6..22`), feet stay planted on `y = 22`.
+8. **Transparency**: Required (`RGBA` 32-bit PNG, fully transparent background; zero baked floor shadow — shadow comes from `AST-007`).
+9. **Pivot / Origin & Godot Offset Proof**:
+   - Ground contact foot-center inside every `16×24` frame: **`(8, 22)`** (soles rest on row `y = 22`).
+   - Frame geometric center: `(8, 12)`.
+   - With `Sprite2D.centered = true`: `offset = Vector2(8 - 8, 12 - 22) = Vector2(0, -10)`. Pixel `(8, 22)` maps identically to `CharacterBody2D` local origin `(0, 0)` (exact Y-sort anchor!).
+10. **Variations**: `4` dedicated non-mirrored directions × `4` locomotion/tool states (`16` rows).
 11. **Godot Integration**:
-    - Target Path: `game/assets/world/flora/prop_rimlands_flora_sheet.png`
-    - Node Type: Modular flora `Node2D` scenes (`Sprite2D` region / `AnimatedSprite2D` on `YSortWorldLayer` + `Area2D` on `layer_5="interactable_flora"`).
-    - Import Settings: `Compress = Lossless`, `Mipmaps = Off`, `Filter = Nearest`.
-12. **Priority**: **High** (brings Milestone 01 coastline & glades to life and validates ecological Poisson spacing visually).
+    - Path: `game/assets/characters/player/char_mara_lin_sheet.png`
+    - Node: `Sprite2D` (`hframes = 6`, `vframes = 16`, `centered = true`, `offset = Vector2(0, -10)`) inside `Player` (`CharacterBody2D`, `motion_mode = MOTION_MODE_FLOATING`, `collision_layer = 2`, `collision_mask = 5`, foot `RectangleShape2D(10, 6)` at `(0, -2)`).
+    - Import: `Compress = Lossless`, `Mipmaps = Off`, `Filter = Nearest`.
+12. **Priority**: **Critical**.
 
 ---
 
-### `AST-006` — `prop_drop_pod_landmark_sheet.png`
+### `AST-002` — `env_amber_coast_ground_tileset.png` (**Priority: Critical**)
+
+1. **Asset Name**: `env_amber_coast_ground_tileset.png`
+2. **Purpose**: Ground sand, curved coastlines, walkable shallow tidal pools, low coastal cliffs, beach decals, and animated coastal water/foam for **Biome 01 — Amber Kelp Littoral**.
+3. **Visual Description**: Warm ochre coastal sand (`#B89A6C` base, `#D7BE91` sunlit ripple, `#9B7F58` damp shore edge, `#7C6549` pebble shade), translucent turquoise-teal coastal water (`#367E8A` shallow, `#1C485C` deep, `#C9DCE3` 1 px organic sea-foam), weathered coastal sandstone/basalt ledges (`#7E9AA2` top cap, `#566B73` vertical front rock face, `#2D423E` base shade). Keep center sand tiles calm & low-noise so characters pop clearly.
+4. **Dimensions**: **`16 × 16 px`** tile grid · **`192 × 128 px`** total atlas (`12` columns × `8` rows = `96` cells, `0 px` padding; Godot `use_texture_padding = true`).
+5. **Perspective**: Oblique 3/4 Top-Down (southern vertical cliff faces clearly readable).
+6. **Style**: Painterly pixel art, zero harsh grid outlines, seamlessly tileable across repeating ground/water regions.
+7. **Animation & Exact Non-Overlapping `12 × 8` (`96`-Cell) Atlas Coordinate Map**:
+   - Every `(col, row)` coordinate is uniquely assigned (`18 + 12 + 6 + 18 + 12 + 6 unused + 24 animated = 96` cells; **zero overlaps**).
+   - **Animated Water Layout Rule**: Godot 4 `TileSetAtlasSource` reads consecutive frames horizontally (`animation_columns = 2`, `animation_frames_count = 2`, `animation_speed = 2.0 FPS`). Rows `6` and `7` therefore hold `6` side-by-side 2-frame pairs each (`12` animated water/foam tiles total).
+
+| Atlas Coords `(col, row)` | Tile Role / Exact Description | Godot Layer | `surface_type` / Physics / Terrain Bitmask |
+| --- | --- | --- | --- |
+| `(0,0)` | Full Dry Ochre Sand A (calm base, weight `0.55`) | `GroundLayer` | `sand` · **Terrain Set 0 (`MATCH_CORNERS`) T0**: `TL+TR+BL+BR` |
+| `(1,0)` | Full Dry Sand B (subtle wind ripple, weight `0.20`) | `GroundLayer` | `sand` · **Set 0 T0**: `TL+TR+BL+BR` |
+| `(2,0)` | Full Dry Sand C (tiny pebbles, weight `0.15`) | `GroundLayer` | `sand` · **Set 0 T0**: `TL+TR+BL+BR` |
+| `(3,0)` | Full Dry Sand D (faint shell glint, weight `0.10`) | `GroundLayer` | `sand` · **Set 0 T0**: `TL+TR+BL+BR` |
+| `(4,0)` | Curved Sand Cape — Outer NW Corner | `GroundLayer` | `sand` · **Set 0 T0**: `BR` only (transparent NW/NE/SW) |
+| `(5,0)` | Curved Coastline — North Edge (water north) | `GroundLayer` | `sand` · **Set 0 T0**: `BL+BR` |
+| `(6,0)` | Curved Sand Cape — Outer NE Corner | `GroundLayer` | `sand` · **Set 0 T0**: `BL` only |
+| `(7,0)` | Curved Coastline — West Edge (water west) | `GroundLayer` | `sand` · **Set 0 T0**: `TR+BR` |
+| `(0,1)` | Concave Cove Bay — Inner NW Water Notch | `GroundLayer` | `sand` · **Set 0 T0**: `TR+BL+BR` |
+| `(1,1)` | Concave Cove Bay — Inner NE Water Notch | `GroundLayer` | `sand` · **Set 0 T0**: `TL+BL+BR` |
+| `(2,1)` | Concave Cove Bay — Inner SW Water Notch | `GroundLayer` | `sand` · **Set 0 T0**: `TL+TR+BR` |
+| `(3,1)` | Concave Cove Bay — Inner SE Water Notch | `GroundLayer` | `sand` · **Set 0 T0**: `TL+TR+BL` |
+| `(4,1)` | Curved Coastline — East Edge (water east) | `GroundLayer` | `sand` · **Set 0 T0**: `TL+BL` |
+| `(5,1)` | Curved Sand Cape — Outer SW Corner | `GroundLayer` | `sand` · **Set 0 T0**: `TR` only |
+| `(6,1)` | Curved Coastline — South Edge (water south) | `GroundLayer` | `sand` · **Set 0 T0**: `TL+TR` |
+| `(7,1)` | Curved Sand Cape — Outer SE Corner | `GroundLayer` | `sand` · **Set 0 T0**: `TL` only |
+| `(0,2)` | Diagonal Sand Spit Bridge (NW–SE) | `GroundLayer` | `sand` · **Set 0 T0**: `TL+BR` |
+| `(1,2)` | Diagonal Sand Spit Bridge (NE–SW) | `GroundLayer` | `sand` · **Set 0 T0**: `TR+BL` |
+| `(2,2)`–`(7,2)` | **6 Beach Decals** (transparent): `(2,2)` Shells, `(3,2)` Washed Kelp, `(4,2)` Driftwood, `(5,2)` Tide Puddle, `(6,2)` Pebble Cluster, `(7,2)` Wind Drift | `GroundDecalShadowLayer` | Decorative only (no physics) |
+| `(8,0)`–`(11,0)` | **Shallow Tidal Pool & Wet Sandbars**: `(8,0)` Shallow Water A, `(9,0)` Shallow Water B, `(10,0)` Wet Dark Sandbar A, `(11,0)` Wet Sandbar Pebbles | `GroundLayer` | `shallow_water` (walkable, 75% speed + ripples!) |
+| `(8,1)`–`(11,1)` | Curved Wet-Sandbar / Tidal-Pool Edges: `(8,1)` N, `(9,1)` S, `(10,1)` W, `(11,1)` E | `GroundLayer` | `shallow_water` |
+| `(8,2)`–`(11,2)` | Curved Wet-Sandbar / Tidal-Pool Corners: `(8,2)` NW, `(9,2)` NE, `(10,2)` SW, `(11,2)` SE | `GroundLayer` | `shallow_water` |
+| `(0,3)`–`(5,3)` | **Low Coastal Cliff Top Cap**: `(0,3)` NW Rim, `(1,3)` N Rim, `(2,3)` NE Rim, `(3,3)` Plateau Center A, `(4,3)` Plateau Center B, `(5,3)` Solo Boulder Cap | `CliffWallCollisionLayer` | **Terrain Set 1 (`MATCH_CORNERS_AND_SIDES`) T0** · Solid `layer_1` |
+| `(0,4)`–`(5,4)` | **Coastal Cliff Mid / Inner Corners**: `(0,4)` W Rim, `(1,4)` Center C, `(2,4)` E Rim, `(3,4)` Inner NW, `(4,4)` Inner NE, `(5,4)` Side Pillar Mid | `CliffWallCollisionLayer` | **Set 1 T0** · Solid `layer_1` |
+| `(0,5)`–`(5,5)` | **Coastal Cliff South Vertical Face**: `(0,5)` SW Vertical Drop, `(1,5)` S Vertical Face A, `(2,5)` S Vertical Face B, `(3,5)` SE Vertical Drop, `(4,5)` Base Shadow Fringe, `(5,5)` Narrow Rock Notch | `CliffWallCollisionLayer` | **Set 1 T0** · Solid `layer_1` |
+| `(6,3)`–`(11,3)` | **Deep Water Shelf**: `(6,3)` Deep Water A, `(7,3)` Deep Water B, `(8,3)` Shelf N, `(9,3)` Shelf S, `(10,3)` Shelf W, `(11,3)` Shelf E | `WaterBaseLayer` | `deep_water` · Impassable border (`layer_1`) |
+| `(6,4)`–`(11,4)` | **Deep Water Corners & Reefs**: `(6,4)` NW, `(7,4)` NE, `(8,4)` SW, `(9,4)` SE, `(10,4)` Submerged Reef A, `(11,4)` Submerged Reef B | `WaterBaseLayer` | `deep_water` · Impassable border (`layer_1`) |
+| `(6,5)`–`(11,5)` | **`6` EXPLICITLY UNUSED / TRANSPARENT CELLS** (`RGBA = 0,0,0,0`) | — | Reserved for Low/High Tide expansion |
+| `(0,6)+(1,6)` | **Anim Pair 0**: Open Shallow Water Shimmer A (Frame 0 + Frame 1) | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(2,6)+(3,6)` | **Anim Pair 1**: Open Shallow Water Shimmer B | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(4,6)+(5,6)` | **Anim Pair 2**: Deep Water Swell | `WaterBaseLayer` | `deep_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(6,6)+(7,6)` | **Anim Pair 3**: North Shore Sea-Foam Lap | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(8,6)+(9,6)` | **Anim Pair 4**: South Shore Sea-Foam Lap | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(10,6)+(11,6)` | **Anim Pair 5**: West Shore Sea-Foam Lap | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(0,7)+(1,7)` | **Anim Pair 6**: East Shore Sea-Foam Lap | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(2,7)+(3,7)` | **Anim Pair 7**: NW Corner Foam | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(4,7)+(5,7)` | **Anim Pair 8**: NE Corner Foam | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(6,7)+(7,7)` | **Anim Pair 9**: SW Corner Foam | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(8,7)+(9,7)` | **Anim Pair 10**: SE Corner Foam | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(10,7)+(11,7)` | **Anim Pair 11**: Tidal Pool Gentle Shimmer | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+
+8. **Transparency**: Required (`RGBA` 32-bit PNG; transparent outside curved sand coastlines, cliffs, decals, and unused cells).
+9. **Pivot / Origin**: `TileMapLayer` standard tile center `(8, 8)`.
+10. **Variations**: `4` dry-sand base variants, `6` beach decals, `12` horizontal `2`-frame water/foam loops.
+11. **Godot Integration**:
+    - Path: `game/assets/world/tilesets/env_amber_coast_ground_tileset.png`
+    - `TileSet` Config: `tile_size = Vector2i(16, 16)`, `TileSetAtlasSource` (`source_id = 0`, `texture_region_size = Vector2i(16, 16)`, `use_texture_padding = true`), `Custom Data Layer 0 = "surface_type" (TYPE_STRING)`, `Physics Layer 0 = layer 1 ("world_solid")`, `Terrain Set 0 = TERRAIN_MODE_MATCH_CORNERS`, `Terrain Set 1 = TERRAIN_MODE_MATCH_CORNERS_AND_SIDES`.
+    - Import: `Compress = Lossless`, `Mipmaps = Off`, `Filter = Nearest`.
+12. **Priority**: **Critical**.
+
+---
+
+### `AST-003` — `env_singing_canopy_ground_tileset.png` (**Priority: Critical**)
+
+1. **Asset Name**: `env_singing_canopy_ground_tileset.png`
+2. **Purpose**: Forest floor moss, ragged coastal-sand ecotone border, 4-bit root-lined dirt footpaths, mossy root-bank terraces, decals, and forest creek tiles for **Biome 02 — Singing Reedwood Canopy**.
+3. **Visual Description**: Painterly olive-sage forest floor (`#6F8A68` base, `#97AF7E` dappled sun patches, `#3D5444` deep shade, `#47695E` cool edges), worn golden-ochre footpath (`#B89A6C` / `#8C7757` bordered by dark roots `#3D5444`), forest stream water (`#4B8B82`). Outer ecotone edges (`Rows 0–2, Cols 0–7`) MUST overlap transparently onto `AST-002`'s `#B89A6C` sand with organic grass blades & moss tufts!
+4. **Dimensions**: **`16 × 16 px`** tile grid · **`192 × 96 px`** total atlas (`12` columns × `6` rows = `72` cells, `0 px` padding).
+5. **Perspective & Style**: Oblique 3/4 Top-Down matching `AST-002` identically; low-noise painterly turf clusters.
+6. **Animation & Exact Non-Overlapping `12 × 6` (`72`-Cell) Atlas Coordinate Map**:
+   - Every `(col, row)` coordinate uniquely assigned (`18 + 16 + 6 + 18 + 6 + 8 animated = 72` cells; **zero overlaps, zero wasted cells**).
+
+| Atlas Coords `(col, row)` | Tile Role / Exact Description | Godot Layer | `surface_type` / Physics / Terrain Bitmask |
+| --- | --- | --- | --- |
+| `(0,0)`–`(3,0)` | `4` Calm Olive-Sage Moss Base Variants (`A 0.50, B 0.25, C 0.15, D 0.10`) | `EcotoneOverlayLayer` / `GroundLayer` | `reedwood_floor` · **Terrain Set 0 (`MATCH_CORNERS`) T1**: `TL+TR+BL+BR` |
+| `(4,0)`–`(7,0)` | Ragged Moss->Sand Outer Edges: `(4,0)` NW (`BR`), `(5,0)` N (`BL+BR`), `(6,0)` NE (`BL`), `(7,0)` W (`TR+BR`) | `EcotoneOverlayLayer` | `reedwood_floor` · **Set 0 T1** (transparent outside ragged grass border!) |
+| `(0,1)`–`(3,1)` | Ragged Moss->Sand Concave Bays: `(0,1)` Inner NW (`TR+BL+BR`), `(1,1)` Inner NE (`TL+BL+BR`), `(2,1)` Inner SW (`TL+TR+BR`), `(3,1)` Inner SE (`TL+TR+BL`) | `EcotoneOverlayLayer` | `reedwood_floor` · **Set 0 T1** |
+| `(4,1)`–`(7,1)` | Ragged Moss->Sand Outer Edges: `(4,1)` E (`TL+BL`), `(5,1)` SW (`TR`), `(6,1)` S (`TL+TR`), `(7,1)` SE (`TL`) | `EcotoneOverlayLayer` | `reedwood_floor` · **Set 0 T1** |
+| `(0,2)`–`(1,2)` | Diagonal Moss Bridges: `(0,2)` NW–SE (`TL+BR`), `(1,2)` NE–SW (`TR+BL`) | `EcotoneOverlayLayer` | `reedwood_floor` · **Set 0 T1** |
+| `(2,2)`–`(7,2)` | **`6` Forest Floor Decals** (transparent): `(2,2)` Hollow Fallen Reed, `(3,2)` Surface Root A, `(4,2)` Surface Root B, `(5,2)` Sun-Dapple Spot, `(6,2)` Clover/Lichen Tuft, `(7,2)` Mossy Stepping Stone | `GroundDecalShadowLayer` | Decorative only |
+| `(8,0)`–`(11,3)` | **`16` Root-Lined Dirt Trail Tiles** (`4×4` complete 4-bit cardinal mask `N=1, E=2, S=4, W=8`!): Row `0`: `(8,0)` Isolated `0000`, `(9,0)` N end `0001`, `(10,0)` E end `0010`, `(11,0)` NE turn `0011`; Row `1`: `(8,1)` S end `0100`, `(9,1)` Vertical N+S `0101`, `(10,1)` SE turn `0110`, `(11,1)` T-East `0111`; Row `2`: `(8,2)` W end `1000`, `(9,2)` NW turn `1001`, `(10,2)` Horizontal E+W `1010`, `(11,2)` T-North `1011`; Row `3`: `(8,3)` SW turn `1100`, `(9,3)` T-West `1101`, `(10,3)` T-South `1110`, `(11,3)` Crossroads `1111` | `GroundDecalShadowLayer` / `EcotoneOverlayLayer` | `forest_trail` · **Terrain Set 2 (`TERRAIN_MODE_MATCH_SIDES`) T0** |
+| `(0,3)`–`(5,5)` | **`18` Mossy Root-Bank Terrace Cliffs** (`6×3` mirroring `AST-002` cliff layout identically: Row `3` top mossy rims, Row `4` mid/inner corners, Row `5` vertical root-earth front faces!) | `CliffWallCollisionLayer` | **Terrain Set 1 (`MATCH_CORNERS_AND_SIDES`) T1** · Solid `layer_1` |
+| `(6,3)`–`(7,5)` | **`6` Forest Creek Moss Banks**: `(6,3)` N Bank, `(7,3)` S Bank, `(6,4)` W Bank, `(7,4)` E Bank, `(6,5)` Outer Bank Corner, `(7,5)` Inner Bank Corner | `EcotoneOverlayLayer` | `shallow_water` |
+| `(8,4)+(9,4)` | **Anim Pair 0**: Forest Stream Shimmer A (`#4B8B82`) | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(10,4)+(11,4)` | **Anim Pair 1**: Forest Stream Shimmer B | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(8,5)+(9,5)` | **Anim Pair 2**: Stream Pebble Riffle A | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+| `(10,5)+(11,5)` | **Anim Pair 3**: Stream Leaf-Eddy Ripple B | `WaterBaseLayer` | `shallow_water` · `anim_cols=2, frames=2, 2.0 FPS` |
+
+7. **Transparency & Pivot**: Transparent PNG outside ragged moss edges, trails, banks, and decals · Standard tile center `(8, 8)`.
+8. **Variations**: `4` moss base variants, `16` full cardinal trail connections, `6` decals, `4` animated creek loops.
+9. **Godot Integration**:
+   - Path: `game/assets/world/tilesets/env_singing_canopy_ground_tileset.png`
+   - `TileSet` Config: `TileSetAtlasSource` (`source_id = 1`, `texture_region_size = Vector2i(16, 16)`, `use_texture_padding = true`), sharing `Terrain Set 0` (T1 `"reedwood_floor"`), `Terrain Set 1` (T1 `"moss_terrace"`), and `Terrain Set 2` (`TERRAIN_MODE_MATCH_SIDES`, T0 `"forest_trail"`).
+   - Import: `Compress = Lossless`, `Mipmaps = Off`, `Filter = Nearest`.
+10. **Priority**: **Critical**.
+
+---
+
+### `AST-004` — `prop_singing_reedwood_tree_sheet.png` (**Priority: Critical**)
+
+1. **Asset Name**: `prop_singing_reedwood_tree_sheet.png`
+2. **Purpose**: Iconic towering `48×80` **Singing Reedwood** (*Arundo sonoris*) split cleanly into grounded Y-sorted trunk + overhead cutaway canopy crown.
+3. **Visual Description**: Tall fluted hollow reed trunk (`#9B8F74` sunlit left ridge, `#5F6652` mid, `#313D36` shadow) with carved vertical dark wind-slits (`#1B2624`) and faint warm resonance accents (`#FFB838`), rooted into `#3D5444` moss; sweeping seafoam-sage feathery canopy crown (`#97AF7E` sunlit tips, `#6F8A68` mid, `#47695E`/`#2D423E` underside).
+4. **Dimensions**: **`48 × 80 px`** per cell · **`96 × 160 px`** total sheet (`2` cols × `2` rows, `0 px` padding).
+5. **Perspective & Style**: Oblique 3/4 Top-Down; crisp painterly foliage masses (no 1 px leaf static, no blurred shadows).
+6. **Exact Cell Map & Mandatory `4 px` Trunk-Behind-Canopy Overlap Seam**:
+   - **`(0, 0, 48, 80)`**: **Variant A — Lower Fluted Trunk & Roots** (roots sit `y = 66..76`; trunk rises solidly up to **`y = 32`** — including a `4 px` overlap collar `y = 32..36` tucked behind the canopy rim!).
+   - **`(48, 0, 48, 80)`**: **Variant A — Overhead Canopy Crown** (canopy foliage spans `y = 2..36`, registered **pixel-for-pixel** on the exact same `48×80` canvas as Col `0` so compositing Col `1` directly over Col `0` creates one seamless tree AND fading Col `1` to `0.38` alpha never exposes a floating gap!).
+   - **`(0, 80, 48, 80)`**: **Variant B — Leaning Twin-Stem Fluted Trunk & Roots** (same `(24, 72)` anchor and `y = 32..36` overlap collar).
+   - **`(48, 80, 48, 80)`**: **Variant B — Matching Overhead Canopy Crown** (pixel-registered to Row `1`, Col `0`).
+7. **Animation**: Static split-layer sheet (lightweight pixel wind-sway added in later shader pass).
+8. **Transparency**: Required (`RGBA` 32-bit PNG, transparent background, zero baked floor shadow).
+9. **Shared Origin, Offset Proof & Exact Godot Assembly Architecture**:
+   - **Shared Origin Inside EVERY `48×80` Cell**: Trunk base center at **`(24, 72)`**.
+   - **Geometric Center of `48×80` Cell**: `(24, 40)`.
+   - **Exact Local `Sprite2D.offset` (with `centered = true`)**: **`Vector2(24 - 24, 40 - 72) = Vector2(0, -32)`** on BOTH `TrunkSprite` and `CanopySprite`!
+   - **Exact Godot Scene Hierarchy (`game/world/props/singing_reedwood_tree.tscn`)**:
+     ```text
+     SingingReedwoodTree (StaticBody2D, child of YSortWorldLayer, collision_layer = 1 "world_solid")
+     ├── ShadowSprite       (Sprite2D, AST-007 Large Shadow, pos=(0,0), z_index = -1)
+     ├── FootCollider       (CollisionShape2D, RectangleShape2D(14, 8), pos=(0, -2))
+     ├── TrunkSprite        (Sprite2D, region_rect=Rect2(0, variant*80, 48, 80), pos=(0,0), offset=(0,-32))
+     ├── CanopySprite       (Sprite2D, region_rect=Rect2(48, variant*80, 48, 80), pos=(0,0), offset=(0,-32), z_index=20, z_as_relative=false)
+     └── CanopyFadeArea     (Area2D, collision_layer=128 "canopy_occluder", collision_mask=2 "player")
+         └── FadeShape      (CollisionShape2D, RectangleShape2D(44, 52), pos=(0, -44))
+     ```
+   - **Why This Assembly Never Drifts**: Keeping `CanopySprite` as a child of `SingingReedwoodTree` at identical `pos = (0, 0), offset = (0, -32)` with `z_index = 20, z_as_relative = false` guarantees **pixel-exact `(0, -32)` lock** with `TrunkSprite` while always drawing above Y-sorted actors — and smoothly fading `CanopySprite.modulate.a` between `1.0` and `0.38` whenever Mara enters `CanopyFadeArea`!
+10. **Variations**: `2` silhouettes × `2` pixel-registered layers (`4` cells total).
+11. **Godot Integration**: `game/assets/world/props/prop_singing_reedwood_tree_sheet.png` · Lossless / `Nearest` / `Mipmaps Off`.
+12. **Priority**: **Critical**.
+
+---
+
+### `AST-005` — `prop_rimlands_flora_sheet.png` (**Priority: High**)
+
+1. **Asset Name**: `prop_rimlands_flora_sheet.png`
+2. **Purpose**: Interactive starter botanical props (`Amber Tide-Kelp`, `Mirror Glasswort`, `Sun-Drop Bulb`, `Cordage Frond`).
+3. **Visual Description**: `Amber Tide-Kelp` (`#E49836`/`#FFC648`/`#8C5320` tall golden coastal ribbons), `Mirror Glasswort` (`#C9DCE3`/`#7E9AA2`/`#367E8A` crystalline succulent), `Sun-Drop Bulb` (`#FFB838`/`#FFE047` open honey-gold bloom / `#47695E` tight closed night bud), `Cordage Frond` (`#6F8A68`/`#97AF7E`/`#3D5444` woven fibrous fern).
+4. **Dimensions**: **`16 × 32 px`** per cell · **`64 × 128 px`** total sheet (`4` cols × `4` rows = `16` cells, `0 px` padding; **zero overlap verified**).
+5. **Perspective & Style**: Oblique 3/4 Top-Down; crisp unmistakable silhouettes even in grayscale.
+6. **Exact Non-Overlapping `4 × 4` Cell Map (`64 × 128 px`, Transparent PNG)**:
+   - Row `0` (`y = 0..31`): `(0,0)`..`(3,0)` (`Rect2(col*16, 0, 16, 32)`) -> **`Amber Tide-Kelp`** `4`-frame sway (`4 FPS`, loop; kelp rises `y_local = 3..30`).
+   - Row `1` (`y = 32..63`): `(0,1)`, `(1,1)` -> **`Mirror Glasswort`** Static Variants A & B (`y_local = 14..30`); `(2,1)`, `(3,1)` -> **`UNUSED / TRANSPARENT`**.
+   - Row `2` (`y = 64..95`): `(0,2)` -> **`Sun-Drop Bulb` Open (Day)**, `(1,2)` -> **`Sun-Drop Bulb` Closed (Night)** (`y_local = 14..30`); `(2,2)`, `(3,2)` -> **`UNUSED / TRANSPARENT`**.
+   - Row `3` (`y = 96..127`): `(0,3)`, `(1,3)` -> **`Cordage Frond`** Static Variants A & B (`y_local = 12..30`); `(2,3)`, `(3,3)` -> **`UNUSED / TRANSPARENT`**.
+7. **Transparency**: Required (`RGBA` 32-bit PNG, `10` active cells + `6` transparent unused cells).
+8. **Pivot / Origin & Godot Offset Proof**: Ground base `(8, 30)` inside `16×32` cell (center `(8, 16)`) -> **`Sprite2D.offset = Vector2(0, -14)`** (`centered = true`).
+9. **Variations**: `4` species (`10` frames/variants).
+10. **Godot Integration**: `game/assets/world/flora/prop_rimlands_flora_sheet.png` -> `game/world/flora/flora_prop.tscn` (`YSortWorldLayer`, `Area2D` on `layer_5="interactable_flora"`); Lossless / `Nearest` / `Mipmaps Off`.
+11. **Priority**: **High**.
+
+---
+
+### `AST-006` — `prop_drop_pod_landmark_sheet.png` (**Priority: High**)
+
 1. **Asset Name**: `prop_drop_pod_landmark_sheet.png`
-2. **Purpose**: **Hero Landmark #1 (*Drop-Pod Clearing*)** — Mara's crashed *ICV Meridian* emergency drop-pod + salvage crates proving our **Handcrafted Hero Landmark + Feathered Blend Collar** visual strategy!
-3. **Visual Description**: Grounded, tactile sci-fi human intrusion contrasting warmly against organic alien sand:
-   - **Emergency Drop-Pod Hull**: Scuffed matte ivory-ceramic outer plates (`#E8E4D8`, shaded `#9DA4AB`), international aerospace burnt-orange rescue stripe (`#FF6B3D`), heat-scorched charcoal thruster nose (`#202A36`), cracked curved canopy glass (`#367E8A` reflecting pale sky `#C9DCE3`), angled partially embedded into furrowed ochre sand (`#B89A6C` / `#7C6549` soft feathered sand-ridge collar along the bottom edge so it melts seamlessly into `AST-002` sand!).
-   - **Salvage Crates (2)**: Compact weathered field supply cases (`#D7CFC2` + `#FF6B3D` hazard latch) partially dusted with coastal sand.
-4. **Dimensions**:
-   - **Total Sheet Dimensions**: **`96 × 64 px`** (single clean prop sheet with transparent background):
-     - Region `(0, 0, 64, 48)`: **Crashed *ICV Meridian* Drop-Pod** (`64 × 48 px` = `4 × 3` world tiles).
-     - Region `(64, 0, 16, 16)`: **Supply Crate Variant A (Intact)** (`16 × 16 px`).
-     - Region `(80, 0, 16, 16)`: **Supply Crate Variant B (Half-Buried Open)** (`16 × 16 px`).
-     - Region `(64, 16, 32, 32)`: **Deployed Compact Field Camp Tent / Lamp Pack** (`32 × 32 px`, warm amber interior glow `#FFB838` for Milestone 01 lighting & camp readability test!).
-     - Region `(0, 48, 64, 16)`: **Scorched Sand Skid-Furrow Ground Decal** (`64 × 16 px`, transparent soft edges for `GroundDecalShadowLayer`).
-5. **Perspective**: Oblique 3/4 Top-Down matching `AST-002` & `AST-004`.
-6. **Style**: Painterly pixel art, realistic lived-in scratches and dust (zero glossy plastic gradients), warm top-left sunlight matching coastline tiles.
-7. **Animation**: Static landmark prop sheet (optional tiny blinking beacon LED or rising smoke wisps handled cleanly via lightweight Godot pixels/particles later).
-8. **Transparency**: Required (`RGBA` 32-bit PNG, transparent background).
-9. **Pivot / Origin**:
-   - Drop-Pod: bottom-center **`(32, 42)`** within its `64×48` region.
-   - Crates: **`(8, 14)`** within each `16×16` region.
-   - Camp Tent: **`(16, 28)`** within its `32×32` region.
-10. **Variations**: `5` cohesive Hero Landmark elements packed on `1` atlas sheet.
-11. **Godot Integration**:
-    - Target Path: `game/assets/world/landmarks/prop_drop_pod_landmark_sheet.png`
-    - Node Type: Handcrafted `PackedScene` prefab (`game/world/landmarks/drop_pod_clearing.tscn`) using `Sprite2D` (`region_enabled = true`) + `StaticBody2D` polygon collider on `layer_1="world_solid"`.
-    - Import Settings: `Compress = Lossless`, `Mipmaps = Off`, `Filter = Nearest`.
-12. **Priority**: **High** (proves the living-painting focal composition & feathered landmark blend collar in Milestone 01).
+2. **Purpose**: **Hero Landmark #1 (*Drop-Pod Clearing*)** proving handcrafted focal composition and feathered ochre-sand collar blending into `AST-002`.
+3. **Visual Description**: Weathered matte ivory *ICV Meridian* drop-pod (`#E8E4D8`/`#9DA4AB`) with burnt-orange rescue stripe (`#FF6B3D`), heat-scorched nose (`#202A36`), cracked teal glass (`#367E8A`/`#C9DCE3`), embedded in feathered ochre sand (`#B89A6C`/`#7C6549`), paired with `2` salvage crates, `1` compact warm-glowing field camp tent (`#FFB838`), and `1` scorched sand skid-furrow decal.
+4. **Dimensions & Exact Partition Verification (`96 × 64 px` = `6144 px²`, Zero Overlap)**:
+
+| Region Name | Exact `Rect2(x, y, w, h)` | Area (`px²`) | Pivot `(px, py)` Inside Region | Verified Godot `Sprite2D.offset` (`centered = true`) |
+| --- | :---: | :---: | :---: | :---: |
+| Crashed *ICV Meridian* Drop-Pod | `Rect2(0, 0, 64, 48)` | `3072` | `(32, 42)` | `Vector2(0, -18)` |
+| Salvage Crate A (Intact) | `Rect2(64, 0, 16, 16)` | `256` | `(8, 14)` | `Vector2(0, -6)` |
+| Salvage Crate B (Half-Buried Open) | `Rect2(80, 0, 16, 16)` | `256` | `(8, 14)` | `Vector2(0, -6)` |
+| Deployed Field Camp Tent | `Rect2(64, 16, 32, 32)` | `1024` | `(16, 28)` | `Vector2(0, -12)` |
+| Scorched Sand Skid-Furrow Decal | `Rect2(0, 48, 64, 16)` | `1024` | `(32, 8)` | `Vector2(0, 0)` |
+| **`UNUSED / TRANSPARENT`** | `Rect2(64, 48, 32, 16)` | `512` | — | Must stay `RGBA = 0,0,0,0` |
+| **Total Partition Check** | **`96 × 64 px`** | **`6144`** | **Zero Overlap** | **100% Verified** |
+
+5. **Perspective & Style**: Oblique 3/4 Top-Down; warm top-left sunlight matching `AST-002`/`AST-004`, worn matte aerospace paint.
+6. **Animation**: Static prop atlas.
+7. **Transparency**: Required (`RGBA` 32-bit PNG).
+8. **Variations**: `5` landmark props packed cleanly on `1` sheet.
+9. **Godot Integration**: `game/assets/world/landmarks/prop_drop_pod_landmark_sheet.png` -> `game/world/landmarks/drop_pod_clearing.tscn` (`Sprite2D` regions + `StaticBody2D` colliders on `layer_1="world_solid"`); Lossless / `Nearest` / `Mipmaps Off`.
+10. **Priority**: **High**.
 
 ---
 
-### `AST-007` — `fx_shadows_ripples_lens_sheet.png`
+### `AST-007` — `fx_shadows_ripples_lens_sheet.png` (**Priority: High**)
+
 1. **Asset Name**: `fx_shadows_ripples_lens_sheet.png`
-2. **Purpose**: Grounded pixel contact shadows (preventing floating actors/trees!), shallow-water footstep wade ripples, and **Acoustic Field Lens** concentric pulse wave VFX — all lightweight `Sprite2D` quads ideal for `GL Compatibility / Intel HD 3000` (zero heavy GPU shaders required!).
-3. **Visual Description**:
-   - **Contact Shadows**: Clean crisp elliptical dark-slate shadows (`#12161C` at ~`35–45%` uniform pixel opacity — crisp pixel-art edges, NO blurry Gaussian feathering!).
-   - **Shallow-Water Wade Ripples**: Crisp 1 px expanding concentric ovals in pale seafoam `#C9DCE3` / `#6CF2B2` tint.
-   - **Acoustic Field Lens Pulse**: Delicate broken concentric harmonic wave rings in soft bioluminescent cyan-gold (`#4CE8E0` & `#FFB838`, 1 px crisp dashed arcs expanding outward!).
-4. **Dimensions**:
-   - **Per Cell**: `32 × 32 px` uniform cell grid.
-   - **Total Sheet Dimensions**: **`128 × 96 px`** (`4` columns × `3` rows, `0 px` padding).
-5. **Perspective**: Flat oblique ground-plane ovals (`2:1` horizontal-to-vertical perspective compression matching Oblique 3/4 Top-Down!).
-6. **Style**: Clean crisp 1 px pixel-art VFX, zero blurry anti-aliased rings.
-7. **Animation & Exact Sheet Layout (`4 cols × 3 rows`, `32×32` per cell -> `128×96 px`, transparent PNG)**:
-   - Row `0`, Col `0`: **Small Actor Contact Shadow** (`12×6 px` centered oval for Mara / small fauna).
-   - Row `0`, Col `1`: **Medium Flora/Crate Contact Shadow** (`18×9 px` centered oval).
-   - Row `0`, Col `2`: **Large Tree Trunk Contact Shadow** (`30×14 px` centered oval for Singing Reedwoods).
-   - Row `0`, Col `3`: Transparent (unused).
-   - Row `1`, Cols `0–3`: **Shallow-Water Wade Ripple** — `4`-frame expanding ring (`8 FPS`, one-shot).
-   - Row `2`, Cols `0–3`: **Acoustic Field Lens Sound Wave Ring** — `4`-frame expanding dashed harmonic oval (`8 FPS`, one-shot/pulse).
-8. **Transparency**: Required (`RGBA` 32-bit PNG, semi-transparent shadow row + crisp opaque/alpha pixel rings).
-9. **Pivot / Origin**: Center **`(16, 16)`** inside each `32×32` cell.
-10. **Variations**: `3` shadow sizes + `2` four-frame VFX animations (`11` active cells).
-11. **Godot Integration**:
-    - Target Path: `game/assets/vfx/fx_shadows_ripples_lens_sheet.png`
-    - Node Type: `Sprite2D` (`region_enabled = true`) on `GroundDecalShadowLayer` (shadows) + lightweight pooled `AnimatedSprite2D` (ripples & acoustic rings).
-    - Import Settings: `Compress = Lossless`, `Mipmaps = Off`, `Filter = Nearest`.
-12. **Priority**: **High** (immediately anchors sprites into the painted ground and proves Acoustic Lens readability with near-zero GPU cost on Intel HD 3000).
+2. **Purpose**: Crisp pixel contact shadows, shallow-water footstep ripples, and Acoustic Field Lens harmonic rings — ultra-lightweight `Sprite2D` quads ideal for Intel HD Graphics 3000.
+3. **Visual Description**: Uniform semi-transparent pixel-edged ellipses (`#12161C` at `35–45%` alpha, zero blur), `1 px` pale-foam water rings (`#C9DCE3`/`#6CF2B2`), and dashed `1 px` cyan-gold harmonic rings (`#4CE8E0`/`#FFB838`).
+4. **Dimensions**: **`32 × 32 px`** per cell · **`128 × 96 px`** total sheet (`4` cols × `3` rows = `12` cells, `0 px` padding; **all drawings maintain `>= 1 px` margin inside `32×32`**).
+5. **Perspective & Style**: Ground-plane `2:1` oblique ellipses; crisp `1 px` pixel edges.
+6. **Exact Non-Overlapping `4 × 3` Cell Map (`128 × 96 px`, Transparent PNG)**:
+   - Row `0` (`y = 0..31` — Static Contact Shadows):
+     - `(0,0)` Small Actor Shadow: `12×6 px` oval centered at `(16, 16)` (`x = 10..21, y = 13..18`).
+     - `(1,0)` Medium Flora/Crate Shadow: `18×9 px` oval centered at `(16, 16)` (`x = 7..24, y = 12..20`).
+     - `(2,0)` Large Tree Trunk Shadow: `30×14 px` oval centered at `(16, 16)` (`x = 1..30, y = 9..22` — `1 px` margin).
+     - `(3,0)` **`UNUSED / TRANSPARENT`** (`RGBA = 0,0,0,0`).
+   - Row `1` (`y = 32..63` — Shallow-Water Wade Ripple, `8 FPS`, one-shot):
+     - `(0,1)` `8×4 px` oval -> `(1,1)` `14×7 px` -> `(2,1)` `20×10 px` -> `(3,1)` `26×13 px` fading dashed oval.
+   - Row `2` (`y = 64..95` — Acoustic Field Lens Wave Ring, `8 FPS`, one-shot):
+     - `(0,2)` `10×5 px` ring -> `(1,2)` `16×8 px` -> `(2,2)` `24×12 px` -> `(3,2)` `30×15 px` (`1 px` margin) fading dashed harmonic ring.
+7. **Transparency & Pivot**: Transparent PNG · Center **`(16, 16)`** -> **`Sprite2D.offset = Vector2.ZERO`** (`centered = true`).
+8. **Variations**: `3` contact shadows + `2` four-frame VFX animations (`11` active cells + `1` unused).
+9. **Godot Integration**: `game/assets/vfx/fx_shadows_ripples_lens_sheet.png` -> `Sprite2D` shadows + lightweight pooled `Node2D` VFX script (`game/world/vfx/ground_ring_vfx.gd`); Lossless / `Nearest` / `Mipmaps Off`.
+10. **Priority**: **High**.
 
 ---
 
-### `AST-008` — `sfx_rimlands_core_pack` (Audio Asset Pack — `10` Short Clips)
-1. **Asset Name** *(exact filenames)*:
+### `AST-008` — `sfx_rimlands_core_pack` (**Priority: Optional for M01, High for M02**)
+
+1. **Asset Names (`10` clips)**:
    - `sfx_footstep_sand_01.ogg`, `sfx_footstep_sand_02.ogg`, `sfx_footstep_sand_03.ogg`
    - `sfx_footstep_water_01.ogg`, `sfx_footstep_water_02.ogg`, `sfx_footstep_water_03.ogg`
    - `sfx_footstep_moss_01.ogg`, `sfx_footstep_moss_02.ogg`, `sfx_footstep_moss_03.ogg`
-   - `sfx_acoustic_lens_ping_01.ogg`
-   *(Uncompressed 16-bit `.wav` also accepted cleanly for short clips under 200 KB!)*
-2. **Purpose**: Proves *VERDANT SIGNAL*'s surface-aware `TileData` footstep audio and organic acoustic Field Lens feedback routed cleanly through `game/audio/default_bus_layout.tres` (`Tier2_Action`!).
-3. **Visual / Sonic Description**: Dry, intimate, organic Foley with zero harsh clipping or metallic sci-fi beeps:
-   - *Sand*: Soft crunchy dry littoral grit (`0.12–0.18s`).
-   - *Water*: Light ankle-deep tidal lap/splash (`0.18–0.25s`).
-   - *Moss/Reedwood Floor*: Soft muffled woodland earth & dry reed leaf brush (`0.12–0.18s`).
-   - *Acoustic Lens Ping*: Warm breathy wooden-flute / glass-harmonica double-overtone chime (`0.45–0.65s`, gentle resonant tail).
-4. **Dimensions / Technical Format**: **Mono**, `44.1 kHz`, `16-bit` `.ogg` (Vorbis `q6`) or `.wav`, peak normalized cleanly to **`-3 dBFS`**, trimmed tightly (`< 10 ms` leading silence).
-5. **Perspective**: Non-positional centered player Foley (`AudioStreamPlayer`, Mono).
-6. **Style**: Intimate organic acoustic naturalism matching Deliverable O (`15-audio-direction.md`).
-7. **Animation / Playback**: Loaded into Godot `AudioStreamRandomizer` (`PLAYBACK_RANDOM_NO_REPEATS`, `±4%` pitch variance) per surface type; one-shot non-looping clips.
-8. **Transparency**: N/A (Audio — clean silence tail, zero DC offset or click pops).
-9. **Pivot / Origin**: Transient onset aligned cleanly within first `5–10 ms` of clip.
-10. **Variations**: `3` distinct takes per surface × `3` surfaces (`9` footsteps) + `1` Acoustic Lens ping = `10` files.
-11. **Godot Integration**:
-    - Target Path: `game/audio/sfx/`
-    - Node Type: `AudioStreamPlayer` routed to bus **`Tier2_Action`** with `AudioStreamRandomizer` driven by `TileData.get_custom_data("surface_type")`.
-    - Import Settings: `Loop = Off`.
-12. **Priority**: **Optional** for Milestone 01 Visual Prototype (code can run silently until received), **High** for Milestone 02 Feel & Audio Gate.
+   - `sfx_acoustic_lens_ping_01.ogg` *(16-bit `.wav` under 200 KB also accepted)*
+2. **Purpose**: Surface-aware `TileData` footsteps & organic wooden-flute/glass Acoustic Field Lens chime routed to `Tier2_Action`.
+3. **Sonic Description**: Dry intimate natural Foley — soft sand grit (`0.12–0.18s`), gentle ankle-water lap (`0.18–0.25s`), muffled moss/reed brush (`0.12–0.18s`), breathy warm wooden-flute/glass harmonic chime (`0.45–0.65s`).
+4. **Format**: **Mono**, `44.1 kHz`, `16-bit` `.ogg` (Vorbis `q6`) or `.wav`, peak normalized `-3 dBFS`, `< 10 ms` leading trim, `Loop = Off`.
+5. **Godot Integration**: `game/audio/sfx/` -> `AudioStreamPlayer` (`bus = "Tier2_Action"`) using `AudioStreamRandomizer` (`PLAYBACK_RANDOM_NO_REPEATS`, `±4%` pitch variance).

@@ -1,0 +1,48 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://ui/prototype_hud.gd" id="1_hud"]
+
+[node name="PrototypeHud" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_hud")
+
+[node name="PlaceholderBanner" type="PanelContainer" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -226.0
+offset_top = 4.0
+offset_right = 226.0
+offset_bottom = 20.0
+
+[node name="BannerLabel" type="Label" parent="PlaceholderBanner"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.721569, 0.219608, 1)
+theme_override_font_sizes/font_size = 8
+text = "TEMP DEBUG PLACEHOLDER ART"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TelemetryPanel" type="PanelContainer" parent="."]
+offset_left = 6.0
+offset_top = 24.0
+offset_right = 290.0
+offset_bottom = 78.0
+
+[node name="TelemetryLabel" type="Label" parent="TelemetryPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.956863, 0.937255, 0.886275, 1)
+theme_override_font_sizes/font_size = 8
+text = "Initializing telemetry..."
+
+[node name="ControlsLabel" type="Label" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = -15.0
+offset_right = 474.0
+offset_bottom = -3.0
+theme_override_colors/font_color = Color(0.82, 0.88, 0.86, 0.92)
+theme_override_font_sizes/font_size = 8
+text = "WASD Move | Shift Crouch | Q/RMB Lens | T Time | F3 Telemetry | Esc Boot"
