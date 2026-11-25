@@ -1,0 +1,26 @@
+# Normalize text line endings across Windows (GitHub Desktop / Godot) and Linux (Arena Agent)
+* text=auto eol=lf
+
+*.gd text eol=lf
+*.tscn text eol=lf
+*.tres text eol=lf
+*.godot text eol=lf
+*.gdshader text eol=lf
+*.import text eol=lf
+*.uid text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.svg text eol=lf
+*.cfg text eol=lf
+
+# Treat binary visual & audio files cleanly as binary (no EOL mangling)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ogg binary
+*.wav binary
+*.mp3 binary
+*.ttf binary
+*.otf binary
