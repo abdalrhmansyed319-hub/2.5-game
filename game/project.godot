@@ -1,16 +1,14 @@
 ; Engine configuration file.
 ; VERDANT SIGNAL — Production Godot 4 Project Root
 ;
-; Version Compatibility Note (DDL-015):
-;   Minimum feature baseline is set to Godot 4.3 (required for TileMapLayer,
-;   2D physics_interpolation, and AudioStreamInteractive/Synchronized).
-;   Godot 4.3, 4.4, 4.5, 4.6, and 4.7+ on Windows will open and cleanly adopt
-;   this configuration without triggering a "newer version" rejection.
+; Verified Windows Target Baseline:
+;   Godot 4.7.2-stable (Official) | Windows | Intel HD Graphics 3000 (1366x768 @ 60 Hz)
+;   Renderer: GL Compatibility (OpenGL 3 with automatic ANGLE fallback on OpenGL 3.1 GPUs).
+;   Note: Do not force Vulkan or D3D12; HD Graphics 3000 hardware caps at D3D10.1 / OpenGL 3.1.
 ;
-; Visual Prototype Gate Note (DDL-011):
-;   Default viewport is 480x270 (Oblique 3/4 Top-Down, 16x16 tiles, 16x24 Mara)
-;   with integer pixel scaling. A/B validation against 640x360 on 1080p/1440p
-;   Windows monitors is planned for Stage 05 Visual Prototype Gate.
+; Conservative Pixel-Art Baseline:
+;   Native viewport 480x270 (16x16 tiles, 16x24 Mara), 960x540 (2x) preview window,
+;   Nearest filtering, MSAA 2D off, HDR 2D off, pixel-snapped transforms/vertices.
 
 config_version=5
 
@@ -19,7 +17,7 @@ config_version=5
 config/name="VERDANT SIGNAL"
 config/description="Painterly 2.5D Oblique 3/4 Top-Down Xenobiological Exploration, Ecological Survival, and Field-Science Mystery on Oura-IV (Catalog K-419b)."
 run/main_scene="res://scenes/boot/main.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://assets/icon.svg"
 
 [audio]
@@ -136,7 +134,12 @@ common/physics_interpolation=true
 
 [rendering]
 
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+gl_compatibility/fallback_to_angle=true
 textures/canvas_textures/default_texture_filter=0
+anti_aliasing/quality/msaa_2d=0
+viewport/hdr_2d=false
 2d/snap/snap_2d_transforms_to_pixel=true
 2d/snap/snap_2d_vertices_to_pixel=true
 environment/defaults/default_clear_color=Color(0.0705882, 0.0862745, 0.109804, 1)

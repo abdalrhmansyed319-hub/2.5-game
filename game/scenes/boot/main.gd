@@ -17,7 +17,7 @@ func _ready() -> void:
 
 func _build_diagnostics_report() -> String:
 	var version_info: Dictionary = Engine.get_version_info()
-	var version_str: String = String(version_info.get("string", "unknown"))
+	var version_str: String = _variant_to_display_string(version_info.get("string"), "unknown")
 	var os_name: String = OS.get_name()
 	var gpu_name: String = RenderingServer.get_video_adapter_name()
 	var render_method: String = RenderingServer.get_current_rendering_method()
@@ -57,3 +57,12 @@ func _build_diagnostics_report() -> String:
 		"STATUS    : Production Bootstrap OK — Ready for Stage 05 Visual Prototype Gate",
 	])
 	return "\n".join(lines)
+
+
+func _variant_to_display_string(value: Variant, fallback: String = "unknown") -> String:
+	if value == null:
+		return fallback
+	var text: String = str(value)
+	if text.is_empty():
+		return fallback
+	return text

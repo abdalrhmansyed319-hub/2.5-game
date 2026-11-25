@@ -1,8 +1,18 @@
 # *VERDANT SIGNAL* — Production Godot 4 Project (`game/`)
 
 > **Project Root**: `game/project.godot`  
-> **Minimum Godot Feature Baseline**: **Godot `4.3+`** (`TileMapLayer`, 2D `physics_interpolation`, `AudioStreamInteractive` / `AudioStreamSynchronized`). Compatible cleanly with Godot `4.3`, `4.4`, `4.5`, `4.6`, and `4.7+` on Windows.  
-> **Current Stage**: **Controlled Pre-Production Bootstrap** — ready for Windows Godot verification (`DDL-015`) and the **Stage 05 Visual & Streaming Prototype Gate** (`DDL-011` / `Deliverable Y`). No full game systems or mass assets have been implemented yet.
+> **Verified Windows Target Baseline**: **Godot `4.7.2-stable` (Official)** · **Windows** · **Intel HD Graphics 3000** (`1366×768 @ 60 Hz`) · **`GL Compatibility`** renderer (OpenGL 3 with automatic ANGLE fallback on OpenGL 3.1 GPUs).  
+> **Current Stage**: **Controlled Pre-Production Bootstrap** — hardened for Godot `4.7.2` + `GL Compatibility`, ready for Stage 05 Visual & Streaming Prototype Gate. No full game systems or mass assets have been implemented yet.
+
+---
+
+## Conservative Graphics & Performance Baseline (Intel HD Graphics 3000 Minimum Spec)
+
+Because Intel HD Graphics 3000 caps at **Direct3D 10.1 / OpenGL 3.1** on Windows (requiring Godot's `GL Compatibility` renderer with ANGLE translation), initial production obeys strict low-overhead 2D rules without compromising *VERDANT SIGNAL*'s painterly pixel-art identity:
+- **Canvas & Pixel Purity**: Keep `480×270` native viewport (`960×540` `2×` preview window), `Nearest` texture filtering, `msaa_2d = 0`, `hdr_2d = false`, and pixel-snapped transforms/vertices.
+- **Lightweight 2D Rendering First**: Prefer baked/painterly sprite craft, `CanvasModulate` + lightweight 1D LUT color grading, and simple UV wind/water shaders over expensive multi-pass post-processing.
+- **Strict Restraint on Fill-Rate Traps**: Avoid unnecessary real-time `PointLight2D` / `LightOccluder2D` shadow passes, stacked full-screen alpha overlays, and dense particle clouds unless measured directly on Intel HD 3000 hardware.
+- **Decoupled Simulation**: Keep physics, chunk streaming, and 4-state autonomous ecology timing independent of rendering frame rate.
 
 ---
 
