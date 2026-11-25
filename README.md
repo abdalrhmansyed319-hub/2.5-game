@@ -20,6 +20,7 @@
 | Directory / File | Contents |
 | --- | --- |
 | [`game/`](game/README.md) | ***VERDANT SIGNAL* Production Godot 4 Project Root (`game/project.godot`)**: Clean modular architecture (`autoload/`, `audio/`, `assets/`, `resources/`, `scenes/boot/`, `characters/`, `systems/`, `world/`, `ui/`, `shaders/`, `tests/`) ready to open directly in Godot `4.3+` on Windows |
+| [`docs/asset-production/ASSET_REQUESTS.md`](docs/asset-production/ASSET_REQUESTS.md) | **Production Asset Requests & Delivery Manifest**: Exact 12-field pixel/audio specifications & approval status tracking per milestone |
 | [`docs/concept/`](docs/concept/README.md) | ***VERDANT SIGNAL* Pre-Production Lock (`A`–`Y`)**: `25` cross-referenced concept/audit/decision/acceptance docs, `5` verified JSON databases (`data/`), and `4` visually inspected analytical proof PNGs (`visuals/`) |
 | [`docs/studio/README.md`](docs/studio/README.md) | **Phase 3 Unified Studio Hub**: 10 cross-disciplinary Technical <-> Creative integration bridges |
 | [`docs/phase-3-deliverables/`](docs/phase-3-deliverables/deliverable-a-unified-studio-handbook.md) | **Phase 3 Studio Deliverables (A–J)** + [`docs/phase-3-studio-readiness-report.md`](docs/phase-3-studio-readiness-report.md) |
