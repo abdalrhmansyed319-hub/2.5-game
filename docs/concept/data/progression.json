@@ -1,0 +1,99 @@
+{
+  "core_progression_principle": "Scientific Discovery IS the Tech Tree — Acyclic Branching Progression DAG where every Tier-N hazard biome has an explicit safe ecotone or natural-window entry path so players NEVER hit a circular unlock deadlock.",
+  "relay_spine": [
+    {"node": 1, "name": "Node 1 — The Acoustic Anchor", "biome": "singing_canopy", "sub_biome": "Hollow Flute Groves", "milestone": "ms_02_respirator_and_node1"},
+    {"node": 2, "name": "Node 2 — The Subterranean Conduit", "biome": "mycelial_caverns", "sub_biome": "Root-Nerve Nexus", "milestone": "ms_03_mycelial_and_node2"},
+    {"node": 3, "name": "Node 3 — The Piezoelectric Spire", "biome": "quartz_peaks", "sub_biome": "Piezoelectric Spires", "milestone": "ms_05_peaks_and_node3"}
+  ],
+  "ending_world_state_axes": [
+    "ecological_conduct (non-invasive observation & Keystone communions vs. destructive harvesting/hunting)",
+    "forensic_truth (Surveyor-01 wreckage & Kaelen Voss 7-cache investigation depth)",
+    "caldera_resolution (Reactor Overdrive extraction vs. Bio-Remediation healing & open-band vs. silenced relay)"
+  ],
+  "milestones": [
+    {
+      "id": "ms_01_camp_stabilize",
+      "tier": 1,
+      "branch": "spine",
+      "prerequisites": [],
+      "title": "Salvage Drop-Pod & Field Lab Boot",
+      "required_biomes": ["amber_kelp_coast", "singing_canopy"],
+      "safe_entry_mechanism": "Tier-1 Rimlands have breathable air; Twin-Moon Low Tide exposes Drift-Wreck Cove salvage safely.",
+      "required_resources": ["hull_alloy", "amber_agar", "resonant_reed"],
+      "required_discoveries": ["fl_01_amber_kelp", "fl_03_flute_reed", "fa_03_chime_glider"],
+      "unlocks": ["Acoustic Field Lens", "Camp Synthesis Bench", "Collapsible Field Shelter"]
+    },
+    {
+      "id": "ms_02_respirator_and_node1",
+      "tier": 1,
+      "branch": "spine",
+      "prerequisites": ["ms_01_camp_stabilize"],
+      "title": "Relay Node 1 (Rimlands) & Bio-Membrane Filter Mk1",
+      "required_biomes": ["amber_kelp_coast", "singing_canopy"],
+      "safe_entry_mechanism": "Breath-Sponge Lichen and Lichen-Back Newts inhabit the safe wet Singing Canopy / Fen Ecotone border AND midday sun briefly lifts low Acid Mist.",
+      "required_resources": ["filter_lichen", "amber_sap", "fibrous_bast"],
+      "required_discoveries": ["fl_06_filter_lichen", "fa_06_bog_filterer"],
+      "unlocks": ["Acid/Spore Suit Filter Mk1", "Harmonic Decoy Beacon", "Relay Node 1 (Hollow Flute Grove)"]
+    },
+    {
+      "id": "ms_03_mycelial_and_node2",
+      "tier": 2,
+      "branch": "basin_underground",
+      "prerequisites": ["ms_02_respirator_and_node1"],
+      "title": "Basin Ecology, Acoustic Stealth & Relay Node 2 (Caverns)",
+      "required_biomes": ["glass_fen_marshes", "fungal_cathedral", "mycelial_caverns"],
+      "safe_entry_mechanism": "Bio-Membrane Filter Mk1 protects Mara in Vitreous Fen, Vesper Jungle, and upper Mycelial Caverns; Echo-Bat pings map dark passages safely.",
+      "required_resources": ["mycelial_filament", "luminous_cap", "echo_mineral"],
+      "required_discoveries": ["fl_07_snare_pitcher", "fl_09_vesper_parasol", "fl_22_echo_moss", "fl_21_root_nerve", "fa_19_blind_weaver"],
+      "unlocks": ["Whisper-Moss Stealth Boots", "Bio-Cable Relay Link", "Night-Vision Tonic", "Sedative Bio-Dart", "Relay Node 2 (Root-Nerve Nexus)"]
+    },
+    {
+      "id": "ms_04a_sea_and_reef_branch",
+      "tier": 3,
+      "branch": "azure_sea",
+      "prerequisites": ["ms_02_respirator_and_node1"],
+      "title": "Buoyancy Skiff & Tidal Lagoon Survey (Optional Parallel Branch)",
+      "required_biomes": ["basalt_terraces", "azure_archipelago", "abyssal_shelf"],
+      "safe_entry_mechanism": "Basalt Terraces require zero special suit (wind & predators only); Float-Bladder Rafts grow along Archipelago shores allowing Skiff crafting BEFORE entering deep Tidal Lagoon basins, which drain at Twin-Moon Low Tide.",
+      "required_resources": ["piezo_basalt", "buoy_bladders", "pressure_gel"],
+      "required_discoveries": ["fa_11_horn_migrator", "fl_16_buoy_kelp", "fa_16_reef_manta"],
+      "unlocks": ["Buoyancy Skiff", "Tidal Vapor Seal", "Submerged Surveyor-01 Buoy Black Box"]
+    },
+    {
+      "id": "ms_04b_rift_thermal_branch",
+      "tier": 3,
+      "branch": "sun_scoured_rift",
+      "prerequisites": ["ms_02_respirator_and_node1"],
+      "title": "Twilight Desert Crossing & Thermal Lining (Optional Parallel Branch)",
+      "required_biomes": ["basalt_terraces", "ochre_badlands"],
+      "safe_entry_mechanism": "Ochre Badlands is safely traversable during Dusk, Night, and Dawn (or inside Glass-Skink canyon shade) without a Thermal Suit — earning Mirage Wax-Barrel & Copper-Bloom to craft permanent thermal protection!",
+      "required_resources": ["desert_wax", "copper_salts", "fulgerite_glass"],
+      "required_discoveries": ["fl_14_wax_barrel", "fl_15_copper_bloom", "fa_13_sand_skink"],
+      "unlocks": ["Thermal Wax/Moss Suit Lining", "Relay Copper Winding Coils", "Surveyor-01 Telemetry Tracker"]
+    },
+    {
+      "id": "ms_05_peaks_and_node3",
+      "tier": 3,
+      "branch": "highland_summit",
+      "prerequisites": ["ms_03_mycelial_and_node2", "ms_04b_rift_thermal_branch"],
+      "title": "Arc-Grounded Suit & Relay Node 3 (Resonant Quartz Peaks)",
+      "required_biomes": ["basalt_terraces", "quartz_peaks"],
+      "safe_entry_mechanism": "Thermal Lining resists alpine chill; sheltering beside Grounding Storm-Ferns during Ion Tempests allows harvesting Capacitor Ore to craft the permanent Arc-Grounded Suit!",
+      "required_resources": ["capacitor_ore", "resonant_quartz", "alpine_moss"],
+      "required_discoveries": ["fl_18_storm_fern", "fl_19_frost_cushion"],
+      "unlocks": ["Arc-Grounded Suit", "Geode Vault Fast-Travel Activation", "Relay Node 3 (Piezoelectric Spire)"]
+    },
+    {
+      "id": "ms_06_polar_caldera_climax",
+      "tier": 4,
+      "branch": "convergence",
+      "prerequisites": ["ms_05_peaks_and_node3"],
+      "title": "The Polar Superconductor & Caldera Resolution",
+      "required_biomes": ["cryo_glacier", "mycelial_caverns", "sulfur_caldera"],
+      "safe_entry_mechanism": "Thermal Lining + Geothermal Oases (guided by Rime-Puff Burrowers) allow Cryo-Glacier exploration; walking in the steam-shadow of the Cinder-Back Tortoise permits reaching Surveyor-01 Wreck Core inside Caldera radiation.",
+      "required_resources": ["cryo_enzyme", "neural_hyphae", "thermo_bacterium", "reactor_core_cell"],
+      "required_discoveries": ["fl_20_cryo_lotus", "fl_23_thermo_mat", "fl_24_blight_husk", "fa_20_slag_leviathan"],
+      "unlocks": ["Bio-Remediation Culture (Endings B/C)", "Salvaged Reactor Overdrive (Ending A)", "Primary Planetary Broadcast Resolution"]
+    }
+  ]
+}

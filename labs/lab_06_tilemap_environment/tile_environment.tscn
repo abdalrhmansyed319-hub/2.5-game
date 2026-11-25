@@ -1,0 +1,41 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://lab_06_tilemap_environment/tile_environment_controller.gd" id="1_env"]
+
+[sub_resource type="TileSet" id="TileSet_shared"]
+tile_size = Vector2i(16, 16)
+custom_data_layer_0/name = "surface_type"
+custom_data_layer_0/type = 4
+custom_data_layer_1/name = "speed_multiplier"
+custom_data_layer_1/type = 3
+
+[node name="TileEnvironment" type="Node2D" node_paths=PackedStringArray("ground_layer", "walls_ysort_layer", "canopy_overlay_layer", "destructible_layer")]
+y_sort_enabled = true
+script = ExtResource("1_env")
+ground_layer = NodePath("GroundLayer")
+walls_ysort_layer = NodePath("WorldYSort/WallsAndPropsLayer")
+canopy_overlay_layer = NodePath("CanopyOverlayLayer")
+destructible_layer = NodePath("WorldYSort/DestructibleLayer")
+
+[node name="GroundLayer" type="TileMapLayer" parent="."]
+z_index = -20
+tile_set = SubResource("TileSet_shared")
+collision_enabled = false
+
+[node name="WorldYSort" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="WallsAndPropsLayer" type="TileMapLayer" parent="WorldYSort"]
+y_sort_enabled = true
+tile_set = SubResource("TileSet_shared")
+physics_quadrant_size = 16
+
+[node name="DestructibleLayer" type="TileMapLayer" parent="WorldYSort"]
+y_sort_enabled = true
+tile_set = SubResource("TileSet_shared")
+physics_quadrant_size = 1
+
+[node name="CanopyOverlayLayer" type="TileMapLayer" parent="."]
+z_index = 20
+tile_set = SubResource("TileSet_shared")
+collision_enabled = false

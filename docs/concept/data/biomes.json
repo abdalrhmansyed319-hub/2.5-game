@@ -1,0 +1,283 @@
+{
+  "planet": "Oura-IV (Catalog K-419b)",
+  "architecture": "6 Macro-Regions -> 12 Core Biomes + 24 Distinct Sub-Biomes = 36 Named Environmental Identities (plus 1 Subterranean Transition Hub)",
+  "taxonomy_rules": {
+    "core_biome": "Independent master tileset, bespoke 5-band color script, unique atmospheric rule, dedicated ambient audio stem.",
+    "sub_biome": "Shares parent biome base terrain kit while introducing a distinct micro-elevation/lighting rule, bespoke hero landmarks, and at least one exclusive ecological or traversal interaction (never a cosmetic reskin).",
+    "transition_hub": "Cross-regional subterranean connector stitching distant biomes together as an unlockable ecological shortcut."
+  },
+  "biomes": [
+    {
+      "id": "amber_kelp_coast",
+      "name": "Amber Kelp Littoral",
+      "macro_region": "Sunken Rimlands",
+      "tier": 1,
+      "elevation": "sea_level",
+      "moisture": 0.85,
+      "temp_c": 19,
+      "atmosphere_hazard": "none",
+      "sub_biomes": ["Tidal Mirror Flats", "Drift-Wreck Cove"],
+      "adjacent": ["singing_canopy", "glass_fen_marshes", "abyssal_shelf"],
+      "key_resources": ["amber_agar", "salt_silicate", "hull_alloy"],
+      "palette": {
+        "band1_sky": "#C9DCE3",
+        "band2_bg": "#7E9AA2",
+        "band3_ground": "#B89A6C",
+        "band4_actor": "#202A36",
+        "band5_signal": "#FF6B3D",
+        "water": "#367E8A"
+      },
+      "summary": "Crash-landing zone. Warm ochre sands, towering shore-kelp fronds swaying in sea breeze, shallow reflective pools mirroring double moons."
+    },
+    {
+      "id": "singing_canopy",
+      "name": "Singing Reedwood Canopy",
+      "macro_region": "Sunken Rimlands",
+      "tier": 1,
+      "elevation": "lowland",
+      "moisture": 0.72,
+      "temp_c": 21,
+      "atmosphere_hazard": "spore_pollen_periodic",
+      "sub_biomes": ["Hollow Flute Groves", "Sun-Dappled Glades"],
+      "adjacent": ["amber_kelp_coast", "glass_fen_marshes", "basalt_terraces"],
+      "key_resources": ["resonant_reed", "amber_sap", "fibrous_bast"],
+      "palette": {
+        "band1_sky": "#BDD4C8",
+        "band2_bg": "#47695E",
+        "band3_ground": "#6F8A68",
+        "band4_actor": "#F4EFE2",
+        "band5_signal": "#FFB838",
+        "water": "#4B8B82"
+      },
+      "summary": "Cathedral-tall hollow reed trees that hum low harmonic chords when wind passes through their wind-slits; safe starter wilderness rich in benign wildlife."
+    },
+    {
+      "id": "glass_fen_marshes",
+      "name": "Vitreous Fen & Bog",
+      "macro_region": "Lowland Basin",
+      "tier": 2,
+      "elevation": "basin",
+      "moisture": 0.96,
+      "temp_c": 24,
+      "atmosphere_hazard": "acid_mist",
+      "sub_biomes": ["Lantern Mire", "Sunken Root Catacombs"],
+      "adjacent": ["amber_kelp_coast", "singing_canopy", "fungal_cathedral", "mycelial_caverns"],
+      "key_resources": ["filter_lichen", "bio_sulfur", "peat_resin"],
+      "palette": {
+        "band1_sky": "#6D837C",
+        "band2_bg": "#2D423E",
+        "band3_ground": "#4C6356",
+        "band4_actor": "#F5ECD8",
+        "band5_signal": "#6CF2B2",
+        "water": "#3D6D63"
+      },
+      "summary": "Steaming emerald-teal wetlands bridged by tangled root-arches and silica-crusted islands; toxic low mist forces elevated pathing or botanical filters."
+    },
+    {
+      "id": "fungal_cathedral",
+      "name": "Vesper Fungal Jungle",
+      "macro_region": "Lowland Basin",
+      "tier": 2,
+      "elevation": "lowland",
+      "moisture": 0.88,
+      "temp_c": 26,
+      "atmosphere_hazard": "neuro_spores",
+      "sub_biomes": ["Spore-Fall Ravine", "Parasite Crown"],
+      "adjacent": ["glass_fen_marshes", "mycelial_caverns", "ochre_badlands"],
+      "key_resources": ["mycelial_filament", "luminous_cap", "alkaloid_nectar"],
+      "palette": {
+        "band1_sky": "#3F3A56",
+        "band2_bg": "#2A2440",
+        "band3_ground": "#524468",
+        "band4_actor": "#F8EEDB",
+        "band5_signal": "#4CE8E0",
+        "water": "#37556F"
+      },
+      "summary": "Twilight alien jungle under colossal tiered umbrella-fungi blocking 80% of sunlight; glowing spore drifts illuminate complex vertical ecosystems."
+    },
+    {
+      "id": "basalt_terraces",
+      "name": "Steppe of Wind-Carved Basalt",
+      "macro_region": "Highland Divide",
+      "tier": 2,
+      "elevation": "midland",
+      "moisture": 0.42,
+      "temp_c": 16,
+      "atmosphere_hazard": "high_wind",
+      "sub_biomes": ["Grass-Sea Plains", "Whispering Monoliths"],
+      "adjacent": ["singing_canopy", "ochre_badlands", "quartz_peaks", "azure_archipelago"],
+      "key_resources": ["piezo_basalt", "wind_grain", "iron_nodule"],
+      "palette": {
+        "band1_sky": "#D8E2E6",
+        "band2_bg": "#919FA8",
+        "band3_ground": "#948C78",
+        "band4_actor": "#1C232E",
+        "band5_signal": "#E64A2E",
+        "water": "#4A7A8C"
+      },
+      "summary": "Sweeping hexagonal basalt steps blanketed in undulating silver-amber prairie grass; vast horizon sightlines and migratory herds."
+    },
+    {
+      "id": "ochre_badlands",
+      "name": "Ochre Salt-Canyon Desert",
+      "macro_region": "Sun-Scoured Rift",
+      "tier": 3,
+      "elevation": "midland",
+      "moisture": 0.14,
+      "temp_c": 41,
+      "atmosphere_hazard": "heat_radiation",
+      "sub_biomes": ["Fulgerite Dunes", "Dry Riverbed Fossils"],
+      "adjacent": ["basalt_terraces", "fungal_cathedral", "sulfur_caldera"],
+      "key_resources": ["fulgerite_glass", "copper_salts", "desert_wax"],
+      "palette": {
+        "band1_sky": "#E8CEAD",
+        "band2_bg": "#BA835A",
+        "band3_ground": "#A36842",
+        "band4_actor": "#1C2430",
+        "band5_signal": "#22E0D8",
+        "water": "#46757A"
+      },
+      "summary": "Ancient dried inland sea carved into crimson-ochre slot canyons laced with lightning-fused glass spires; blistering midday heat eases into freezing twilight."
+    },
+    {
+      "id": "azure_archipelago",
+      "name": "Pelagic Coral Archipelago",
+      "macro_region": "Azure Sea",
+      "tier": 3,
+      "elevation": "sea_level",
+      "moisture": 0.92,
+      "temp_c": 22,
+      "atmosphere_hazard": "tidal_surge",
+      "sub_biomes": ["Floating Atoll Rings", "Sunken Monolith Shoals"],
+      "adjacent": ["basalt_terraces", "abyssal_shelf", "cryo_glacier"],
+      "key_resources": ["buoy_bladders", "pearl_chitin", "brine_crystal"],
+      "palette": {
+        "band1_sky": "#C6E7F0",
+        "band2_bg": "#75A7B8",
+        "band3_ground": "#C4B48C",
+        "band4_actor": "#1C222D",
+        "band5_signal": "#FF5E6C",
+        "water": "#226F8C"
+      },
+      "summary": "Chain of calcified coral-limestone islands linked by living kelp-rafts and tidal sandbars that emerge and submerge with Oura-IV's twin-moon tides."
+    },
+    {
+      "id": "abyssal_shelf",
+      "name": "Bioluminescent Lagoon & Tidal Reef",
+      "macro_region": "Azure Sea",
+      "tier": 3,
+      "elevation": "intertidal_lagoon",
+      "moisture": 1.0,
+      "temp_c": 11,
+      "atmosphere_hazard": "tidal_vapor_surge",
+      "sub_biomes": ["Glass-Water Kelp Drop", "Drained Thermal Reef-Basins"],
+      "adjacent": ["amber_kelp_coast", "azure_archipelago", "crystal_geode_vaults"],
+      "key_resources": ["pressure_gel", "vent_titanium", "lumen_coral"],
+      "palette": {
+        "band1_sky": "#0F2233",
+        "band2_bg": "#1A384F",
+        "band3_ground": "#2B5269",
+        "band4_actor": "#F6ECD4",
+        "band5_signal": "#FF9838",
+        "water": "#133247"
+      },
+      "summary": "Oblique 3/4 top-down aquatic shelf: traversed at High Tide by Buoyancy Skiff over crystal-clear glowing reefs, and walked directly across drained terraced coral boardwalks and venting tide-basins during Twin-Moon Low Tide."
+    },
+    {
+      "id": "quartz_peaks",
+      "name": "Resonant Quartz Peaks",
+      "macro_region": "Highland Divide",
+      "tier": 3,
+      "elevation": "alpine",
+      "moisture": 0.48,
+      "temp_c": 2,
+      "atmosphere_hazard": "thin_air_lightning",
+      "sub_biomes": ["Cloud-Bridge Ridges", "Piezoelectric Spires"],
+      "adjacent": ["basalt_terraces", "cryo_glacier", "crystal_geode_vaults"],
+      "key_resources": ["resonant_quartz", "alpine_moss", "capacitor_ore"],
+      "palette": {
+        "band1_sky": "#D0DFEE",
+        "band2_bg": "#8CA0B5",
+        "band3_ground": "#7B8694",
+        "band4_actor": "#1B1E29",
+        "band5_signal": "#FFE047",
+        "water": "#5A8BA6"
+      },
+      "summary": "Towering mountains pierced by giant translucent quartz needles that discharge rhythmic arcs during planetary storms; ideal site for the Primary Relay Array."
+    },
+    {
+      "id": "cryo_glacier",
+      "name": "Rime-Glass Tundra & Glacier",
+      "macro_region": "Polar Crown",
+      "tier": 4,
+      "elevation": "polar",
+      "moisture": 0.55,
+      "temp_c": -18,
+      "atmosphere_hazard": "hypothermia",
+      "sub_biomes": ["Aurora Ice Shelves", "Geothermal Oases"],
+      "adjacent": ["quartz_peaks", "azure_archipelago"],
+      "key_resources": ["cryo_enzyme", "superconductor_vein", "glacial_amber"],
+      "palette": {
+        "band1_sky": "#263B54",
+        "band2_bg": "#86A4BD",
+        "band3_ground": "#B8CFE0",
+        "band4_actor": "#19202B",
+        "band5_signal": "#FF5B4A",
+        "water": "#2A5878"
+      },
+      "summary": "Frozen polar wastes lit by shimmering green-violet magnetic auroras; ancient ecosystems preserved inside crystal ice sheets and warm thermal spring pockets."
+    },
+    {
+      "id": "mycelial_caverns",
+      "name": "Deep Mycelial & Crystal Caverns",
+      "macro_region": "Subterranean Choir",
+      "tier": 3,
+      "elevation": "underground",
+      "moisture": 0.80,
+      "temp_c": 14,
+      "atmosphere_hazard": "darkness_spores",
+      "sub_biomes": ["Echoing Dripstone Halls", "Root-Nerve Nexus"],
+      "adjacent": ["glass_fen_marshes", "fungal_cathedral", "crystal_geode_vaults", "sulfur_caldera"],
+      "key_resources": ["neural_hyphae", "echo_mineral", "cave_silkworm_thread"],
+      "palette": {
+        "band1_sky": "#111624",
+        "band2_bg": "#212B40",
+        "band3_ground": "#3C4B63",
+        "band4_actor": "#F6EBD4",
+        "band5_signal": "#5CF5E6",
+        "water": "#1B4254"
+      },
+      "summary": "Cathedral-scale underground cave system where glowing root-nerves pulse with visible waves of bio-electric light connecting distant continents."
+    },
+    {
+      "id": "sulfur_caldera",
+      "name": "The Blighted Caldera (Surveyor-01 Scar)",
+      "macro_region": "Sun-Scoured Rift",
+      "tier": 4,
+      "elevation": "volcanic",
+      "moisture": 0.25,
+      "temp_c": 48,
+      "atmosphere_hazard": "radiation_sulfur",
+      "sub_biomes": ["Obsidian Glass Flows", "Surveyor-01 Wreck Core"],
+      "adjacent": ["ochre_badlands", "mycelial_caverns", "crystal_geode_vaults"],
+      "key_resources": ["reactor_core_cell", "obsidian_prism", "thermo_bacterium"],
+      "palette": {
+        "band1_sky": "#2B1E24",
+        "band2_bg": "#473236",
+        "band3_ground": "#5E4644",
+        "band4_actor": "#F7F1E1",
+        "band5_signal": "#FF912E",
+        "water": "#8C5E2A"
+      },
+      "summary": "Volcanic basin scarred by the 19-year-old corporate probe Surveyor-01; leaking synthetic catalyst turns vibrant mycelial stone into brittle dead ash. Narrative climax site."
+    }
+  ],
+  "linked_transition_hubs": [
+    {
+      "id": "crystal_geode_vaults",
+      "name": "Piezoelectric Geode Vaults (Sub-Biome Hub)",
+      "parent_biome": "mycelial_caverns",
+      "connects": ["abyssal_shelf", "quartz_peaks", "mycelial_caverns", "sulfur_caldera"]
+    }
+  ]
+}

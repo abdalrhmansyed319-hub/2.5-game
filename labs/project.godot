@@ -1,0 +1,69 @@
+; Engine configuration file.
+; Isolated Phase 1 Technical Labs Harness — NOT a game project.
+; Target engine baseline: Godot 4.7.2-stable.
+
+config_version=5
+
+[application]
+
+config/name="Phase 1 Technical Labs Harness"
+config/description="Isolated, genre-agnostic Godot 4.7 engineering verification labs."
+config/features=PackedStringArray("4.7", "Forward Plus")
+
+[debug]
+
+gdscript/warnings/untyped_declaration=2
+gdscript/warnings/unsafe_property_access=2
+gdscript/warnings/unsafe_method_access=2
+gdscript/warnings/unsafe_call_argument=2
+gdscript/warnings/unsafe_cast=2
+settings/gdscript/always_track_call_stacks=true
+
+[display]
+
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[input]
+
+move_left={
+"deadzone": 0.2,
+"events": []
+}
+move_right={
+"deadzone": 0.2,
+"events": []
+}
+move_up={
+"deadzone": 0.2,
+"events": []
+}
+move_down={
+"deadzone": 0.2,
+"events": []
+}
+jump={
+"deadzone": 0.2,
+"events": []
+}
+interact={
+"deadzone": 0.2,
+"events": []
+}
+
+[layer_names]
+
+2d_physics/layer_1="world_solid"
+2d_physics/layer_2="one_way_platform"
+2d_physics/layer_3="actor_body"
+2d_physics/layer_4="interactable"
+2d_physics/layer_5="sensor_hurtbox"
+2d_physics/layer_6="sensor_hitbox"
+3d_physics/layer_1="world_solid"
+3d_physics/layer_2="actor_body"
+3d_physics/layer_3="interactable"
+
+[physics]
+
+common/physics_interpolation=true
+3d/physics_engine="Jolt Physics"

@@ -1,0 +1,72 @@
+{
+  "day_night_cycle": {
+    "duration_minutes": 24,
+    "phases": ["Dawn Mist (3m)", "High Sun (10m)", "Golden Dusk (3m)", "Bioluminescent Night (8m)"]
+  },
+  "planetary_events": [
+    {
+      "id": "wx_01_blooming_tide",
+      "name": "The Blooming Tide (Ionospheric Chorus)",
+      "frequency": "every_5_cycles_planetary",
+      "biomes": ["amber_kelp_coast", "singing_canopy", "fungal_cathedral", "mycelial_caverns", "quartz_peaks", "cryo_glacier"],
+      "gameplay_effect": "All bioluminescent flora pulses in visible harmonic waves; unlocks Choir Root-Nerve alignment; scrambles unshielded radio electronics.",
+      "visual_audio": "Aurora bands sweep twilight sky; bass harmonic drone resonates through ground."
+    },
+    {
+      "id": "wx_02_ion_tempest",
+      "name": "Piezoelectric Ion Tempest",
+      "frequency": "common_in_highlands_occasional_rimlands_squall",
+      "biomes": ["amber_kelp_coast", "singing_canopy", "basalt_terraces", "fungal_cathedral", "quartz_peaks"],
+      "gameplay_effect": "Lightning strikes exposed metal gear unless sheltering beneath Grounding Storm-Ferns, Reedwood Arches, or Field Camp; supercharges Voltaic Beetles; triggers post-storm Verdigris Copper-Blooms in dry canyons.",
+      "visual_audio": "Singing Reedwoods shift from major to urgent minor howling 60s before onset; cyan fork arcs flash crisp pixel silhouettes."
+    },
+    {
+      "id": "wx_03_acid_fog",
+      "name": "Vitreous Acid Mist",
+      "frequency": "periodic_dawn_dusk",
+      "biomes": ["glass_fen_marshes", "sulfur_caldera"],
+      "gameplay_effect": "Drains suit filter envelope in low basins; forces elevated root-arch routes or Breath-Sponge filter; increases Reed-Fang Lurker ambush range.",
+      "visual_audio": "Low emerald ground-fog rolls across water; hissing sizzle on suit visor."
+    },
+    {
+      "id": "wx_04_spore_rain",
+      "name": "Vesper Spore-Fall",
+      "frequency": "common_in_jungle",
+      "biomes": ["fungal_cathedral", "singing_canopy"],
+      "gameplay_effect": "Reduces visibility & triggers mild Neuro-Static without mask; forces shelter beneath Umbrella-Fungi; triggers nocturnal Dusk-Stalker hunts.",
+      "visual_audio": "Drifting teal-gold glowing snowflakes; soft percussive pattering on giant mushroom caps."
+    },
+    {
+      "id": "wx_05_twin_tide",
+      "name": "Twin-Moon Syzygy Tide",
+      "frequency": "every_3_cycles",
+      "biomes": ["amber_kelp_coast", "azure_archipelago", "abyssal_shelf"],
+      "gameplay_effect": "Extreme low tide exposes Sunken Monolith Shoals & wreck salvage for 6 minutes; extreme high tide lifts Float-Bladder Bridges to cliff ledges!",
+      "visual_audio": "Twin moons align visibly in water reflections; rhythmic deep surf rumble."
+    },
+    {
+      "id": "wx_06_heat_mirage",
+      "name": "Zenith Heat Scour",
+      "frequency": "midday_desert",
+      "biomes": ["ochre_badlands", "sulfur_caldera"],
+      "gameplay_effect": "Accelerates thermal drain in open sunlight; wildlife retreats underground; encourages twilight/night desert expeditions & Mirage Wax-Barrel balm.",
+      "visual_audio": "Shimmering heat-haze shader distortion; cicada-like dry mineral clicks."
+    },
+    {
+      "id": "wx_07_aurora_blizzard",
+      "name": "Magnetic Aurora Whiteout",
+      "frequency": "polar_periodic",
+      "biomes": ["cryo_glacier", "quartz_peaks"],
+      "gameplay_effect": "Severe cold drain outside geothermal pockets; ONLY time Aurora Ice-Lotus unfolds for harvesting; compass needle drifts toward magnetic veins.",
+      "visual_audio": "Curtains of green-violet pixel ribbons across sky; howling wind drops to eerie calm inside snow caves."
+    },
+    {
+      "id": "wx_08_seismic_hum",
+      "name": "Subterranean Choir Tremor",
+      "frequency": "rare_underground",
+      "biomes": ["mycelial_caverns", "sulfur_caldera"],
+      "gameplay_effect": "Opens temporary crystal fissures revealing echo minerals; causes Root-Weavers to swarm outward repairing Choir nerves.",
+      "visual_audio": "Subtle camera trauma pulse; crystalline wind-chime resonance echoing through caves."
+    }
+  ]
+}
