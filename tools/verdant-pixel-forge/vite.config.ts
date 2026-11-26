@@ -12,11 +12,19 @@ interface RepoAssetEntry {
   label: string;
   category: 'character' | 'training' | 'reference';
   relPath: string;
-  format: 'source_json' | 'png' | 'jpg';
+  format: 'source_json' | 'vpf_json' | 'png' | 'jpg';
   dimensions: string;
 }
 
 const CURATED_REPO_ASSETS: RepoAssetEntry[] = [
+  {
+    id: 'ast001_mara_vpf',
+    label: 'AST-001: Dr. Mara Lin Production Candidate (16x24 · 64 Frames · 8 Layers)',
+    category: 'character',
+    relPath: 'game/assets/characters/player/candidates/ast001_char_mara_lin_candidate.vpf.json',
+    format: 'vpf_json',
+    dimensions: '16x24 (96x384 sheet)',
+  },
   {
     id: 'mara_v2_source',
     label: 'Dr. Mara Lin v2 (128x128 - 23 Layers)',
@@ -145,7 +153,7 @@ function verdantRepoBridgePlugin(): Plugin {
           return;
         }
         const mime =
-          match.format === 'source_json'
+          match.format === 'source_json' || match.format === 'vpf_json'
             ? 'application/json'
             : match.format === 'png'
               ? 'image/png'

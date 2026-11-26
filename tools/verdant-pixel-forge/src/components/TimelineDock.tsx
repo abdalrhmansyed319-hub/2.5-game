@@ -275,16 +275,20 @@ export const TimelineDock: React.FC<TimelineDockProps> = ({
           </span>
         </div>
 
-        {/* Scrollable Frames Strip */}
+        {/* Scrollable Frames Strip (filters cleanly to active tag when selected!) */}
         <div className="timeline-frames">
           {doc.frames.map((frame, idx) => {
+            const activeTag = activeTagId ? doc.tags.find((t) => t.id === activeTagId) : null;
+            if (activeTag && (idx < activeTag.from || idx > activeTag.to)) return null;
             const isActive = idx === doc.activeFrameIndex;
+            const ownerTag = doc.tags.find((t) => idx >= t.from && idx <= t.to);
             return (
               <div
                 key={frame.id}
                 className={`frame-card ${isActive ? 'active' : ''}`}
                 onClick={() => onSelectFrame(idx)}
                 data-frame-index={idx}
+                title={ownerTag ? `${ownerTag.name} — Frame ${idx - ownerTag.from + 1}` : `Frame ${idx + 1}`}
               >
                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', fontSize: 10 }}>
                   <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>#{idx + 1}</span>

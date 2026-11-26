@@ -38,7 +38,7 @@ Every production asset progresses strictly through six tracked states:
 | Asset ID | Filename | Milestone | Category | Target Godot Destination | Priority | Status |
 | :---: | --- | :---: | --- | --- | :---: | :---: |
 | `AST-000` | `icon.svg` | M00 | Project Icon | `game/assets/icon.svg` | Critical | **Integrated** *(Pending Windows visual sign-off)* |
-| `AST-001` | `char_mara_lin_sheet.png` | M01 | Character Sprite Sheet (`96×384`) | `game/assets/characters/player/char_mara_lin_sheet.png` | **Critical** | **Requested** *(Spec v2.0 Audited)* |
+| `AST-001` | `char_mara_lin_sheet.png` | M01 | Character Sprite Sheet (`96×384`) | `game/assets/characters/player/char_mara_lin_sheet.png` *(Candidate staged in `candidates/`)* | **Critical** | **Received** *(VPF Candidate Pending Artistic Approval — Not Yet Integrated)* |
 | `AST-002` | `env_amber_coast_ground_tileset.png` | M01 | Core Ground Tileset (`192×128`) | `game/assets/world/tilesets/env_amber_coast_ground_tileset.png` | **Critical** | **Requested** *(Spec v2.0 Audited)* |
 | `AST-003` | `env_singing_canopy_ground_tileset.png` | M01 | Core Ground Tileset (`192×96`) | `game/assets/world/tilesets/env_singing_canopy_ground_tileset.png` | **Critical** | **Requested** *(Spec v2.0 Audited)* |
 | `AST-004` | `prop_singing_reedwood_tree_sheet.png` | M01 | Multi-Tile Tree & Canopy (`96×160`) | `game/assets/world/props/prop_singing_reedwood_tree_sheet.png` | **Critical** | **Requested** *(Spec v2.0 Audited)* |
@@ -128,6 +128,14 @@ Every production asset progresses strictly through six tracked states:
     - Path: `game/assets/characters/player/char_mara_lin_sheet.png`
     - Node: `Sprite2D` (`hframes = 6`, `vframes = 16`, `centered = true`, `offset = Vector2(0, -10)`) inside `Player` (`CharacterBody2D`, `motion_mode = MOTION_MODE_FLOATING`, `collision_layer = 2`, `collision_mask = 5`, foot `RectangleShape2D(10, 6)` at `(0, -2)`).
     - Import: `Compress = Lossless`, `Mipmaps = Off`, `Filter = Nearest`.
+12. **Production Candidate Delivery Status (2026-11-25 — Pending User Artistic Sign-Off)**:
+    - **Authoring Tool**: Authored and exported natively through **VERDANT PIXEL FORGE v1.1** (`tools/verdant-pixel-forge/`, 8 editable layers × 64 populated frames × 16 tags, exported via `'tag_rows'` Godot `6×16` RGBA8 PNG pipeline). Visual identity reconciled directly with approved `mara_lin_concept_128x128_v2.png` and `VERDANT_SIGNAL_PIXEL_ART_STYLE_GUIDE.md` (30-color Master Palette: burnt-orange survival suit, warm ivory helmet stripe, curved dark-teal glass visor, weathered brown harness/boots, brushed titanium backpack & chest rig, moss specimen vial, metallic parabolic Acoustic Field Lens).
+    - **Candidate Staging Paths (Isolated from M01 Gameplay & Concept Art)**:
+      - Production Candidate Sheet (`96×384` RGBA8 PNG): `game/assets/characters/player/candidates/ast001_char_mara_lin_sheet.png`
+      - Editable VPF Studio Project (8 layers × 64 frames): `game/assets/characters/player/candidates/ast001_char_mara_lin_candidate.vpf.json` (also loadable live via VERDANT PIXEL FORGE **Repo Assets -> `ast001_mara_vpf`**)
+      - Godot Metadata & Import Sidecar: `game/assets/characters/player/candidates/ast001_godot_manifest.json` & `ast001_char_mara_lin_sheet.png.import`
+      - Review & Animated Previews: `game/assets/characters/player/candidates/previews/` (`ast001_directions_and_states_8x.png`, `ast001_walk_cycles_6x.png`, `ast001_sheet_1x_and_3x_review.png`, `ast001_showcase_loop_4x.gif`, + 8 individual `4×` animated GIFs)
+    - **Integration Gate**: `game/assets/debug_placeholders/debug_placeholder_char_mara_lin_sheet.png` and `game/characters/player/player.gd` remain **untouched** until explicit artistic approval is granted. Upon approval, promote `candidates/ast001_char_mara_lin_sheet.png` -> `game/assets/characters/player/char_mara_lin_sheet.png` and wire into `Player.tscn`.
 12. **Priority**: **Critical**.
 
 ---

@@ -2,13 +2,129 @@ import type { AnimationFrame, LayerNode, PalettePreset, ProjectDocument } from '
 import { compositeFrame, createEmptyBuffer, hexToRgba, rgbaToHex } from './pixelBuffer';
 import { DEFAULT_PALETTES, VERDANT_MASTER_PALETTE } from './paletteEngine';
 import { encodeAnimatedGIF } from './gifEncoder';
+import { encodeRGBA8PNG } from './pngEncoder';
 import { runPixelQualityAudit } from './qcEngine';
 
 export interface SpriteSheetOptions {
-  layout: 'horizontal' | 'vertical' | 'grid';
+  layout: 'horizontal' | 'vertical' | 'grid' | 'tag_rows';
   columns: number;
   spacing: number;
   margin: number;
+}
+
+export interface SpriteSheetBufferResult {
+  width: number;
+  height: number;
+  pixels: Uint8ClampedArray;
+  cols: number;
+  rows: number;
+  populatedCells: number;
+  transparentCells: number;
+  frameRects: Array<{
+    frame: number;
+    tag?: string;
+    row: number;
+    col: number;
+    flatIndex: number;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    durationMs: number;
+  }>;
+}
+
+export function renderSpriteSheetBuffer(
+  doc: ProjectDocument,
+  opts: SpriteSheetOptions
+): SpriteSheetBufferResult {
+  const frameRects: SpriteSheetBufferResult['frameRects'] = [];
+  let cols = 1;
+  let rows = 1;
+
+  if (opts.layout === 'tag_rows' && doc.tags.length > 0) {
+    const maxTagLen = Math.max(...doc.tags.map((t) => Math.max(1, t.to - t.from + 1)));
+    cols = Math.max(opts.columns, maxTagLen);
+    rows = doc.tags.length;
+  } else {
+    const count = doc.frames.length;
+    cols =
+      opts.layout === 'horizontal'
+        ? count
+        : opts.layout === 'vertical'
+          ? 1
+          : Math.max(1, Math.min(count, opts.columns));
+    rows = Math.max(1, Math.ceil(count / cols));
+  }
+
+  const sheetW = opts.margin * 2 + cols * doc.width + Math.max(0, cols - 1) * opts.spacing;
+  const sheetH = opts.margin * 2 + rows * doc.height + Math.max(0, rows - 1) * opts.spacing;
+  const pixels = new Uint8ClampedArray(sheetW * sheetH * 4);
+
+  const blitFrame = (frameIdx: number, col: number, row: number, tagName?: string) => {
+    const frame = doc.frames[frameIdx];
+    if (!frame) return;
+    const ox = opts.margin + col * (doc.width + opts.spacing);
+    const oy = opts.margin + row * (doc.height + opts.spacing);
+    const comp = compositeFrame(doc.width, doc.height, doc.layers, frame, null);
+    for (let y = 0; y < doc.height; y++) {
+      for (let x = 0; x < doc.width; x++) {
+        const s = (y * doc.width + x) * 4;
+        if (comp[s + 3] === 0) continue;
+        const d = ((oy + y) * sheetW + (ox + x)) * 4;
+        pixels[d] = comp[s];
+        pixels[d + 1] = comp[s + 1];
+        pixels[d + 2] = comp[s + 2];
+        pixels[d + 3] = comp[s + 3];
+      }
+    }
+    frameRects.push({
+      frame: frameIdx,
+      tag: tagName,
+      row,
+      col,
+      flatIndex: row * cols + col,
+      x: ox,
+      y: oy,
+      w: doc.width,
+      h: doc.height,
+      durationMs: frame.durationMs,
+    });
+  };
+
+  if (opts.layout === 'tag_rows' && doc.tags.length > 0) {
+    doc.tags.forEach((tag, rowIdx) => {
+      let colIdx = 0;
+      for (let fIdx = tag.from; fIdx <= tag.to && colIdx < cols; fIdx++, colIdx++) {
+        blitFrame(fIdx, colIdx, rowIdx, tag.name);
+      }
+    });
+  } else {
+    for (let i = 0; i < doc.frames.length; i++) {
+      blitFrame(i, i % cols, Math.floor(i / cols));
+    }
+  }
+
+  const totalCells = cols * rows;
+  return {
+    width: sheetW,
+    height: sheetH,
+    pixels,
+    cols,
+    rows,
+    populatedCells: frameRects.length,
+    transparentCells: Math.max(0, totalCells - frameRects.length),
+    frameRects,
+  };
+}
+
+export function encodeSpriteSheetPNG(doc: ProjectDocument, opts: SpriteSheetOptions): {
+  pngBytes: Uint8Array;
+  sheet: SpriteSheetBufferResult;
+} {
+  const sheet = renderSpriteSheetBuffer(doc, opts);
+  const pngBytes = encodeRGBA8PNG(sheet.pixels, sheet.width, sheet.height);
+  return { pngBytes, sheet };
 }
 
 export function bufferToCanvas(buf: Uint8ClampedArray, width: number, height: number): HTMLCanvasElement {
@@ -46,40 +162,13 @@ export function renderSpriteSheetCanvas(
   opts: SpriteSheetOptions
 ): {
   canvas: HTMLCanvasElement;
-  frameRects: Array<{ frame: number; x: number; y: number; w: number; h: number; durationMs: number }>;
+  frameRects: SpriteSheetBufferResult['frameRects'];
   cols: number;
   rows: number;
 } {
-  const count = doc.frames.length;
-  const cols =
-    opts.layout === 'horizontal'
-      ? count
-      : opts.layout === 'vertical'
-        ? 1
-        : Math.max(1, Math.min(count, opts.columns));
-  const rows = Math.max(1, Math.ceil(count / cols));
-  const sheetW = opts.margin * 2 + cols * doc.width + Math.max(0, cols - 1) * opts.spacing;
-  const sheetH = opts.margin * 2 + rows * doc.height + Math.max(0, rows - 1) * opts.spacing;
-
-  const canvas = document.createElement('canvas');
-  canvas.width = sheetW;
-  canvas.height = sheetH;
-  const ctx = canvas.getContext('2d')!;
-  ctx.imageSmoothingEnabled = false;
-
-  const frameRects: Array<{ frame: number; x: number; y: number; w: number; h: number; durationMs: number }> = [];
-
-  for (let i = 0; i < count; i++) {
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    const x = opts.margin + col * (doc.width + opts.spacing);
-    const y = opts.margin + row * (doc.height + opts.spacing);
-    const comp = compositeFrame(doc.width, doc.height, doc.layers, doc.frames[i], null);
-    const frameCanvas = bufferToCanvas(comp, doc.width, doc.height);
-    ctx.drawImage(frameCanvas, x, y);
-    frameRects.push({ frame: i, x, y, w: doc.width, h: doc.height, durationMs: doc.frames[i].durationMs });
-  }
-  return { canvas, frameRects, cols, rows };
+  const sheet = renderSpriteSheetBuffer(doc, opts);
+  const canvas = bufferToCanvas(sheet.pixels, sheet.width, sheet.height);
+  return { canvas, frameRects: sheet.frameRects, cols: sheet.cols, rows: sheet.rows };
 }
 
 export function buildGodotImportSidecar(pngFileName: string): string {
@@ -122,7 +211,18 @@ export function buildGodotManifestJSON(
   doc: ProjectDocument,
   sheetFileName: string,
   opts: SpriteSheetOptions,
-  frameRects: Array<{ frame: number; x: number; y: number; w: number; h: number; durationMs: number }>,
+  frameRects: Array<{
+    frame: number;
+    tag?: string;
+    row?: number;
+    col?: number;
+    flatIndex?: number;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    durationMs: number;
+  }>,
   cols: number,
   rows: number
 ): string {
@@ -135,6 +235,10 @@ export function buildGodotManifestJSON(
     null
   );
   const qc = runPixelQualityAudit(activeComp, doc.width, doc.height, palette, doc.tileset.tileWidth, doc.tileset.tileHeight);
+  const spriteOffset = {
+    x: Math.floor(doc.width / 2) - doc.pivot.x,
+    y: Math.floor(doc.height / 2) - doc.pivot.y,
+  };
   const manifest = {
     schema: 'verdant_pixel_forge_godot_manifest_v1',
     generator: 'VERDANT PIXEL FORGE',
@@ -142,19 +246,44 @@ export function buildGodotManifestJSON(
       target_version: '4.7.2',
       texture_filter: 'TEXTURE_FILTER_NEAREST',
       mipmaps: false,
+      hframes: cols,
+      vframes: rows,
+      centered: true,
+      sprite2d_offset: spriteOffset,
       binary_alpha_verified: qc.semiAlphaPixels === 0,
     },
     asset_name: doc.name,
     sprite_sheet_file: sheetFileName,
     frame_dimensions: { width: doc.width, height: doc.height },
-    sheet_layout: { mode: opts.layout, columns: cols, rows, spacing: opts.spacing, margin: opts.margin },
+    sheet_dimensions: {
+      width: opts.margin * 2 + cols * doc.width + Math.max(0, cols - 1) * opts.spacing,
+      height: opts.margin * 2 + rows * doc.height + Math.max(0, rows - 1) * opts.spacing,
+    },
+    sheet_layout: {
+      mode: opts.layout,
+      columns: cols,
+      rows,
+      populated_cells: frameRects.length,
+      transparent_cells: Math.max(0, cols * rows - frameRects.length),
+      spacing: opts.spacing,
+      margin: opts.margin,
+    },
     pivot: doc.pivot,
-    animations: doc.tags.map((tag) => ({
-      name: tag.name,
-      from_frame: tag.from,
-      to_frame: tag.to,
-      frames: frameRects.slice(tag.from, tag.to + 1),
-    })),
+    animations: doc.tags.map((tag, rowIdx) => {
+      const tagRects =
+        opts.layout === 'tag_rows'
+          ? frameRects.filter((r) => r.row === rowIdx)
+          : frameRects.slice(tag.from, tag.to + 1);
+      return {
+        name: tag.name,
+        row: opts.layout === 'tag_rows' ? rowIdx : undefined,
+        from_frame: tag.from,
+        to_frame: tag.to,
+        frame_count: tag.to - tag.from + 1,
+        flat_indices: tagRects.map((r) => r.flatIndex),
+        frames: tagRects,
+      };
+    }),
     frames: frameRects,
     tileset: {
       tile_width: doc.tileset.tileWidth,

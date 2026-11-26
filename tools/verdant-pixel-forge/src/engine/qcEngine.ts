@@ -1,5 +1,6 @@
-import type { PalettePreset, QCReport } from '../types/studio';
-import { rgbaToHex } from './pixelBuffer';
+import type { PalettePreset, ProjectDocument, QCReport } from '../types/studio';
+import { compositeFrame, rgbaToHex } from './pixelBuffer';
+import { flipBufferHorizontal } from './transformEngine';
 
 function lumAt(buf: Uint8ClampedArray, idx: number): number {
   return (0.2126 * buf[idx] + 0.7152 * buf[idx + 1] + 0.0722 * buf[idx + 2]) / 255;
@@ -255,5 +256,139 @@ export function runPixelQualityAudit(
     seamIssuesH,
     seamIssuesV,
     summaryNotes,
+  };
+}
+
+export interface AnimationContinuityReport {
+  totalFrames: number;
+  tagAudits: Array<{
+    tagName: string;
+    frameCount: number;
+    avgOpaquePx: number;
+    minTopY: number;
+    maxBottomY: number;
+    avgFrameChurnPct: number;
+    groundedAtPivotY: boolean;
+  }>;
+  mirrorPairsDetected: Array<{ rightTag: string; leftTag: string; mirrorMatchPct: number }>;
+  allBinaryAlpha: boolean;
+  totalOffPalettePixels: number;
+}
+
+/**
+ * Multi-Frame Animation Continuity, Grounding & Mirroring Inspector (Non-Destructive)
+ */
+export function runAnimationContinuityAudit(doc: ProjectDocument): AnimationContinuityReport {
+  const palette = doc.palettes.find((p) => p.id === doc.activePaletteId) ?? doc.palettes[0];
+  const palSet = new Set(palette.colors.map((c) => c.hex.toUpperCase()));
+  const composites = doc.frames.map((f) => compositeFrame(doc.width, doc.height, doc.layers, f, null));
+
+  let allBinaryAlpha = true;
+  let totalOffPalettePixels = 0;
+
+  for (const buf of composites) {
+    for (let i = 0; i < buf.length; i += 4) {
+      const a = buf[i + 3];
+      if (a > 0 && a < 255) allBinaryAlpha = false;
+      if (a > 0) {
+        const hx = rgbaToHex(buf[i], buf[i + 1], buf[i + 2]);
+        if (palSet.size > 0 && !palSet.has(hx)) totalOffPalettePixels++;
+      }
+    }
+  }
+
+  const tagAudits: AnimationContinuityReport['tagAudits'] = [];
+  for (const tag of doc.tags) {
+    const idxs: number[] = [];
+    for (let i = tag.from; i <= tag.to && i < composites.length; i++) idxs.push(i);
+    if (idxs.length === 0) continue;
+
+    let opaqueSum = 0;
+    let minTopY = doc.height;
+    let maxBottomY = -1;
+    let groundedCount = 0;
+    let churnSum = 0;
+    let churnPairs = 0;
+
+    for (let k = 0; k < idxs.length; k++) {
+      const buf = composites[idxs[k]];
+      let frameOpaque = 0;
+      let fBottom = -1;
+      for (let y = 0; y < doc.height; y++) {
+        for (let x = 0; x < doc.width; x++) {
+          if (buf[(y * doc.width + x) * 4 + 3] > 0) {
+            frameOpaque++;
+            if (y < minTopY) minTopY = y;
+            if (y > maxBottomY) maxBottomY = y;
+            if (y > fBottom) fBottom = y;
+          }
+        }
+      }
+      opaqueSum += frameOpaque;
+      if (fBottom === doc.pivot.y) groundedCount++;
+
+      if (idxs.length > 1) {
+        const nextBuf = composites[idxs[(k + 1) % idxs.length]];
+        let diff = 0;
+        let union = 0;
+        for (let p = 0; p < buf.length; p += 4) {
+          const a1 = buf[p + 3] > 0;
+          const a2 = nextBuf[p + 3] > 0;
+          if (!a1 && !a2) continue;
+          union++;
+          if (buf[p] !== nextBuf[p] || buf[p + 1] !== nextBuf[p + 1] || buf[p + 2] !== nextBuf[p + 2] || a1 !== a2) {
+            diff++;
+          }
+        }
+        if (union > 0) {
+          churnSum += (diff / union) * 100;
+          churnPairs++;
+        }
+      }
+    }
+
+    tagAudits.push({
+      tagName: tag.name,
+      frameCount: idxs.length,
+      avgOpaquePx: Math.round(opaqueSum / idxs.length),
+      minTopY,
+      maxBottomY,
+      avgFrameChurnPct: churnPairs > 0 ? Number((churnSum / churnPairs).toFixed(1)) : 0,
+      groundedAtPivotY: groundedCount === idxs.length,
+    });
+  }
+
+  // Detect accidental horizontal mirroring between *_right and *_left tags
+  const mirrorPairsDetected: AnimationContinuityReport['mirrorPairsDetected'] = [];
+  for (const rTag of doc.tags) {
+    if (!rTag.name.endsWith('_right')) continue;
+    const prefix = rTag.name.slice(0, -6);
+    const lTag = doc.tags.find((t) => t.name === `${prefix}_left`);
+    if (!lTag) continue;
+    const rBuf = composites[rTag.from];
+    const lBuf = composites[lTag.from];
+    if (!rBuf || !lBuf) continue;
+    const flippedR = flipBufferHorizontal(rBuf, doc.width, doc.height).pixels;
+    let same = 0;
+    let union = 0;
+    for (let p = 0; p < lBuf.length; p += 4) {
+      const a1 = flippedR[p + 3] > 0;
+      const a2 = lBuf[p + 3] > 0;
+      if (!a1 && !a2) continue;
+      union++;
+      if (flippedR[p] === lBuf[p] && flippedR[p + 1] === lBuf[p + 1] && flippedR[p + 2] === lBuf[p + 2] && a1 === a2) {
+        same++;
+      }
+    }
+    const pct = union > 0 ? Number(((same / union) * 100).toFixed(1)) : 0;
+    mirrorPairsDetected.push({ rightTag: rTag.name, leftTag: lTag.name, mirrorMatchPct: pct });
+  }
+
+  return {
+    totalFrames: doc.frames.length,
+    tagAudits,
+    mirrorPairsDetected,
+    allBinaryAlpha,
+    totalOffPalettePixels,
   };
 }

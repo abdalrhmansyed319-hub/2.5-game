@@ -754,7 +754,7 @@ export const App: React.FC = () => {
       setDoc(loaded);
       setSelection(null);
       setFloating(null);
-      setZoom(loaded.width <= 64 ? 8 : 4);
+      setZoom(loaded.width <= 24 ? 16 : loaded.width <= 64 ? 8 : loaded.width <= 128 ? 4 : 2);
       setPan({ x: 0, y: 0 });
       setIsPlaying(false);
       notify(`Loaded repository asset "${loaded.name}" (${loaded.layers.length} editable layers).`);

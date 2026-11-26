@@ -31,8 +31,8 @@ export const NewCanvasModal: React.FC<{
 
   const presets = [
     { label: '16×16 Tile', w: 16, h: 16, t: 16 },
+    { label: '16×24 Character (AST-001)', w: 16, h: 24, t: 16 },
     { label: '32×32 Icon / Prop', w: 32, h: 32, t: 16 },
-    { label: '48×48 Study', w: 48, h: 48, t: 16 },
     { label: '64×64 Sprite', w: 64, h: 64, t: 16 },
     { label: '128×128 Hero', w: 128, h: 128, t: 16 },
     { label: '256×256 Tileset', w: 256, h: 256, t: 32 },
@@ -300,12 +300,12 @@ export const ExportModal: React.FC<{
   onNotify: (msg: string) => void;
 }> = ({ doc, onClose, onNotify }) => {
   const [pngScale, setPngScale] = useState(1);
-  const [sheetOpts, setSheetOpts] = useState<SpriteSheetOptions>({
-    layout: 'horizontal',
-    columns: Math.max(1, Math.min(4, doc.frames.length)),
+  const [sheetOpts, setSheetOpts] = useState<SpriteSheetOptions>(() => ({
+    layout: doc.tags.length > 1 ? 'tag_rows' : 'horizontal',
+    columns: doc.tags.length > 1 ? Math.max(6, ...doc.tags.map((t) => t.to - t.from + 1)) : Math.max(1, Math.min(4, doc.frames.length)),
     spacing: 0,
     margin: 0,
-  });
+  }));
   const previewRef = useRef<HTMLCanvasElement>(null);
 
   const safeName = doc.name.replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -414,6 +414,7 @@ export const ExportModal: React.FC<{
                   value={sheetOpts.layout}
                   onChange={(e) => setSheetOpts({ ...sheetOpts, layout: e.target.value as SpriteSheetOptions['layout'] })}
                 >
+                  <option value="tag_rows">Row per Animation Tag (Godot H×V)</option>
                   <option value="horizontal">Horizontal Strip</option>
                   <option value="vertical">Vertical Strip</option>
                   <option value="grid">Custom Grid</option>
@@ -425,7 +426,7 @@ export const ExportModal: React.FC<{
                   type="number"
                   min={1}
                   max={64}
-                  disabled={sheetOpts.layout !== 'grid'}
+                  disabled={sheetOpts.layout !== 'grid' && sheetOpts.layout !== 'tag_rows'}
                   value={sheetOpts.columns}
                   onChange={(e) => setSheetOpts({ ...sheetOpts, columns: Math.max(1, Number(e.target.value) || 1) })}
                 />
@@ -502,7 +503,7 @@ export const RepoAssetsModal: React.FC<{
   useEffect(() => {
     fetch('/api/repo-assets')
       .then((r) => (r.ok ? r.json() : { assets: [] }))
-      .then((d) => setAssets((d.assets ?? []).filter((a: { format: string }) => a.format === 'source_json')))
+      .then((d) => setAssets((d.assets ?? []).filter((a: { format: string }) => a.format === 'source_json' || a.format === 'vpf_json')))
       .catch(() => {});
   }, []);
 

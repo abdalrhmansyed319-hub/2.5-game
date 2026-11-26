@@ -35,16 +35,20 @@ import {
   importPaletteText,
   replaceColorAcrossFrames,
 } from '../engine/paletteEngine';
-import { runPixelQualityAudit } from '../engine/qcEngine';
+import { runAnimationContinuityAudit, runPixelQualityAudit } from '../engine/qcEngine';
 import { encodeAnimatedGIF } from '../engine/gifEncoder';
+import { encodeRGBA8PNG } from '../engine/pngEncoder';
 import {
   buildGodotImportSidecar,
   buildGodotManifestJSON,
   createBlankProject,
   deserializeProjectJSON,
+  encodeSpriteSheetPNG,
   exportAsVerdantSourceJSON,
+  renderSpriteSheetBuffer,
   serializeVpfProject,
 } from '../engine/exportEngine';
+import { buildAst001VpfProject } from '../production/ast001MaraAuthoring';
 
 describe('VERDANT PIXEL FORGE — Core Pixel Engine & File Formats', () => {
   it('draws & erases crisp pixels on 128x128 with zero semi-alpha blur', () => {
@@ -253,5 +257,96 @@ describe('VERDANT PIXEL FORGE — Core Pixel Engine & File Formats', () => {
     );
     expect(manifest.godot_compatibility.texture_filter).toBe('TEXTURE_FILTER_NEAREST');
     expect(manifest.godot_compatibility.binary_alpha_verified).toBe(true);
+  });
+
+  it('exports AST-001 via tag_rows Godot 6x16 layout (96x384 RGBA8 PNG), passes continuity audit, and reloads saved .vpf.json', () => {
+    const doc = buildAst001VpfProject();
+    expect(doc.width).toBe(16);
+    expect(doc.height).toBe(24);
+    expect(doc.layers.length).toBe(8);
+    expect(doc.frames.length).toBe(64);
+    expect(doc.tags.length).toBe(16);
+    expect(doc.pivot).toEqual({ x: 8, y: 22 });
+
+    // 1. Export via VERDANT PIXEL FORGE tag_rows Godot sheet engine
+    const sheet = renderSpriteSheetBuffer(doc, {
+      layout: 'tag_rows',
+      columns: 6,
+      spacing: 0,
+      margin: 0,
+    });
+    expect(sheet.width).toBe(96);
+    expect(sheet.height).toBe(384);
+    expect(sheet.cols).toBe(6);
+    expect(sheet.rows).toBe(16);
+    expect(sheet.frameRects.length).toBe(64);
+
+    // 2. Verify all 32 unused cells are strictly transparent RGBA(0,0,0,0)
+    const occupied = new Set(sheet.frameRects.map((m) => `${m.x},${m.y}`));
+    expect(occupied.size).toBe(64);
+    let unusedCells = 0;
+    for (let r = 0; r < 16; r++) {
+      for (let c = 0; c < 6; c++) {
+        const key = `${c * 16},${r * 24}`;
+        if (occupied.has(key)) continue;
+        unusedCells++;
+        for (let y = r * 24; y < (r + 1) * 24; y++) {
+          for (let x = c * 16; x < (c + 1) * 16; x++) {
+            const idx = (y * 96 + x) * 4;
+            expect(sheet.pixels[idx + 3]).toBe(0);
+          }
+        }
+      }
+    }
+    expect(unusedCells).toBe(32);
+
+    // 3. Verify lossless RGBA8 PNG encoder header + IHDR dimensions
+    const png = encodeSpriteSheetPNG(doc, { layout: 'tag_rows', columns: 6, spacing: 0, margin: 0 });
+    const rawPng = encodeRGBA8PNG(sheet.pixels, sheet.width, sheet.height);
+    expect(png.pngBytes.length).toBe(rawPng.length);
+    expect(Array.from(png.pngBytes.slice(0, 8))).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
+    const dv = new DataView(png.pngBytes.buffer, png.pngBytes.byteOffset, png.pngBytes.byteLength);
+    expect(dv.getUint32(16)).toBe(96);
+    expect(dv.getUint32(20)).toBe(384);
+    expect(png.pngBytes[24]).toBe(8); // 8-bit depth
+    expect(png.pngBytes[25]).toBe(6); // RGBA8
+
+    // 4. Verify multi-frame animation continuity & anti-mirroring QC
+    const continuity = runAnimationContinuityAudit(doc);
+    expect(continuity.allBinaryAlpha).toBe(true);
+    expect(continuity.totalOffPalettePixels).toBe(0);
+    expect(continuity.tagAudits.length).toBe(16);
+    expect(continuity.tagAudits.every((t) => t.groundedAtPivotY)).toBe(true);
+    expect(continuity.mirrorPairsDetected.length).toBe(4);
+    expect(continuity.mirrorPairsDetected.every((m) => m.mirrorMatchPct < 35)).toBe(true);
+
+    // 5. Verify saved candidate .vpf.json on disk reloads identically into Pixel Forge
+    const vpfPath = path.resolve(
+      __dirname,
+      '../../../../game/assets/characters/player/candidates/ast001_char_mara_lin_candidate.vpf.json'
+    );
+    const reopened = deserializeProjectJSON(fs.readFileSync(vpfPath, 'utf-8'));
+    expect(reopened.width).toBe(16);
+    expect(reopened.height).toBe(24);
+    expect(reopened.layers.length).toBe(8);
+    expect(reopened.frames.length).toBe(64);
+    expect(reopened.tags.length).toBe(16);
+
+    // 6. Verify Godot manifest computes exact Sprite2D.offset = (0, -10)
+    const manifest = JSON.parse(
+      buildGodotManifestJSON(
+        reopened,
+        'ast001_char_mara_lin_sheet.png',
+        { layout: 'tag_rows', columns: 6, spacing: 0, margin: 0 },
+        sheet.frameRects,
+        sheet.cols,
+        sheet.rows
+      )
+    );
+    expect(manifest.godot_compatibility.hframes).toBe(6);
+    expect(manifest.godot_compatibility.vframes).toBe(16);
+    expect(manifest.godot_compatibility.sprite2d_offset).toEqual({ x: 0, y: -10 });
+    expect(manifest.sheet_layout.populated_cells).toBe(64);
+    expect(manifest.sheet_layout.transparent_cells).toBe(32);
   });
 });
