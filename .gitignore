@@ -38,6 +38,12 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 
+# Node / Web Studio build artifacts (VERDANT PIXEL FORGE)
+node_modules/
+tools/verdant-pixel-forge/dist/
+tools/verdant-pixel-forge/.vite/
+*.tsbuildinfo
+
 # OS & external editor clutter (Windows / macOS / Linux)
 .DS_Store
 Thumbs.db
