@@ -15,7 +15,7 @@ var _show_telemetry: bool = true
 func _ready() -> void:
 	_refresh_banner()
 	_controls_label.text = (
-		"WASD Move | Shift Crouch | Q/RMB Lens | T Time | F3 Telemetry | Esc Boot"
+		"WASD/Arrows Move | C/Ctrl Crouch | Q/RMB Lens | T Time | F3 HUD | Esc Boot"
 	)
 
 

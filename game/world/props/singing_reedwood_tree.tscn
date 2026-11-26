@@ -32,7 +32,7 @@ region_enabled = true
 
 [node name="CanopyFadeArea" type="Area2D" parent="."]
 collision_layer = 128
-collision_mask = 2
+collision_mask = 4
 monitoring = true
 monitorable = false
 

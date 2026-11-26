@@ -14,7 +14,7 @@ const FADE_SPEED: float = 8.0
 @export_range(0, 1) var tree_variant: int = 0
 
 var _target_canopy_alpha: float = 1.0
-var _player_inside: bool = false
+var _overlapping_player: PlayerController = null
 
 @onready var _shadow_sprite: Sprite2D = $ShadowSprite
 @onready var _trunk_sprite: Sprite2D = $TrunkSprite
@@ -26,6 +26,12 @@ func _ready() -> void:
 	_apply_variant_textures()
 	_fade_area.body_entered.connect(_on_fade_area_body_entered)
 	_fade_area.body_exited.connect(_on_fade_area_body_exited)
+
+
+func _exit_tree() -> void:
+	if _overlapping_player != null and is_instance_valid(_overlapping_player):
+		_overlapping_player.notify_canopy_exited()
+	_overlapping_player = null
 
 
 func _process(delta: float) -> void:
@@ -72,14 +78,16 @@ func _apply_variant_textures() -> void:
 
 
 func _on_fade_area_body_entered(body: Node2D) -> void:
-	if body is PlayerController and not _player_inside:
-		_player_inside = true
+	if body is PlayerController and _overlapping_player == null:
+		var player: PlayerController = body as PlayerController
+		_overlapping_player = player
 		_target_canopy_alpha = FADE_ALPHA
-		(body as PlayerController).notify_canopy_entered()
+		player.notify_canopy_entered()
 
 
 func _on_fade_area_body_exited(body: Node2D) -> void:
-	if body is PlayerController and _player_inside:
-		_player_inside = false
+	if body is PlayerController and body == _overlapping_player:
+		var player: PlayerController = body as PlayerController
+		_overlapping_player = null
 		_target_canopy_alpha = 1.0
-		(body as PlayerController).notify_canopy_exited()
+		player.notify_canopy_exited()

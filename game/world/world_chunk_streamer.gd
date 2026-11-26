@@ -93,6 +93,8 @@ func set_night_mode(night_enabled: bool) -> void:
 
 
 func get_surface_type_at(world_pos: Vector2) -> String:
+	if _ground_layer.tile_set == null:
+		return "sand"
 	var cell: Vector2i = _ground_layer.local_to_map(_ground_layer.to_local(world_pos))
 	var layers: Array[TileMapLayer] = [
 		_decal_layer,
@@ -182,9 +184,13 @@ func _unload_chunk_at(index: int) -> void:
 
 
 func _populate_tile(tx: int, ty: int) -> void:
+	if _tileset == null:
+		return
 	var cell := Vector2i(tx, ty)
 	var coast_src: int = RimlandsTileSetBuilder.SOURCE_AMBER_COAST
 	var canopy_src: int = RimlandsTileSetBuilder.SOURCE_SINGING_CANOPY
+	if not _tileset.has_source(coast_src) or not _tileset.has_source(canopy_src):
+		return
 
 	# Base animated water layer everywhere beneath coastline & deep shelf
 	var elev: float = _sample_elevation(tx, ty)

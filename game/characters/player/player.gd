@@ -65,7 +65,7 @@ func _physics_process(delta: float) -> void:
 		"move_down"
 	)
 	is_crouching = Input.is_action_pressed("crouch_stealth")
-	is_scanning = Input.is_action_pressed("acoustic_lens_hold")
+	is_scanning = Input.is_action_pressed("toggle_acoustic_lens")
 
 	if input_vec.length_squared() > 0.01:
 		_update_facing(input_vec)
