@@ -1,0 +1,939 @@
+{
+  "version": "V7.2",
+  "viewW": 480,
+  "viewH": 270,
+  "worldW": 1440,
+  "worldH": 340,
+  "walkBounds": {
+    "minX": 48,
+    "maxX": 1392,
+    "minY": 168,
+    "maxY": 318
+  },
+  "presets": {
+    "A_corridor": {
+      "title": "A. DENSE FOREST CORRIDOR (V7.2 NATIVE 480X270)",
+      "maraX": 254,
+      "maraY": 266,
+      "dir": "up",
+      "camX": 0,
+      "camY": 42
+    },
+    "B_interior": {
+      "title": "B. DEEP FOREST INTERIOR (V7.2 NATIVE 480X270)",
+      "maraX": 678,
+      "maraY": 264,
+      "dir": "right",
+      "camX": 480,
+      "camY": 42
+    },
+    "C_clearing": {
+      "title": "C. DRAMATIC FOREST CLEARING (V7.2 NATIVE 480X270)",
+      "maraX": 1192,
+      "maraY": 274,
+      "dir": "up",
+      "camX": 960,
+      "camY": 42
+    }
+  },
+  "puddles": [
+    {
+      "id": "puddle_A_small",
+      "x": 222,
+      "y": 264,
+      "rx": 24,
+      "ry": 9,
+      "seed": 137,
+      "ripplePhase": 0.15,
+      "ripplePeriod": 3.9
+    },
+    {
+      "id": "puddle_A_main",
+      "x": 296,
+      "y": 294,
+      "rx": 46,
+      "ry": 16,
+      "seed": 101,
+      "ripplePhase": 0.62,
+      "ripplePeriod": 4.7
+    },
+    {
+      "id": "puddle_B_heart",
+      "x": 664,
+      "y": 278,
+      "rx": 34,
+      "ry": 12,
+      "seed": 211,
+      "ripplePhase": 0.34,
+      "ripplePeriod": 5.1
+    },
+    {
+      "id": "puddle_C_left",
+      "x": 1128,
+      "y": 268,
+      "rx": 36,
+      "ry": 13,
+      "seed": 349,
+      "ripplePhase": 0.81,
+      "ripplePeriod": 4.3
+    },
+    {
+      "id": "puddle_C_main",
+      "x": 1258,
+      "y": 288,
+      "rx": 56,
+      "ry": 18,
+      "seed": 307,
+      "ripplePhase": 0.08,
+      "ripplePeriod": 3.6
+    }
+  ],
+  "spriteSizes": {
+    "treeline_ridge": {
+      "w": 280,
+      "h": 92
+    },
+    "treeline_ridge_flip": {
+      "w": 280,
+      "h": 92
+    },
+    "titan_straight": {
+      "w": 192,
+      "h": 288
+    },
+    "titan_straight_tall": {
+      "w": 204,
+      "h": 312
+    },
+    "titan_gnarled": {
+      "w": 204,
+      "h": 284
+    },
+    "titan_gnarled_flip": {
+      "w": 204,
+      "h": 284
+    },
+    "titan_buttress": {
+      "w": 224,
+      "h": 304
+    },
+    "titan_split_arch": {
+      "w": 236,
+      "h": 298
+    },
+    "titan_moss_pillar": {
+      "w": 212,
+      "h": 302
+    },
+    "titan_straight_bg": {
+      "w": 162,
+      "h": 244
+    },
+    "titan_gnarled_bg": {
+      "w": 170,
+      "h": 242
+    },
+    "titan_buttress_bg": {
+      "w": 184,
+      "h": 252
+    },
+    "titan_split_arch_bg": {
+      "w": 188,
+      "h": 246
+    },
+    "titan_moss_pillar_bg": {
+      "w": 176,
+      "h": 252
+    },
+    "fern_cluster": {
+      "w": 62,
+      "h": 48
+    },
+    "fern_cluster_flip": {
+      "w": 62,
+      "h": 48
+    },
+    "fern_cluster_small": {
+      "w": 48,
+      "h": 38
+    },
+    "fern_cluster_small_flip": {
+      "w": 48,
+      "h": 38
+    },
+    "bush_mid": {
+      "w": 112,
+      "h": 82
+    },
+    "bush_mid_dark": {
+      "w": 118,
+      "h": 86
+    },
+    "bush_small_dark": {
+      "w": 84,
+      "h": 62
+    },
+    "bush_fg_huge": {
+      "w": 204,
+      "h": 146
+    },
+    "bush_fg_small_flip": {
+      "w": 142,
+      "h": 102
+    },
+    "fg_bough_fern": {
+      "w": 214,
+      "h": 158
+    },
+    "fg_bough_fern_flip": {
+      "w": 214,
+      "h": 158
+    },
+    "canopy_mass": {
+      "w": 288,
+      "h": 144
+    },
+    "canopy_mass_flip": {
+      "w": 288,
+      "h": 144
+    },
+    "canopy_mass_wide": {
+      "w": 328,
+      "h": 148
+    },
+    "canopy_bough_alt": {
+      "w": 276,
+      "h": 138
+    },
+    "canopy_bough_alt_flip": {
+      "w": 276,
+      "h": 138
+    },
+    "fallen_log": {
+      "w": 152,
+      "h": 96
+    },
+    "fallen_log_flip": {
+      "w": 152,
+      "h": 96
+    },
+    "clearing_chime_outcrop": {
+      "w": 94,
+      "h": 64
+    }
+  },
+  "props": [
+    {
+      "id": "TL_A1",
+      "spriteKey": "treeline_ridge",
+      "x": 160,
+      "y": 172,
+      "layer": "treeline"
+    },
+    {
+      "id": "TL_A2",
+      "spriteKey": "treeline_ridge_flip",
+      "x": 420,
+      "y": 174,
+      "layer": "treeline"
+    },
+    {
+      "id": "TL_B1",
+      "spriteKey": "treeline_ridge",
+      "x": 680,
+      "y": 172,
+      "layer": "treeline"
+    },
+    {
+      "id": "TL_B2",
+      "spriteKey": "treeline_ridge_flip",
+      "x": 940,
+      "y": 174,
+      "layer": "treeline"
+    },
+    {
+      "id": "TL_C1",
+      "spriteKey": "treeline_ridge",
+      "x": 1200,
+      "y": 172,
+      "layer": "treeline"
+    },
+    {
+      "id": "TL_C2",
+      "spriteKey": "treeline_ridge_flip",
+      "x": 1420,
+      "y": 174,
+      "layer": "treeline"
+    },
+    {
+      "id": "A_bg_left_deep",
+      "spriteKey": "titan_moss_pillar_bg",
+      "x": 194,
+      "y": 176,
+      "layer": "bg_titan",
+      "shadowRx": 72,
+      "shadowRy": 16,
+      "rootSkirt": true
+    },
+    {
+      "id": "A_bg_right_deep",
+      "spriteKey": "titan_straight_bg",
+      "x": 378,
+      "y": 172,
+      "layer": "bg_titan",
+      "shadowRx": 68,
+      "shadowRy": 15,
+      "rootSkirt": true
+    },
+    {
+      "id": "A_bg_bush_l",
+      "spriteKey": "bush_mid_dark",
+      "x": 44,
+      "y": 176,
+      "layer": "bg_titan",
+      "swayKind": "bush",
+      "swayAmp": 0.7,
+      "swaySpeed": 0.71,
+      "swayPhase": 0.4
+    },
+    {
+      "id": "A_bg_bush_c",
+      "spriteKey": "bush_small_dark",
+      "x": 256,
+      "y": 168,
+      "layer": "bg_titan",
+      "swayKind": "bush",
+      "swayAmp": 0.6,
+      "swaySpeed": 0.89,
+      "swayPhase": 1.7
+    },
+    {
+      "id": "A_bg_bush_r",
+      "spriteKey": "bush_mid_dark",
+      "x": 446,
+      "y": 174,
+      "layer": "bg_titan",
+      "swayKind": "bush",
+      "swayAmp": 0.7,
+      "swaySpeed": 0.63,
+      "swayPhase": 3.1
+    },
+    {
+      "id": "A_mid_left_titan",
+      "spriteKey": "titan_straight_tall",
+      "x": 92,
+      "y": 248,
+      "layer": "ysort",
+      "colRx": 34,
+      "colRy": 13,
+      "colOffsetY": -12,
+      "shadowRx": 92,
+      "shadowRy": 22,
+      "rootSkirt": true
+    },
+    {
+      "id": "A_fern_left_root",
+      "spriteKey": "fern_cluster",
+      "x": 134,
+      "y": 248,
+      "layer": "ysort",
+      "shadowRx": 20,
+      "shadowRy": 6,
+      "swayKind": "fern",
+      "swayAmp": 1.3,
+      "swaySpeed": 1.18,
+      "swayPhase": 0.2
+    },
+    {
+      "id": "A_bush_mid_left",
+      "spriteKey": "bush_mid",
+      "x": 180,
+      "y": 214,
+      "layer": "ysort",
+      "colRx": 20,
+      "colRy": 9,
+      "colOffsetY": -6,
+      "shadowRx": 44,
+      "shadowRy": 12,
+      "swayKind": "bush",
+      "swayAmp": 0.9,
+      "swaySpeed": 0.84,
+      "swayPhase": 2.3
+    },
+    {
+      "id": "A_mid_right_lean",
+      "spriteKey": "titan_gnarled_flip",
+      "x": 354,
+      "y": 220,
+      "layer": "ysort",
+      "colRx": 32,
+      "colRy": 13,
+      "colOffsetY": -10,
+      "shadowRx": 80,
+      "shadowRy": 19,
+      "rootSkirt": true
+    },
+    {
+      "id": "A_fern_mid_right",
+      "spriteKey": "fern_cluster_small_flip",
+      "x": 306,
+      "y": 226,
+      "layer": "ysort",
+      "shadowRx": 18,
+      "shadowRy": 6,
+      "swayKind": "fern",
+      "swayAmp": 1.2,
+      "swaySpeed": 1.32,
+      "swayPhase": 4.1
+    },
+    {
+      "id": "A_front_right_titan",
+      "spriteKey": "titan_split_arch",
+      "x": 422,
+      "y": 298,
+      "layer": "ysort",
+      "colRx": 42,
+      "colRy": 16,
+      "colOffsetY": -12,
+      "shadowRx": 102,
+      "shadowRy": 24,
+      "rootSkirt": true
+    },
+    {
+      "id": "A_fern_front_r",
+      "spriteKey": "fern_cluster_flip",
+      "x": 354,
+      "y": 294,
+      "layer": "ysort",
+      "shadowRx": 22,
+      "shadowRy": 7,
+      "swayKind": "fern",
+      "swayAmp": 1.4,
+      "swaySpeed": 1.07,
+      "swayPhase": 1.1
+    },
+    {
+      "id": "A_ov_tr",
+      "spriteKey": "canopy_bough_alt_flip",
+      "x": 214,
+      "y": 24,
+      "layer": "overhang",
+      "parallax": 1.05,
+      "anchorCamX": 0,
+      "swayKind": "canopy",
+      "swayAmp": 1.5,
+      "swaySpeed": 0.68,
+      "swayPhase": 0.5
+    },
+    {
+      "id": "A_ov_tl_edge",
+      "spriteKey": "canopy_mass_flip",
+      "x": -188,
+      "y": 6,
+      "layer": "overhang",
+      "parallax": 1.05,
+      "anchorCamX": 0,
+      "swayKind": "canopy",
+      "swayAmp": 1.2,
+      "swaySpeed": 0.82,
+      "swayPhase": 2.6
+    },
+    {
+      "id": "A_fg_bot_left",
+      "spriteKey": "fg_bough_fern",
+      "x": -24,
+      "y": 164,
+      "layer": "foreground",
+      "parallax": 1.15,
+      "anchorCamX": 0,
+      "swayKind": "fern",
+      "swayAmp": 1.4,
+      "swaySpeed": 0.77,
+      "swayPhase": 1.9
+    },
+    {
+      "id": "AB_bg_wall",
+      "spriteKey": "titan_gnarled_bg",
+      "x": 508,
+      "y": 170,
+      "layer": "bg_titan",
+      "shadowRx": 72,
+      "shadowRy": 16,
+      "rootSkirt": true
+    },
+    {
+      "id": "AB_bush_top",
+      "spriteKey": "bush_mid_dark",
+      "x": 486,
+      "y": 192,
+      "layer": "ysort",
+      "colRx": 24,
+      "colRy": 10,
+      "colOffsetY": -6,
+      "shadowRx": 46,
+      "shadowRy": 12,
+      "swayKind": "bush",
+      "swayAmp": 0.8,
+      "swaySpeed": 0.91,
+      "swayPhase": 3.4
+    },
+    {
+      "id": "B_bg_1",
+      "spriteKey": "titan_straight_bg",
+      "x": 598,
+      "y": 166,
+      "layer": "bg_titan",
+      "shadowRx": 68,
+      "shadowRy": 15,
+      "rootSkirt": true
+    },
+    {
+      "id": "B_bg_2",
+      "spriteKey": "titan_split_arch_bg",
+      "x": 752,
+      "y": 170,
+      "layer": "bg_titan",
+      "shadowRx": 78,
+      "shadowRy": 16,
+      "rootSkirt": true
+    },
+    {
+      "id": "B_bg_3",
+      "spriteKey": "titan_moss_pillar_bg",
+      "x": 912,
+      "y": 166,
+      "layer": "bg_titan",
+      "shadowRx": 74,
+      "shadowRy": 16,
+      "rootSkirt": true
+    },
+    {
+      "id": "B_bg_bush_1",
+      "spriteKey": "bush_mid_dark",
+      "x": 672,
+      "y": 176,
+      "layer": "bg_titan",
+      "swayKind": "bush",
+      "swayAmp": 0.6,
+      "swaySpeed": 0.74,
+      "swayPhase": 0.9
+    },
+    {
+      "id": "B_bg_bush_2",
+      "spriteKey": "bush_mid_dark",
+      "x": 836,
+      "y": 178,
+      "layer": "bg_titan",
+      "swayKind": "bush",
+      "swayAmp": 0.6,
+      "swaySpeed": 0.66,
+      "swayPhase": 2.4
+    },
+    {
+      "id": "B_mid_left_gnarled",
+      "spriteKey": "titan_gnarled",
+      "x": 600,
+      "y": 228,
+      "layer": "ysort",
+      "colRx": 34,
+      "colRy": 14,
+      "colOffsetY": -10,
+      "shadowRx": 86,
+      "shadowRy": 20,
+      "rootSkirt": true
+    },
+    {
+      "id": "B_mid_right_titan",
+      "spriteKey": "titan_straight",
+      "x": 868,
+      "y": 224,
+      "layer": "ysort",
+      "colRx": 34,
+      "colRy": 14,
+      "colOffsetY": -10,
+      "shadowRx": 82,
+      "shadowRy": 19,
+      "rootSkirt": true
+    },
+    {
+      "id": "B_fallen_log",
+      "spriteKey": "fallen_log",
+      "x": 716,
+      "y": 226,
+      "layer": "ysort",
+      "colRx": 36,
+      "colRy": 11,
+      "colOffsetY": -8,
+      "shadowRx": 68,
+      "shadowRy": 16,
+      "rootSkirt": true
+    },
+    {
+      "id": "B_fern_log_l",
+      "spriteKey": "fern_cluster_small",
+      "x": 656,
+      "y": 232,
+      "layer": "ysort",
+      "shadowRx": 18,
+      "shadowRy": 6,
+      "swayKind": "fern",
+      "swayAmp": 1.2,
+      "swaySpeed": 1.24,
+      "swayPhase": 0.7
+    },
+    {
+      "id": "B_bush_mid_r",
+      "spriteKey": "bush_mid",
+      "x": 782,
+      "y": 204,
+      "layer": "ysort",
+      "colRx": 20,
+      "colRy": 9,
+      "colOffsetY": -6,
+      "shadowRx": 42,
+      "shadowRy": 11,
+      "swayKind": "bush",
+      "swayAmp": 0.8,
+      "swaySpeed": 0.88,
+      "swayPhase": 4.5
+    },
+    {
+      "id": "B_front_left_titan",
+      "spriteKey": "titan_buttress",
+      "x": 538,
+      "y": 304,
+      "layer": "ysort",
+      "colRx": 40,
+      "colRy": 15,
+      "colOffsetY": -12,
+      "shadowRx": 98,
+      "shadowRy": 23,
+      "rootSkirt": true
+    },
+    {
+      "id": "B_front_center_titan",
+      "spriteKey": "titan_moss_pillar",
+      "x": 806,
+      "y": 298,
+      "layer": "ysort",
+      "colRx": 36,
+      "colRy": 14,
+      "colOffsetY": -10,
+      "shadowRx": 90,
+      "shadowRy": 21,
+      "rootSkirt": true
+    },
+    {
+      "id": "B_fern_front_c",
+      "spriteKey": "fern_cluster",
+      "x": 626,
+      "y": 292,
+      "layer": "ysort",
+      "shadowRx": 24,
+      "shadowRy": 7,
+      "swayKind": "fern",
+      "swayAmp": 1.4,
+      "swaySpeed": 1.12,
+      "swayPhase": 2.8
+    },
+    {
+      "id": "B_fern_pillar_base",
+      "spriteKey": "fern_cluster_small_flip",
+      "x": 742,
+      "y": 296,
+      "layer": "ysort",
+      "shadowRx": 18,
+      "shadowRy": 6,
+      "swayKind": "fern",
+      "swayAmp": 1.2,
+      "swaySpeed": 1.29,
+      "swayPhase": 5.1
+    },
+    {
+      "id": "B_ov_crown",
+      "spriteKey": "canopy_mass_wide",
+      "x": 562,
+      "y": -14,
+      "layer": "overhang",
+      "parallax": 1.05,
+      "anchorCamX": 480,
+      "swayKind": "canopy",
+      "swayAmp": 1.1,
+      "swaySpeed": 0.59,
+      "swayPhase": 1.4
+    },
+    {
+      "id": "B_ov_left",
+      "spriteKey": "canopy_bough_alt",
+      "x": 454,
+      "y": 18,
+      "layer": "overhang",
+      "parallax": 1.05,
+      "anchorCamX": 480,
+      "swayKind": "canopy",
+      "swayAmp": 1.6,
+      "swaySpeed": 0.76,
+      "swayPhase": 3.9
+    },
+    {
+      "id": "B_ov_right",
+      "spriteKey": "canopy_mass",
+      "x": 698,
+      "y": 12,
+      "layer": "overhang",
+      "parallax": 1.05,
+      "anchorCamX": 480,
+      "swayKind": "canopy",
+      "swayAmp": 1.4,
+      "swaySpeed": 0.67,
+      "swayPhase": 0.2
+    },
+    {
+      "id": "B_fg_bl",
+      "spriteKey": "bush_fg_huge",
+      "x": 432,
+      "y": 204,
+      "layer": "foreground",
+      "parallax": 1.15,
+      "anchorCamX": 480,
+      "swayKind": "bush",
+      "swayAmp": 1.2,
+      "swaySpeed": 0.81,
+      "swayPhase": 2.1
+    },
+    {
+      "id": "B_fg_br",
+      "spriteKey": "bush_fg_small_flip",
+      "x": 826,
+      "y": 214,
+      "layer": "foreground",
+      "parallax": 1.15,
+      "anchorCamX": 480,
+      "swayKind": "bush",
+      "swayAmp": 1.3,
+      "swaySpeed": 0.73,
+      "swayPhase": 4.7
+    },
+    {
+      "id": "BC_throat_top",
+      "spriteKey": "titan_straight",
+      "x": 966,
+      "y": 212,
+      "layer": "ysort",
+      "colRx": 32,
+      "colRy": 13,
+      "colOffsetY": -10,
+      "shadowRx": 78,
+      "shadowRy": 18,
+      "rootSkirt": true
+    },
+    {
+      "id": "BC_throat_bot",
+      "spriteKey": "bush_mid",
+      "x": 962,
+      "y": 298,
+      "layer": "ysort",
+      "colRx": 22,
+      "colRy": 9,
+      "colOffsetY": -6,
+      "shadowRx": 44,
+      "shadowRy": 12,
+      "swayKind": "bush",
+      "swayAmp": 0.9,
+      "swaySpeed": 0.94,
+      "swayPhase": 1.2
+    },
+    {
+      "id": "C_bg_left",
+      "spriteKey": "titan_buttress_bg",
+      "x": 1034,
+      "y": 172,
+      "layer": "bg_titan",
+      "shadowRx": 74,
+      "shadowRy": 16,
+      "rootSkirt": true
+    },
+    {
+      "id": "C_bg_right",
+      "spriteKey": "titan_gnarled_bg",
+      "x": 1368,
+      "y": 174,
+      "layer": "bg_titan",
+      "shadowRx": 76,
+      "shadowRy": 16,
+      "rootSkirt": true
+    },
+    {
+      "id": "C_bg_bush_l",
+      "spriteKey": "bush_small_dark",
+      "x": 1118,
+      "y": 170,
+      "layer": "bg_titan",
+      "swayKind": "bush",
+      "swayAmp": 0.6,
+      "swaySpeed": 0.85,
+      "swayPhase": 0.6
+    },
+    {
+      "id": "C_bg_bush_r",
+      "spriteKey": "bush_small_dark",
+      "x": 1298,
+      "y": 172,
+      "layer": "bg_titan",
+      "swayKind": "bush",
+      "swayAmp": 0.6,
+      "swaySpeed": 0.72,
+      "swayPhase": 3.3
+    },
+    {
+      "id": "C_rim_left",
+      "spriteKey": "titan_gnarled",
+      "x": 1004,
+      "y": 266,
+      "layer": "ysort",
+      "colRx": 34,
+      "colRy": 14,
+      "colOffsetY": -10,
+      "shadowRx": 86,
+      "shadowRy": 20,
+      "rootSkirt": true
+    },
+    {
+      "id": "C_fern_left",
+      "spriteKey": "fern_cluster",
+      "x": 1054,
+      "y": 264,
+      "layer": "ysort",
+      "shadowRx": 22,
+      "shadowRy": 7,
+      "swayKind": "fern",
+      "swayAmp": 1.3,
+      "swaySpeed": 1.15,
+      "swayPhase": 2.2
+    },
+    {
+      "id": "C_rim_log",
+      "spriteKey": "fallen_log_flip",
+      "x": 1096,
+      "y": 204,
+      "layer": "ysort",
+      "colRx": 32,
+      "colRy": 10,
+      "colOffsetY": -7,
+      "shadowRx": 60,
+      "shadowRy": 15,
+      "rootSkirt": true
+    },
+    {
+      "id": "C_focal_chime_outcrop",
+      "spriteKey": "clearing_chime_outcrop",
+      "x": 1244,
+      "y": 224,
+      "layer": "ysort",
+      "colRx": 26,
+      "colRy": 10,
+      "colOffsetY": -8,
+      "shadowRx": 40,
+      "shadowRy": 12,
+      "rootSkirt": true,
+      "swayKind": "chime",
+      "swayAmp": 0.5,
+      "swaySpeed": 1.6,
+      "swayPhase": 0.4
+    },
+    {
+      "id": "C_rim_right_titan",
+      "spriteKey": "titan_buttress",
+      "x": 1404,
+      "y": 288,
+      "layer": "ysort",
+      "colRx": 42,
+      "colRy": 16,
+      "colOffsetY": -12,
+      "shadowRx": 100,
+      "shadowRy": 23,
+      "rootSkirt": true
+    },
+    {
+      "id": "C_bush_right",
+      "spriteKey": "bush_mid",
+      "x": 1334,
+      "y": 234,
+      "layer": "ysort",
+      "colRx": 20,
+      "colRy": 9,
+      "colOffsetY": -6,
+      "shadowRx": 42,
+      "shadowRy": 11,
+      "swayKind": "bush",
+      "swayAmp": 0.9,
+      "swaySpeed": 0.79,
+      "swayPhase": 5
+    },
+    {
+      "id": "C_fern_right",
+      "spriteKey": "fern_cluster_small_flip",
+      "x": 1330,
+      "y": 274,
+      "layer": "ysort",
+      "shadowRx": 18,
+      "shadowRy": 6,
+      "swayKind": "fern",
+      "swayAmp": 1.2,
+      "swaySpeed": 1.21,
+      "swayPhase": 1.5
+    },
+    {
+      "id": "C_ov_tl",
+      "spriteKey": "canopy_bough_alt",
+      "x": 868,
+      "y": 6,
+      "layer": "overhang",
+      "parallax": 1.04,
+      "anchorCamX": 960,
+      "swayKind": "canopy",
+      "swayAmp": 1.4,
+      "swaySpeed": 0.64,
+      "swayPhase": 2.9
+    },
+    {
+      "id": "C_ov_tr",
+      "spriteKey": "canopy_mass",
+      "x": 1268,
+      "y": 12,
+      "layer": "overhang",
+      "parallax": 1.04,
+      "anchorCamX": 960,
+      "swayKind": "canopy",
+      "swayAmp": 1.3,
+      "swaySpeed": 0.78,
+      "swayPhase": 0.8
+    },
+    {
+      "id": "C_fg_bl",
+      "spriteKey": "bush_fg_huge",
+      "x": 904,
+      "y": 196,
+      "layer": "foreground",
+      "parallax": 1.15,
+      "anchorCamX": 960,
+      "swayKind": "bush",
+      "swayAmp": 1.2,
+      "swaySpeed": 0.75,
+      "swayPhase": 3.7
+    },
+    {
+      "id": "C_fg_br",
+      "spriteKey": "fg_bough_fern_flip",
+      "x": 1260,
+      "y": 164,
+      "layer": "foreground",
+      "parallax": 1.15,
+      "anchorCamX": 960,
+      "swayKind": "fern",
+      "swayAmp": 1.3,
+      "swaySpeed": 0.89,
+      "swayPhase": 1
+    }
+  ]
+}
