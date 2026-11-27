@@ -38,13 +38,13 @@ Every production asset progresses strictly through six tracked states:
 | Asset ID | Filename | Milestone | Category | Target Godot Destination | Priority | Status |
 | :---: | --- | :---: | --- | --- | :---: | :---: |
 | `AST-000` | `icon.svg` | M00 | Project Icon | `game/assets/icon.svg` | Critical | **Integrated** *(Pending Windows visual sign-off)* |
-| `AST-001` | `char_mara_lin_sheet.png` | M01 | Character Sprite Sheet (`96×384`) | `game/assets/characters/player/char_mara_lin_sheet.png` *(Candidate staged in `candidates/`)* | **Critical** | **Received** *(VPF Candidate Pending Artistic Approval — Not Yet Integrated)* |
-| `AST-002` | `env_amber_coast_ground_tileset.png` | M01 | Core Ground Tileset (`192×128`) | `game/assets/world/tilesets/env_amber_coast_ground_tileset.png` | **Critical** | **Requested** *(Spec v2.0 Audited)* |
-| `AST-003` | `env_singing_canopy_ground_tileset.png` | M01 | Core Ground Tileset (`192×96`) | `game/assets/world/tilesets/env_singing_canopy_ground_tileset.png` | **Critical** | **Requested** *(Spec v2.0 Audited)* |
-| `AST-004` | `prop_singing_reedwood_tree_sheet.png` | M01 | Multi-Tile Tree & Canopy (`96×160`) | `game/assets/world/props/prop_singing_reedwood_tree_sheet.png` | **Critical** | **Requested** *(Spec v2.0 Audited)* |
-| `AST-005` | `prop_rimlands_flora_sheet.png` | M01 | Starter Flora Props (`64×128`) | `game/assets/world/flora/prop_rimlands_flora_sheet.png` | **High** | **Requested** *(Spec v2.0 Audited)* |
-| `AST-006` | `prop_drop_pod_landmark_sheet.png` | M01 | Hero Landmark Prop (`96×64`) | `game/assets/world/landmarks/prop_drop_pod_landmark_sheet.png` | **High** | **Requested** *(Spec v2.0 Audited)* |
-| `AST-007` | `fx_shadows_ripples_lens_sheet.png` | M01 | Ground Shadows & VFX (`128×96`) | `game/assets/vfx/fx_shadows_ripples_lens_sheet.png` | **High** | **Requested** *(Spec v2.0 Audited)* |
+| `AST-001` | `char_mara_lin_sheet.png` | M01 | Character Sprite Sheet (`96×384`) | `game/assets/characters/player/char_mara_lin_sheet.png` | **Critical** | **Integrated** *(Final VPF Build + QA Pass · Pending Windows Godot 4.7.2 Live Test)* |
+| `AST-002` | `env_amber_coast_ground_tileset.png` | M01 | Core Ground Tileset (`192×128`) | `game/assets/world/tilesets/env_amber_coast_ground_tileset.png` | **Critical** | **Integrated** *(Final VPF Build + QA Pass · Pending Windows Godot 4.7.2 Live Test)* |
+| `AST-003` | `env_singing_canopy_ground_tileset.png` | M01 | Core Ground Tileset (`192×96`) | `game/assets/world/tilesets/env_singing_canopy_ground_tileset.png` | **Critical** | **Integrated** *(Final VPF Build + QA Pass · Pending Windows Godot 4.7.2 Live Test)* |
+| `AST-004` | `prop_singing_reedwood_tree_sheet.png` | M01 | Multi-Tile Tree & Canopy (`96×160`) | `game/assets/world/props/prop_singing_reedwood_tree_sheet.png` | **Critical** | **Integrated** *(Final VPF Build + QA Pass · Pending Windows Godot 4.7.2 Live Test)* |
+| `AST-005` | `prop_rimlands_flora_sheet.png` | M01 | Starter Flora Props (`64×128`) | `game/assets/world/flora/prop_rimlands_flora_sheet.png` | **High** | **Integrated** *(Final VPF Build + QA Pass · Pending Windows Godot 4.7.2 Live Test)* |
+| `AST-006` | `prop_drop_pod_landmark_sheet.png` | M01 | Hero Landmark Prop (`96×64`) | `game/assets/world/landmarks/prop_drop_pod_landmark_sheet.png` | **High** | **Integrated** *(Final VPF Build + QA Pass · Pending Windows Godot 4.7.2 Live Test)* |
+| `AST-007` | `fx_shadows_ripples_lens_sheet.png` | M01 | Ground Shadows & VFX (`128×96`) | `game/assets/vfx/fx_shadows_ripples_lens_sheet.png` | **High** | **Integrated** *(Final VPF Build + QA Pass · Pending Windows Godot 4.7.2 Live Test)* |
 | `AST-008` | `sfx_rimlands_core_pack` (`10` `.ogg`/`.wav`) | M01/M02 | Surface Footsteps & Lens SFX | `game/audio/sfx/` | **Optional** *(High for M02)* | **Requested** |
 
 ### Temporary Debug Placeholder Registry (NEVER Counts as Production Art)

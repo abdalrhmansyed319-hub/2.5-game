@@ -31,10 +31,13 @@ export const NewCanvasModal: React.FC<{
 
   const presets = [
     { label: '16×16 Tile', w: 16, h: 16, t: 16 },
-    { label: '16×24 Character (AST-001)', w: 16, h: 24, t: 16 },
+    { label: '16×24 Legacy Char', w: 16, h: 24, t: 16 },
     { label: '32×32 Icon / Prop', w: 32, h: 32, t: 16 },
+    { label: '32×48 Char (Compact)', w: 32, h: 48, t: 16 },
+    { label: '48×64 Char (Study)', w: 48, h: 64, t: 16 },
+    { label: '64×80 Char (Hero)', w: 64, h: 80, t: 16 },
     { label: '64×64 Sprite', w: 64, h: 64, t: 16 },
-    { label: '128×128 Hero', w: 128, h: 128, t: 16 },
+    { label: '128×128 Concept', w: 128, h: 128, t: 16 },
     { label: '256×256 Tileset', w: 256, h: 256, t: 32 },
   ];
 
