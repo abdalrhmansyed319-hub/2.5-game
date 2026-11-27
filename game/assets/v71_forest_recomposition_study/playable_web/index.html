@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VERDANT SIGNAL V7.1 — Recomposition Playable Forest Study (480x270 Native)</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; background: #071212; color: #e2f5f2;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 16px; gap: 10px;
+    }
+    .bar {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+      gap: 8px; max-width: 980px; font-size: 12px;
+    }
+    button {
+      background: #102b2a; color: #b5f7f0; border: 1px solid #2b6b68;
+      padding: 6px 10px; cursor: pointer; font-family: inherit; font-size: 12px; border-radius: 4px;
+    }
+    button:hover { background: #184240; }
+    button.active { background: #266b64; color: #fff; border-color: #85f7f0; }
+    .stage {
+      border: 2px solid #264d4a; background: #040b0b; line-height: 0;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+    }
+    canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    .hud { font-size: 11px; color: #91c7c2; text-align: center; max-width: 960px; }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <strong>VERDANT SIGNAL V7.1 — PLAYABLE FOREST RECOMPOSITION</strong>
+    <button id="btnA" class="active">1: A. Dense Corridor</button>
+    <button id="btnB">2: B. Deep Interior</button>
+    <button id="btnC">3: C. Forest Clearing</button>
+    <button id="btnAuto">Toggle Auto-Walk (A→C)</button>
+    <button id="btn1x">1x Native (480×270)</button>
+    <button id="btn2x" class="active">2x Integer (960×540)</button>
+  </div>
+  <div class="stage">
+    <canvas id="game" width="480" height="270" style="width:960px;height:540px;"></canvas>
+  </div>
+  <div class="hud" id="status">
+    Controls: WASD / Arrow Keys to walk freely across all 3 continuous zones (behind &amp; in front of colossal trunks!) · Keys 1 / 2 / 3 jump to compositions A / B / C
+  </div>
+  <script>
+    (async () => {
+      const manifest = await (await fetch('./v71_forest_manifest.json')).json();
+      const loadImg = (src) => new Promise((res, rej) => {
+        const img = new Image(); img.onload = () => res(img); img.onerror = rej; img.src = src;
+      });
+      const floorImg = await loadImg('../sprites/forest_floor_1440x340.png');
+      const horizonImg = await loadImg('../sprites/distant_horizon_640x128.png');
+      const maraSheet = await loadImg('../sprites/mara_v71_spritesheet.png');
+      const sprites = {};
+      for (const k of Object.keys(manifest.spriteSizes)) {
+        sprites[k] = await loadImg('../sprites/' + k + '.png');
+      }
+
+      const canvas = document.getElementById('game');
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      const statusEl = document.getElementById('status');
+
+      const keys = new Set();
+      let mara = { x: manifest.presets.A_corridor.maraX, y: manifest.presets.A_corridor.maraY, dir: 'up', step: 0 };
+      let camX = manifest.presets.A_corridor.camX;
+      let camY = manifest.presets.A_corridor.camY;
+      let autoWalk = false;
+      let autoPhase = 0;
+
+      const setZoom = (z) => {
+        canvas.style.width = (480 * z) + 'px';
+        canvas.style.height = (270 * z) + 'px';
+        document.getElementById('btn1x').classList.toggle('active', z === 1);
+        document.getElementById('btn2x').classList.toggle('active', z === 2);
+      };
+      const snapPreset = (key) => {
+        autoWalk = false;
+        const p = manifest.presets[key];
+        mara.x = p.maraX; mara.y = p.maraY; mara.dir = p.dir;
+        camX = p.camX; camY = p.camY;
+        document.getElementById('btnA').classList.toggle('active', key === 'A_corridor');
+        document.getElementById('btnB').classList.toggle('active', key === 'B_interior');
+        document.getElementById('btnC').classList.toggle('active', key === 'C_clearing');
+      };
+
+      document.getElementById('btnA').onclick = () => snapPreset('A_corridor');
+      document.getElementById('btnB').onclick = () => snapPreset('B_interior');
+      document.getElementById('btnC').onclick = () => snapPreset('C_clearing');
+      document.getElementById('btnAuto').onclick = () => { autoWalk = !autoWalk; };
+      document.getElementById('btn1x').onclick = () => setZoom(1);
+      document.getElementById('btn2x').onclick = () => setZoom(2);
+
+      window.addEventListener('keydown', (e) => {
+        if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+        if (e.key === '1') snapPreset('A_corridor');
+        else if (e.key === '2') snapPreset('B_interior');
+        else if (e.key === '3') snapPreset('C_clearing');
+        else { autoWalk = false; keys.add(e.key.toLowerCase()); }
+      });
+      window.addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
+
+      const dirRow = { down: 0, up: 1, right: 2, left: 3 };
+      const collides = (nx, ny) => {
+        const b = manifest.walkBounds;
+        if (nx < b.minX || nx > b.maxX || ny < b.minY || ny > b.maxY) return true;
+        for (const p of manifest.props) {
+          if (!p.colRx || !p.colRy) continue;
+          const dx = (nx - p.x) / p.colRx;
+          const dy = (ny - (p.y + (p.colOffsetY || 0))) / p.colRy;
+          if (dx * dx + dy * dy < 1) return true;
+        }
+        return false;
+      };
+
+      const route = [
+        [232,282],[272,258],[362,254],[474,256],[548,256],
+        [676,264],[796,252],[912,248],[1068,258],[1196,274]
+      ];
+      let lastT = performance.now();
+      let stepAcc = 0;
+
+      function tick(now) {
+        const dt = Math.min(0.05, (now - lastT) / 1000);
+        lastT = now;
+
+        let vx = 0, vy = 0;
+        if (autoWalk) {
+          autoPhase = (autoPhase + dt * 0.085) % 1;
+          const segF = autoPhase * (route.length - 1);
+          const idx = Math.min(route.length - 2, Math.floor(segF));
+          const u = segF - idx;
+          const tx = route[idx][0] + (route[idx + 1][0] - route[idx][0]) * u;
+          const ty = route[idx][1] + (route[idx + 1][1] - route[idx][1]) * u;
+          vx = tx - mara.x; vy = ty - mara.y;
+          mara.x = tx; mara.y = ty;
+          mara.dir = Math.abs(vx) >= Math.abs(vy) ? (vx >= 0 ? 'right' : 'left') : (vy >= 0 ? 'down' : 'up');
+          stepAcc += dt * 7;
+          mara.step = Math.floor(stepAcc) % 4;
+        } else {
+          if (keys.has('a') || keys.has('arrowleft')) vx -= 1;
+          if (keys.has('d') || keys.has('arrowright')) vx += 1;
+          if (keys.has('w') || keys.has('arrowup')) vy -= 1;
+          if (keys.has('s') || keys.has('arrowdown')) vy += 1;
+          if (vx || vy) {
+            const len = Math.hypot(vx, vy);
+            const sp = 78;
+            const nx = mara.x + (vx / len) * sp * dt;
+            const ny = mara.y + (vy / len) * sp * dt;
+            if (!collides(nx, mara.y)) mara.x = nx;
+            if (!collides(mara.x, ny)) mara.y = ny;
+            mara.dir = Math.abs(vx) >= Math.abs(vy) ? (vx > 0 ? 'right' : 'left') : (vy > 0 ? 'down' : 'up');
+            stepAcc += dt * 8;
+            mara.step = Math.floor(stepAcc) % 4;
+          } else {
+            mara.step = 0;
+          }
+        }
+
+        const tCamX = Math.max(0, Math.min(manifest.worldW - 480, mara.x - 480 * 0.48));
+        const tCamY = Math.max(24, Math.min(manifest.worldH - 270, mara.y - 270 * 0.78));
+        camX += (tCamX - camX) * Math.min(1, dt * 6);
+        camY += (tCamY - camY) * Math.min(1, dt * 6);
+        const ix = Math.round(camX), iy = Math.round(camY);
+
+        ctx.clearRect(0, 0, 480, 270);
+        // Plane 0: Distant Morning Monolith Horizon (0.22x parallax)
+        const hx = Math.round((ix * 0.22) % (horizonImg.width - 480));
+        ctx.drawImage(horizonImg, hx, 0, 480, horizonImg.height, 0, 0, 480, horizonImg.height);
+        // Plane 1A: Continuous Forest Floor
+        ctx.drawImage(floorImg, ix, iy, 480, 270, 0, 0, 480, 270);
+        // Plane 1B: Lush Distant Treeline Foliage Ridge (overlaps rear floor edge organically — zero flat line!)
+        for (const p of manifest.props) {
+          if (p.layer !== 'treeline') continue;
+          const img = sprites[p.spriteKey];
+          ctx.drawImage(img, Math.round(p.x - ix - img.width / 2), Math.round(p.y - iy - img.height));
+        }
+
+        // Plane 2: Rear Perimeter Titans
+        const bg = manifest.props.filter(p => p.layer === 'bg_titan').sort((a, b) => a.y - b.y);
+        for (const p of bg) {
+          const img = sprites[p.spriteKey];
+          ctx.drawImage(img, Math.round(p.x - ix - img.width / 2), Math.round(p.y - iy - img.height));
+        }
+
+        // Plane 3: Y-Sorted Colossal Trunks + Mara!
+        const ys = manifest.props.filter(p => p.layer === 'ysort').map(p => ({ kind: 'prop', y: p.y, p }));
+        ys.push({ kind: 'mara', y: mara.y });
+        ys.sort((a, b) => a.y - b.y);
+        let maraDrawn = false;
+        let occluded = false;
+        const mDx = Math.round(mara.x - ix - 14);
+        const mDy = Math.round(mara.y - iy - 37);
+
+        for (const item of ys) {
+          if (item.kind === 'mara') {
+            ctx.drawImage(maraSheet, mara.step * 28, dirRow[mara.dir] * 40, 28, 40, mDx, mDy, 28, 40);
+            maraDrawn = true;
+          } else {
+            const img = sprites[item.p.spriteKey];
+            const dx = Math.round(item.p.x - ix - img.width / 2);
+            const dy = Math.round(item.p.y - iy - img.height);
+            ctx.drawImage(img, dx, dy);
+            if (maraDrawn && mDx + 22 > dx + 34 && mDx + 6 < dx + img.width - 34 && mDy + 36 > dy && mDy < dy + img.height) {
+              occluded = true;
+            }
+          }
+        }
+        if (occluded) {
+          ctx.save();
+          ctx.globalAlpha = 0.34;
+          ctx.drawImage(maraSheet, mara.step * 28, dirRow[mara.dir] * 40, 28, 40, mDx, mDy, 28, 40);
+          ctx.restore();
+        }
+
+        // Plane 4 & 5: Overhanging Canopy + Foreground Framing Bushes (anchored parallax!)
+        for (const layerName of ['overhang', 'foreground']) {
+          for (const p of manifest.props) {
+            if (p.layer !== layerName) continue;
+            const img = sprites[p.spriteKey];
+            const pf = p.parallax || (layerName === 'foreground' ? 1.15 : 1.05);
+            const anchor = p.anchorCamX || 0;
+            ctx.drawImage(img, Math.round(p.x - ix - (ix - anchor) * (pf - 1)), Math.round(p.y - iy));
+          }
+        }
+
+        const zone = mara.x < 480 ? 'A. Dense Forest Corridor' : mara.x < 960 ? 'B. Deep Forest Interior' : 'C. Dramatic Forest Clearing';
+        statusEl.textContent = 'Zone: ' + zone + ' | Mara=(' + Math.round(mara.x) + ',' + Math.round(mara.y) + ') | Cam=(' + ix + ',' + iy + ') | WASD/Arrows to walk · Keys 1/2/3 jump zones';
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>

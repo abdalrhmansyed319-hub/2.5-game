@@ -1,0 +1,116 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="v71_forest_recomposition.gd" id="1_script"]
+
+[node name="V71ForestRecomposition" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="HorizonParallax" type="Parallax2D" parent="."]
+scroll_scale = Vector2(0.22, 0.0)
+
+[node name="ForestFloor" type="Sprite2D" parent="."]
+centered = false
+
+[node name="YSortWorld" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Mara" type="CharacterBody2D" parent="YSortWorld"]
+position = Vector2(256, 266)
+
+[node name="Camera2D" type="Camera2D" parent="YSortWorld/Mara"]
+offset = Vector2(0, -76)
+
+[node name="A_mid_left_titan" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(92, 248)
+metadata/sprite = "titan_straight_tall.png"
+metadata/sprite_size = Vector2i(204, 312)
+
+[node name="A_bush_mid_left" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(178, 214)
+metadata/sprite = "bush_mid.png"
+metadata/sprite_size = Vector2i(112, 82)
+
+[node name="A_mid_right_lean" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(356, 220)
+metadata/sprite = "titan_gnarled_flip.png"
+metadata/sprite_size = Vector2i(204, 284)
+
+[node name="A_front_right_titan" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(422, 298)
+metadata/sprite = "titan_buttress.png"
+metadata/sprite_size = Vector2i(224, 304)
+
+[node name="A_bush_front_r" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(332, 290)
+metadata/sprite = "bush_small.png"
+metadata/sprite_size = Vector2i(78, 58)
+
+[node name="AB_bush_top" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(486, 192)
+metadata/sprite = "bush_mid_dark.png"
+metadata/sprite_size = Vector2i(118, 86)
+
+[node name="B_mid_left_gnarled" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(600, 228)
+metadata/sprite = "titan_gnarled.png"
+metadata/sprite_size = Vector2i(204, 284)
+
+[node name="B_mid_right_titan" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(864, 224)
+metadata/sprite = "titan_straight.png"
+metadata/sprite_size = Vector2i(192, 288)
+
+[node name="B_fallen_log" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(716, 226)
+metadata/sprite = "fallen_log.png"
+metadata/sprite_size = Vector2i(152, 96)
+
+[node name="B_bush_mid_r" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(782, 204)
+metadata/sprite = "bush_mid.png"
+metadata/sprite_size = Vector2i(112, 82)
+
+[node name="B_front_left_titan" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(540, 304)
+metadata/sprite = "titan_gnarled_tall.png"
+metadata/sprite_size = Vector2i(218, 304)
+
+[node name="B_front_center_titan" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(804, 298)
+metadata/sprite = "titan_straight_alt.png"
+metadata/sprite_size = Vector2i(176, 274)
+
+[node name="B_bush_front_c" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(626, 296)
+metadata/sprite = "bush_small.png"
+metadata/sprite_size = Vector2i(78, 58)
+
+[node name="BC_throat_top" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(966, 212)
+metadata/sprite = "titan_straight.png"
+metadata/sprite_size = Vector2i(192, 288)
+
+[node name="BC_throat_bot" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(962, 298)
+metadata/sprite = "bush_mid.png"
+metadata/sprite_size = Vector2i(112, 82)
+
+[node name="C_rim_left" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(1004, 266)
+metadata/sprite = "titan_gnarled.png"
+metadata/sprite_size = Vector2i(204, 284)
+
+[node name="C_rim_log" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(1098, 204)
+metadata/sprite = "fallen_log_flip.png"
+metadata/sprite_size = Vector2i(152, 96)
+
+[node name="C_rim_right_titan" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(1404, 288)
+metadata/sprite = "titan_buttress.png"
+metadata/sprite_size = Vector2i(224, 304)
+
+[node name="C_bush_right" type="StaticBody2D" parent="YSortWorld"]
+position = Vector2(1334, 234)
+metadata/sprite = "bush_mid.png"
+metadata/sprite_size = Vector2i(112, 82)
