@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VERDANT SIGNAL V7.0 — Immersive World Perspective Playable Study</title>
+  <style>
+    :root {
+      --bg: #0c131c;
+      --panel: #131e2c;
+      --border: #2b4259;
+      --gold: #fcd88c;
+      --cyan: #8cf7f0;
+      --text: #dceaf5;
+      --muted: #8ea6bc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #172638 0%, var(--bg) 68%);
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      gap: 12px;
+    }
+    header {
+      width: 100%;
+      max-width: 980px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0.06em;
+      color: var(--gold);
+    }
+    .badge {
+      font-size: 11px;
+      color: var(--cyan);
+      background: rgba(140, 247, 240, 0.08);
+      border: 1px solid rgba(140, 247, 240, 0.3);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .toolbar {
+      width: 100%;
+      max-width: 980px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    button {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      transition: border-color 120ms, background 120ms, color 120ms;
+    }
+    button:hover { border-color: var(--cyan); color: #fff; }
+    button.active {
+      background: #1d354c;
+      border-color: var(--gold);
+      color: var(--gold);
+      font-weight: 700;
+    }
+    .stage-wrap {
+      background: #060a0f;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      background: #070d14;
+      border: 1px solid #35526d;
+    }
+    .status-bar {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .status-bar strong { color: var(--gold); }
+    .hint {
+      font-size: 11px;
+      color: var(--muted);
+      max-width: 980px;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .hint kbd {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: var(--cyan);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>VERDANT SIGNAL V7.0 — IMMERSIVE WORLD PERSPECTIVE &amp; SCALE STUDY</h1>
+    <span class="badge">ISOLATED PLAYABLE STUDY · NATIVE 480×270 · M01 UNTOUCHED</span>
+  </header>
+
+  <div class="toolbar">
+    <div class="btn-group" id="modeButtons">
+      <button data-mode="m01">[1] A. Current M01 Overhead</button>
+      <button data-mode="forest" class="active">[2] B. Dense Forest</button>
+      <button data-mode="swamp">[3] C. Living Swamp</button>
+      <button data-mode="coast">[4] D. Vast Coast</button>
+    </div>
+    <div class="btn-group">
+      <button id="btnAuto">[R] Auto Depth-Sort Walk</button>
+      <button id="btnDebug">[G] Y-Sort &amp; Colliders</button>
+      <button id="btnScale" class="active">Scale: 2× (960×540)</button>
+    </div>
+  </div>
+
+  <div class="stage-wrap">
+    <canvas id="game" width="480" height="270" style="width:960px;height:540px"></canvas>
+    <div class="status-bar">
+      <span id="statBiome"><strong>FOREST</strong> · Singing Reedwood Cathedral</span>
+      <span id="statPos">MARA (300, 244) · CAM (60, 21) · OCCLUDED: NO</span>
+      <span id="statRatio">MARA 28×40 (12.6% H) vs TRUNKS 84–96px W × 276px H</span>
+    </div>
+  </div>
+
+  <div class="hint">
+    Move Dr. Mara Lin with <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or <kbd>Arrows</kbd>.
+    Walk <strong>in front of and behind</strong> the colossal Reedwood trunks, mangrove root walls, and coastal boulders to verify live Y-sorting,
+    localized silhouette occlusion readability, and 1.14× foreground parallax. Press <kbd>1</kbd>–<kbd>4</kbd> to compare against current M01 overhead view,
+    <kbd>R</kbd> for automated depth-sort demo, <kbd>G</kbd> for sort baselines, or toggle <strong>1× Native (480×270)</strong>.
+  </div>
+
+  <script>
+    const VIEW_W = 480, VIEW_H = 270;
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.imageSmoothingEnabled = false;
+
+    const offMara = document.createElement('canvas');
+    offMara.width = VIEW_W; offMara.height = VIEW_H;
+    const mCtx = offMara.getContext('2d', { willReadFrequently: true });
+
+    const offOcc = document.createElement('canvas');
+    offOcc.width = VIEW_W; offOcc.height = VIEW_H;
+    const oCtx = offOcc.getContext('2d', { willReadFrequently: true });
+
+    let manifest = null;
+    const images = {};
+    let mode = 'forest';
+    let scaleInt = 2;
+    let showDebug = false;
+    let autoDemo = false;
+    let autoTime = 0;
+
+    const player = { x: 300, y: 244, dir: 'up', step: 0, anim: 0, vx: 0, vy: 0 };
+    const cam = { x: 60, y: 21 };
+    const keys = new Set();
+
+    const DIR_ROW = { down: 0, up: 1, right: 2, left: 3 };
+    const AUTO_WAYPOINTS = [
+      [232, 256, 'left'],
+      [176, 256, 'left'],
+      [122, 254, 'left'],
+      [108, 232, 'up'],
+      [116, 214, 'right'],
+      [154, 214, 'right'],
+      [194, 214, 'right'],
+      [232, 218, 'down'],
+      [232, 256, 'down'],
+    ];
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+
+    async function init() {
+      const res = await fetch('./v7_study_manifest.json');
+      manifest = await res.json();
+      const spriteKeys = new Set(['m01_current_overhead_480x270', 'mara_v7_28x40_sheet']);
+      for (const sc of Object.values(manifest.scenes)) {
+        spriteKeys.add(sc.groundKey);
+        for (const p of sc.props) spriteKeys.add(p.spriteKey);
+      }
+      await Promise.all([...spriteKeys].map(async (k) => {
+        images[k] = await loadImage(`../sprites/${k}.png`);
+      }));
+      setMode('forest');
+      requestAnimationFrame(loop);
+    }
+
+    function setMode(nextMode) {
+      mode = nextMode;
+      autoDemo = false;
+      document.getElementById('btnAuto').classList.remove('active');
+      document.querySelectorAll('#modeButtons button').forEach((b) => {
+        b.classList.toggle('active', b.dataset.mode === nextMode);
+      });
+      if (mode !== 'm01') {
+        const sc = manifest.scenes[mode];
+        player.x = sc.spawnX;
+        player.y = sc.spawnY;
+        player.dir = sc.spawnDir;
+        player.step = 0;
+        cam.x = Math.max(0, Math.min(sc.worldW - VIEW_W, player.x - VIEW_W / 2));
+        cam.y = Math.max(0, Math.min(sc.worldH - VIEW_H, player.y + sc.camOffsetY - VIEW_H / 2));
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();
+      keys.add(e.code);
+      if (e.key === '1') setMode('m01');
+      if (e.key === '2') setMode('forest');
+      if (e.key === '3') setMode('swamp');
+      if (e.key === '4') setMode('coast');
+      if (e.key.toLowerCase() === 'g') toggleDebug();
+      if (e.key.toLowerCase() === 'r') toggleAuto();
+    });
+    window.addEventListener('keyup', (e) => keys.delete(e.code));
+
+    document.querySelectorAll('#modeButtons button').forEach((b) => {
+      b.addEventListener('click', () => setMode(b.dataset.mode));
+    });
+    function toggleDebug() {
+      showDebug = !showDebug;
+      document.getElementById('btnDebug').classList.toggle('active', showDebug);
+    }
+    function toggleAuto() {
+      if (mode !== 'forest') setMode('forest');
+      autoDemo = !autoDemo;
+      autoTime = 0;
+      document.getElementById('btnAuto').classList.toggle('active', autoDemo);
+    }
+    document.getElementById('btnDebug').addEventListener('click', toggleDebug);
+    document.getElementById('btnAuto').addEventListener('click', toggleAuto);
+    document.getElementById('btnScale').addEventListener('click', (e) => {
+      scaleInt = scaleInt === 2 ? 1 : 2;
+      canvas.style.width = `${VIEW_W * scaleInt}px`;
+      canvas.style.height = `${VIEW_H * scaleInt}px`;
+      e.target.textContent = scaleInt === 2 ? 'Scale: 2× (960×540)' : 'Scale: 1× Native (480×270)';
+    });
+
+    function resolveCollision(nx, ny, sc) {
+      let x = Math.max(sc.walkBounds.minX, Math.min(sc.walkBounds.maxX, nx));
+      let y = Math.max(sc.walkBounds.minY, Math.min(sc.walkBounds.maxY, ny));
+      for (const p of sc.props) {
+        if (p.layer !== 'ysort' || p.colRx <= 0) continue;
+        const cx = p.x;
+        const cy = p.sortY + (p.colOffsetY || -8);
+        const rx = p.colRx + 6;
+        const ry = p.colRy + 4;
+        const dx = (x - cx) / rx;
+        const dy = (y - cy) / ry;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < 1.0 && d2 > 0.0001) {
+          const d = Math.sqrt(d2);
+          x = cx + (dx / d) * rx;
+          y = cy + (dy / d) * ry;
+        }
+      }
+      return { x, y };
+    }
+
+    let lastTs = performance.now();
+    let globalT = 0;
+
+    function loop(ts) {
+      const dt = Math.min(0.05, (ts - lastTs) / 1000);
+      lastTs = ts;
+      globalT += dt;
+
+      if (mode === 'm01') {
+        ctx.clearRect(0, 0, VIEW_W, VIEW_H);
+        ctx.drawImage(images.m01_current_overhead_480x270, 0, 0);
+        document.getElementById('statBiome').innerHTML = '<strong>A. CURRENT M01 OVERHEAD</strong> · 16×24 Mara · 48×80 Trees · Centered Camera';
+        document.getElementById('statPos').textContent = 'BASELINE REFERENCE (480×270 NATIVE 1×)';
+        document.getElementById('statRatio').textContent = 'TRUNK WIDTH ~14px (1.0× MARA) · ZERO FOREGROUND FRAMING';
+        requestAnimationFrame(loop);
+        return;
+      }
+
+      const sc = manifest.scenes[mode];
+      let ix = 0, iy = 0;
+      if (keys.has('KeyA') || keys.has('ArrowLeft')) ix -= 1;
+      if (keys.has('KeyD') || keys.has('ArrowRight')) ix += 1;
+      if (keys.has('KeyW') || keys.has('ArrowUp')) iy -= 1;
+      if (keys.has('KeyS') || keys.has('ArrowDown')) iy += 1;
+      if (ix !== 0 || iy !== 0) {
+        autoDemo = false;
+        document.getElementById('btnAuto').classList.remove('active');
+      }
+
+      if (autoDemo && mode === 'forest') {
+        autoTime = (autoTime + dt * 0.22) % 1;
+        const segs = AUTO_WAYPOINTS.length - 1;
+        const u = autoTime * segs;
+        const s = Math.min(segs - 1, Math.floor(u));
+        const lt = u - s;
+        const [x0, y0, dir] = AUTO_WAYPOINTS[s];
+        const [x1, y1] = AUTO_WAYPOINTS[s + 1];
+        player.x = x0 + (x1 - x0) * lt;
+        player.y = y0 + (y1 - y0) * lt;
+        player.dir = dir;
+        player.anim += dt * 7.5;
+        player.step = Math.floor(player.anim) % 4;
+      } else if (ix !== 0 || iy !== 0) {
+        const len = Math.hypot(ix, iy);
+        ix /= len; iy /= len;
+        const speed = 78;
+        const next = resolveCollision(player.x + ix * speed * dt, player.y + iy * speed * dt, sc);
+        player.x = next.x;
+        player.y = next.y;
+        if (Math.abs(ix) > Math.abs(iy)) player.dir = ix > 0 ? 'right' : 'left';
+        else player.dir = iy >= 0 ? 'down' : 'up';
+        player.anim += dt * 7.8;
+        player.step = Math.floor(player.anim) % 4;
+      } else {
+        player.step = 0;
+      }
+
+      // Smooth oblique camera with gentle directional look-ahead
+      const lookX = player.dir === 'right' ? 14 : player.dir === 'left' ? -14 : 0;
+      const targetCamX = Math.max(0, Math.min(sc.worldW - VIEW_W, player.x + lookX - VIEW_W / 2));
+      const targetCamY = Math.max(0, Math.min(sc.worldH - VIEW_H, player.y + sc.camOffsetY - VIEW_H / 2));
+      cam.x += (targetCamX - cam.x) * Math.min(1, dt * 6.5);
+      cam.y += (targetCamY - cam.y) * Math.min(1, dt * 6.5);
+      const icamX = Math.round(cam.x);
+      const icamY = Math.round(cam.y);
+
+      // PLANE 1 & 2: Oblique ground + horizon vista
+      ctx.clearRect(0, 0, VIEW_W, VIEW_H);
+      ctx.drawImage(images[sc.groundKey], icamX, icamY, VIEW_W, VIEW_H, 0, 0, VIEW_W, VIEW_H);
+
+      // Living ambience motes / sparkles
+      ctx.save();
+      for (let i = 0; i < 16; i++) {
+        const drift = (globalT * 0.14 + i * 0.19) % 1;
+        const mx = Math.round(((i * 97 + 40) % (sc.worldW - 80)) + Math.sin(globalT * 1.4 + i) * 4 - icamX);
+        const my = Math.round(((i * 73 + 60) % (sc.worldH - 90)) - drift * 18 - icamY);
+        const fade = Math.sin(drift * Math.PI);
+        if (mx >= 0 && mx < VIEW_W && my >= 0 && my < VIEW_H) {
+          ctx.fillStyle = sc.id === 'swamp'
+            ? `rgba(158,252,244,${(fade * 0.7).toFixed(2)})`
+            : sc.id === 'coast'
+              ? `rgba(255,251,224,${(fade * 0.65).toFixed(2)})`
+              : `rgba(255,245,184,${(fade * 0.7).toFixed(2)})`;
+          ctx.fillRect(mx, my, 1, 1);
+        }
+      }
+      ctx.restore();
+
+      // Ground contact shadows
+      const shCol = `rgba(${sc.shadowColor.r},${sc.shadowColor.g},${sc.shadowColor.b},0.42)`;
+      ctx.fillStyle = shCol;
+      for (const p of sc.props) {
+        if (p.layer !== 'ysort' || !p.shadowRx) continue;
+        ctx.beginPath();
+        ctx.ellipse(Math.round(p.x - icamX), Math.round(p.sortY - icamY - 2), p.shadowRx, p.shadowRy, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.beginPath();
+      ctx.ellipse(Math.round(player.x - icamX), Math.round(player.y - icamY - 1), 9, 3.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // PLANE 3: Exact Y-Sorted Monumental World + Pixel-Accurate Localized Occlusion Readability!
+      const queue = sc.props.filter((p) => p.layer === 'ysort').map((p) => ({ sortY: p.sortY, kind: 'prop', prop: p }));
+      queue.push({ sortY: player.y, kind: 'mara' });
+      queue.sort((a, b) => a.sortY - b.sortY);
+
+      const mSheet = images.mara_v7_28x40_sheet;
+      const fw = manifest.mara.frameW, fh = manifest.mara.frameH;
+      const mSx = player.step * fw, mSy = DIR_ROW[player.dir] * fh;
+      const mDx = Math.round(player.x - icamX - fw / 2);
+      const mDy = Math.round(player.y - icamY - (fh - 3));
+
+      let maraDrawn = false;
+      let hasOccludingProp = false;
+      oCtx.clearRect(0, 0, VIEW_W, VIEW_H);
+
+      for (const item of queue) {
+        if (item.kind === 'mara') {
+          ctx.drawImage(mSheet, mSx, mSy, fw, fh, mDx, mDy, fw, fh);
+          maraDrawn = true;
+        } else {
+          const spr = images[item.prop.spriteKey];
+          const dx = Math.round(item.prop.x - icamX - spr.width / 2);
+          const dy = Math.round(item.prop.sortY - icamY - spr.height);
+          ctx.drawImage(spr, dx, dy);
+          if (maraDrawn) {
+            // Check bounding box overlap with Mara for fast localized occlusion mask
+            if (dx < mDx + fw && dx + spr.width > mDx && dy < mDy + fh && dy + spr.height > mDy) {
+              oCtx.drawImage(spr, dx, dy);
+              hasOccludingProp = true;
+            }
+          }
+        }
+      }
+
+      // Compute exact overlapped silhouette rim ONLY where foreground prop covers Mara!
+      let occludedPx = 0;
+      if (hasOccludingProp) {
+        mCtx.clearRect(0, 0, VIEW_W, VIEW_H);
+        mCtx.drawImage(mSheet, mSx, mSy, fw, fh, mDx, mDy, fw, fh);
+        const rx = Math.max(0, mDx), ry = Math.max(0, mDy);
+        const rw = Math.min(VIEW_W - rx, fw), rh = Math.min(VIEW_H - ry, fh);
+        if (rw > 0 && rh > 0) {
+          const mDat = mCtx.getImageData(rx, ry, rw, rh).data;
+          const oDat = oCtx.getImageData(rx, ry, rw, rh).data;
+          const rim = sc.occlusionRimColor;
+          for (let y = 0; y < rh; y++) {
+            for (let x = 0; x < rw; x++) {
+              const i = (y * rw + x) * 4;
+              if (mDat[i + 3] > 128 && oDat[i + 3] > 128) occludedPx++;
+            }
+          }
+          if (occludedPx >= 18) {
+            for (let y = 0; y < rh; y++) {
+              for (let x = 0; x < rw; x++) {
+                const i = (y * rw + x) * 4;
+                if (mDat[i + 3] <= 128 || oDat[i + 3] <= 128) continue;
+                const aL = x > 0 ? mDat[(y * rw + x - 1) * 4 + 3] : 0;
+                const aR = x < rw - 1 ? mDat[(y * rw + x + 1) * 4 + 3] : 0;
+                const aU = y > 0 ? mDat[((y - 1) * rw + x) * 4 + 3] : 0;
+                const aD = y < rh - 1 ? mDat[((y + 1) * rw + x) * 4 + 3] : 0;
+                if (aL < 128 || aR < 128 || aU < 128 || aD < 128) {
+                  ctx.fillStyle = `rgba(${rim.r},${rim.g},${rim.b},0.65)`;
+                  ctx.fillRect(rx + x, ry + y, 1, 1);
+                } else if (((rx + x + ry + y) & 1) === 0) {
+                  ctx.fillStyle = `rgba(${mDat[i]},${mDat[i + 1]},${mDat[i + 2]},0.24)`;
+                  ctx.fillRect(rx + x, ry + y, 1, 1);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // PLANE 5: Camera-edge foreground framing foliage/reeds/rocks with 1.14x-1.16x parallax!
+      const camShiftX = icamX - (sc.worldW - VIEW_W) / 2;
+      const camShiftY = icamY - (sc.worldH - VIEW_H) / 2;
+      for (const p of sc.props) {
+        if (p.layer !== 'foreground') continue;
+        const spr = images[p.spriteKey];
+        const pf = p.parallax || 1.14;
+        const dx = Math.round(p.x - camShiftX * (pf - 1.0));
+        const dy = Math.round(p.sortY - camShiftY * (pf - 1.0));
+        ctx.drawImage(spr, dx, dy);
+      }
+
+      // Optional Y-Sort Baseline & Trunk Collider Debug Overlay [G]
+      if (showDebug) {
+        ctx.lineWidth = 1;
+        for (const p of sc.props) {
+          if (p.layer !== 'ysort') continue;
+          const sx = Math.round(p.x - icamX), sy = Math.round(p.sortY - icamY);
+          ctx.strokeStyle = 'rgba(140,247,240,0.85)';
+          ctx.beginPath(); ctx.moveTo(sx - 38, sy + 0.5); ctx.lineTo(sx + 38, sy + 0.5); ctx.stroke();
+          if (p.colRx > 0) {
+            ctx.strokeStyle = 'rgba(255,130,66,0.8)';
+            ctx.beginPath();
+            ctx.ellipse(sx, sy + (p.colOffsetY || -8), p.colRx, p.colRy, 0, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+        const mx = Math.round(player.x - icamX), my = Math.round(player.y - icamY);
+        ctx.strokeStyle = 'rgba(252,216,140,0.95)';
+        ctx.beginPath(); ctx.moveTo(mx - 14, my + 0.5); ctx.lineTo(mx + 14, my + 0.5); ctx.stroke();
+      }
+
+      document.getElementById('statBiome').innerHTML = `<strong>${sc.id.toUpperCase()}</strong> · ${sc.title.split(' - ')[1] || sc.title}`;
+      document.getElementById('statPos').textContent =
+        `MARA (${Math.round(player.x)}, ${Math.round(player.y)}) · CAM (${icamX}, ${icamY}) · OCCLUDED: ${occludedPx >= 18 ? 'YES (SILHOUETTE)' : 'NO'}`;
+      document.getElementById('statRatio').textContent =
+        sc.id === 'forest' ? 'MARA 28×40 (12.6% H) vs COLOSSAL TRUNKS 84–96px W × 276px H'
+        : sc.id === 'swamp' ? 'MARA 28×40 vs VAST WATER CHANNELS (>55%) & 96px REED WALLS'
+        : 'MARA 28×40 vs VAST OCEAN (~60% VIEWPORT) & 214px COASTAL CLIFFS';
+
+      requestAnimationFrame(loop);
+    }
+
+    init();
+  </script>
+</body>
+</html>

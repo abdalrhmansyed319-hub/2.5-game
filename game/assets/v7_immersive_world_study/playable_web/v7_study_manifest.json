@@ -1,0 +1,276 @@
+{
+  "viewport": {
+    "width": 480,
+    "height": 270
+  },
+  "mara": {
+    "frameW": 28,
+    "frameH": 40,
+    "sheet": "../sprites/mara_v7_28x40_sheet.png"
+  },
+  "scenes": {
+    "forest": {
+      "id": "forest",
+      "title": "B. IMMERSIVE DENSE FOREST - SINGING REEDWOOD CATHEDRAL",
+      "subtitle": "COLOSSAL 78-96PX TRUNKS EXTENDING OFF-SCREEN, FOREGROUND CANOPY FRAMING & LIVE Y-SORT",
+      "groundKey": "forest_ground",
+      "worldW": 600,
+      "worldH": 310,
+      "spawnX": 300,
+      "spawnY": 244,
+      "spawnDir": "up",
+      "walkBounds": {
+        "minX": 98,
+        "maxX": 502,
+        "minY": 146,
+        "maxY": 294
+      },
+      "camOffsetY": -88,
+      "shadowColor": {
+        "r": 12,
+        "g": 41,
+        "b": 31
+      },
+      "occlusionRimColor": {
+        "r": 140,
+        "g": 247,
+        "b": 240
+      },
+      "props": [
+        {
+          "id": "tree_back_left",
+          "spriteKey": "reedwood_a",
+          "x": 174,
+          "sortY": 184,
+          "colRx": 24,
+          "colRy": 10,
+          "colOffsetY": -8,
+          "layer": "ysort",
+          "shadowRx": 48,
+          "shadowRy": 12
+        },
+        {
+          "id": "tree_back_right",
+          "spriteKey": "reedwood_b",
+          "x": 428,
+          "sortY": 188,
+          "colRx": 26,
+          "colRy": 10,
+          "colOffsetY": -8,
+          "layer": "ysort",
+          "shadowRx": 50,
+          "shadowRy": 12
+        },
+        {
+          "id": "tree_hero_left",
+          "spriteKey": "reedwood_b",
+          "x": 152,
+          "sortY": 238,
+          "colRx": 28,
+          "colRy": 13,
+          "colOffsetY": -9,
+          "layer": "ysort",
+          "shadowRx": 62,
+          "shadowRy": 15
+        },
+        {
+          "id": "tree_hero_right",
+          "spriteKey": "reedwood_a",
+          "x": 446,
+          "sortY": 234,
+          "colRx": 28,
+          "colRy": 13,
+          "colOffsetY": -9,
+          "layer": "ysort",
+          "shadowRx": 60,
+          "shadowRy": 15
+        },
+        {
+          "id": "fg_bough_top_left",
+          "spriteKey": "fg_canopy_left",
+          "x": -34,
+          "sortY": -18,
+          "colRx": 0,
+          "colRy": 0,
+          "layer": "foreground",
+          "parallax": 1.14,
+          "anchorTopLeft": true
+        },
+        {
+          "id": "fg_bough_top_right",
+          "spriteKey": "fg_canopy_right",
+          "x": 334,
+          "sortY": -20,
+          "colRx": 0,
+          "colRy": 0,
+          "layer": "foreground",
+          "parallax": 1.14,
+          "anchorTopLeft": true
+        },
+        {
+          "id": "fg_bough_bot_left",
+          "spriteKey": "fg_canopy_bot_left",
+          "x": -38,
+          "sortY": 172,
+          "colRx": 0,
+          "colRy": 0,
+          "layer": "foreground",
+          "parallax": 1.16,
+          "anchorTopLeft": true
+        }
+      ]
+    },
+    "swamp": {
+      "id": "swamp",
+      "title": "C. IMMERSIVE LIVING SWAMP - MIRE OF WHISPERING ROOTS",
+      "subtitle": "VAST WINDING WATER CHANNELS (>55% SCREEN), GNARLED ROOT ARCHES & TOWERING REEDS",
+      "groundKey": "swamp_ground",
+      "worldW": 600,
+      "worldH": 310,
+      "spawnX": 274,
+      "spawnY": 224,
+      "spawnDir": "right",
+      "walkBounds": {
+        "minX": 108,
+        "maxX": 492,
+        "minY": 146,
+        "maxY": 286
+      },
+      "camOffsetY": -86,
+      "shadowColor": {
+        "r": 11,
+        "g": 31,
+        "b": 36
+      },
+      "occlusionRimColor": {
+        "r": 158,
+        "g": 252,
+        "b": 244
+      },
+      "props": [
+        {
+          "id": "swamp_roots_left",
+          "spriteKey": "swamp_root_reeds",
+          "x": 134,
+          "sortY": 204,
+          "colRx": 30,
+          "colRy": 13,
+          "colOffsetY": -8,
+          "layer": "ysort",
+          "shadowRx": 60,
+          "shadowRy": 14
+        },
+        {
+          "id": "swamp_roots_right",
+          "spriteKey": "swamp_root_reeds_flip",
+          "x": 462,
+          "sortY": 222,
+          "colRx": 30,
+          "colRy": 13,
+          "colOffsetY": -8,
+          "layer": "ysort",
+          "shadowRx": 60,
+          "shadowRy": 14
+        },
+        {
+          "id": "fg_swamp_bot_left",
+          "spriteKey": "fg_swamp_reeds",
+          "x": -24,
+          "sortY": 158,
+          "colRx": 0,
+          "colRy": 0,
+          "layer": "foreground",
+          "parallax": 1.15,
+          "anchorTopLeft": true
+        },
+        {
+          "id": "fg_swamp_top_left",
+          "spriteKey": "fg_swamp_canopy_tl",
+          "x": -34,
+          "sortY": -22,
+          "colRx": 0,
+          "colRy": 0,
+          "layer": "foreground",
+          "parallax": 1.14,
+          "anchorTopLeft": true
+        },
+        {
+          "id": "fg_swamp_top_right",
+          "spriteKey": "fg_swamp_canopy_tr",
+          "x": 332,
+          "sortY": -22,
+          "colRx": 0,
+          "colRy": 0,
+          "layer": "foreground",
+          "parallax": 1.14,
+          "anchorTopLeft": true
+        }
+      ]
+    },
+    "coast": {
+      "id": "coast",
+      "title": "D. IMMERSIVE COASTAL ENVIRONMENT - AMBER COAST LEVIATHAN SHORE",
+      "subtitle": "VAST OCEAN (~60% VIEWPORT), CURLING LACY FOAM, STRATIFIED CLIFFS & FOREGROUND BOULDERS",
+      "groundKey": "coast_ground",
+      "worldW": 600,
+      "worldH": 310,
+      "spawnX": 372,
+      "spawnY": 224,
+      "spawnDir": "left",
+      "walkBounds": {
+        "minX": 242,
+        "maxX": 486,
+        "minY": 132,
+        "maxY": 288
+      },
+      "camOffsetY": -86,
+      "shadowColor": {
+        "r": 74,
+        "g": 41,
+        "b": 30
+      },
+      "occlusionRimColor": {
+        "r": 255,
+        "g": 224,
+        "b": 148
+      },
+      "props": [
+        {
+          "id": "coast_cliff_upper",
+          "spriteKey": "coast_monolith",
+          "x": 522,
+          "sortY": 196,
+          "colRx": 42,
+          "colRy": 20,
+          "colOffsetY": -12,
+          "layer": "ysort",
+          "shadowRx": 70,
+          "shadowRy": 16
+        },
+        {
+          "id": "coast_boulder_mid",
+          "spriteKey": "coast_boulder",
+          "x": 454,
+          "sortY": 244,
+          "colRx": 32,
+          "colRy": 12,
+          "colOffsetY": -8,
+          "layer": "ysort",
+          "shadowRx": 52,
+          "shadowRy": 12
+        },
+        {
+          "id": "fg_coast_rock_br",
+          "spriteKey": "coast_boulder_fg",
+          "x": 396,
+          "sortY": 218,
+          "colRx": 0,
+          "colRy": 0,
+          "layer": "foreground",
+          "parallax": 1.15,
+          "anchorTopLeft": true
+        }
+      ]
+    }
+  }
+}
