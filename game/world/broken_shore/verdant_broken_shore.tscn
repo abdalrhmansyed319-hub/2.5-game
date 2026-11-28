@@ -20,7 +20,7 @@ blend_mode = 1
 script = ExtResource("1_shore_script")
 
 [node name="BrokenShoreFloor" type="Sprite2D" parent="."]
-z_index = -1
+z_index = -2
 material = SubResource("ShaderMaterial_coastal_ocean")
 position = Vector2(0, 1344)
 texture = ExtResource("3_shore_floor")
@@ -82,6 +82,51 @@ position = Vector2(1760, 2200)
 scale = Vector2(2.2, 1.2)
 texture = ExtResource("4_glow_halo")
 
+[node name="FieldRelayGlow" type="Sprite2D" parent="CoastalAtmosphereLayer"]
+material = SubResource("CanvasItemMaterial_add_glow")
+modulate = Color(1, 0.74, 0.34, 0.38)
+position = Vector2(1101, 2086)
+scale = Vector2(0.85, 0.85)
+texture = ExtResource("4_glow_halo")
+
+[node name="SpecimenPodGlow" type="Sprite2D" parent="CoastalAtmosphereLayer"]
+material = SubResource("CanvasItemMaterial_add_glow")
+modulate = Color(0.46, 0.96, 0.92, 0.28)
+position = Vector2(1466, 2222)
+scale = Vector2(0.95, 0.75)
+texture = ExtResource("4_glow_halo")
+
+[node name="WaymarkerGlow" type="Sprite2D" parent="CoastalAtmosphereLayer"]
+material = SubResource("CanvasItemMaterial_add_glow")
+modulate = Color(0.42, 0.94, 0.92, 0.24)
+position = Vector2(1033, 1488)
+scale = Vector2(1.25, 1.45)
+texture = ExtResource("4_glow_halo")
+
+[node name="GatewaySunbeamWest" type="Sprite2D" parent="CoastalAtmosphereLayer"]
+material = SubResource("CanvasItemMaterial_add_glow")
+modulate = Color(1, 0.94, 0.74, 0.22)
+position = Vector2(1082, 1524)
+rotation = 0.34
+scale = Vector2(1.4, 3.8)
+texture = ExtResource("4_glow_halo")
+
+[node name="GatewaySunbeamEast" type="Sprite2D" parent="CoastalAtmosphereLayer"]
+material = SubResource("CanvasItemMaterial_add_glow")
+modulate = Color(1, 0.93, 0.72, 0.18)
+position = Vector2(1248, 1696)
+rotation = 0.34
+scale = Vector2(1.25, 3.4)
+texture = ExtResource("4_glow_halo")
+
+[node name="ShoreSunbeamMorning" type="Sprite2D" parent="CoastalAtmosphereLayer"]
+material = SubResource("CanvasItemMaterial_add_glow")
+modulate = Color(1, 0.91, 0.68, 0.14)
+position = Vector2(812, 2210)
+rotation = 0.36
+scale = Vector2(1.65, 4.2)
+texture = ExtResource("4_glow_halo")
+
 [node name="SeaSprayParticles" type="CPUParticles2D" parent="CoastalAtmosphereLayer"]
 position = Vector2(1152, 2380)
 amount = 18
@@ -113,6 +158,9 @@ initial_velocity_max = 24.0
 scale_amount_min = 1.0
 scale_amount_max = 1.6
 color = Color(0.94, 0.88, 0.62, 0.46)
+
+[node name="MothSporeLayer" type="Node2D" parent="."]
+z_index = 11
 
 [node name="GliderSkyLayer" type="Node2D" parent="."]
 z_index = 14

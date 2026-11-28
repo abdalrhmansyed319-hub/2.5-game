@@ -10,6 +10,7 @@ extends CharacterBody2D
 signal acoustic_pulse_emitted(world_pos: Vector2, scan_radius: float)
 signal water_ripple_requested(world_pos: Vector2)
 signal field_sample_requested(world_pos: Vector2)
+signal footstep_triggered(is_running: bool)
 
 const WALK_SPEED: float = 84.0
 const RUN_SPEED: float = 128.0
@@ -239,8 +240,11 @@ func _update_animation(delta: float, input_vec: Vector2, actual_speed: float) ->
 	elif _anim_state == STATE_LENS:
 		fps = CROUCH_FPS if is_moving else IDLE_FPS
 
+	var prev_col: int = _frame_col
 	_anim_time += delta * fps
 	_frame_col = int(floor(_anim_time)) % SHEET_COLS
+	if is_moving and _frame_col != prev_col and (_frame_col == 1 or _frame_col == 5):
+		footstep_triggered.emit(_anim_state == STATE_RUN)
 	_apply_animation_frame(is_moving)
 
 

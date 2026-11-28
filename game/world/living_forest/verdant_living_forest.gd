@@ -430,16 +430,23 @@ func step_living_ecosystem(delta: float, player: PlayerController) -> void:
 		)
 		cs.frame_coords = Vector2i(int(_time_sec * 9.5 + ph * 4.0) % 4, _critter_kind[ci])
 
-	# Update player natural lighting & foliage occlusion peek (forest interior only; RimlandsPrototype coordinates unified speed!)
-	if p_pos.y < 1420.0:
+	# V10.0: RimlandsPrototype blends lighting tint & occlusion seamlessly across Forest <-> Broken Shore!
+	if p_pos.y < 1360.0:
 		player.set_lighting_tint(_compute_player_lighting_tint(p_pos))
 		player.set_occluded_peek(_compute_player_occluded(p_pos))
-	else:
-		player.set_lighting_tint(Color(1.0, 1.0, 1.0, 1.0))
-		player.set_occluded_peek(false)
 
 	if _debug_collision:
 		_debug_drawer.queue_redraw()
+
+
+func compute_forest_player_occlusion(p_pos: Vector2) -> bool:
+	if p_pos.y > 1620.0:
+		return false
+	return _compute_player_occluded(p_pos)
+
+
+func compute_forest_player_tint(p_pos: Vector2) -> Color:
+	return _compute_player_lighting_tint(p_pos)
 
 
 func _index_scene_geometry() -> void:

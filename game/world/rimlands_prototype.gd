@@ -49,11 +49,13 @@ func _ready() -> void:
 	_player.acoustic_pulse_emitted.connect(_on_player_acoustic_pulse)
 	_player.water_ripple_requested.connect(_on_player_water_ripple)
 	_player.field_sample_requested.connect(_on_player_field_sample)
+	_player.footstep_triggered.connect(_on_player_footstep)
 
 	_world_streamer.update_around_world_pos(_player.global_position)
 	_apply_lighting_mood()
 	_broken_shore.step_broken_shore(0.016, _player)
 	_living_forest.step_living_ecosystem(0.016, _player)
+	_sync_unified_player_atmosphere(_player.global_position)
 
 	if "--capture-production-proofs" in OS.get_cmdline_user_args():
 		call_deferred("_run_automated_production_capture")
@@ -125,11 +127,32 @@ func _physics_process(delta: float) -> void:
 
 	_broken_shore.step_broken_shore(delta, _player)
 	_living_forest.step_living_ecosystem(delta, _player)
+	_sync_unified_player_atmosphere(ppos)
 
 	_hud_timer += delta
 	if _hud_timer >= HUD_REFRESH_INTERVAL:
 		_hud_timer = 0.0
 		_refresh_hud(delta, surf, in_shore)
+
+
+func _sync_unified_player_atmosphere(ppos: Vector2) -> void:
+	# Smooth V10.0 cross-biome micro-lighting & canopy/landmark occlusion across Forest <-> Shore!
+	var ecotone_t: float = clampf((ppos.y - 1360.0) / 220.0, 0.0, 1.0)
+	var forest_tint: Color = _living_forest.compute_forest_player_tint(ppos)
+	var coastal_tint: Color = _broken_shore.compute_coastal_player_tint(ppos)
+	_player.set_lighting_tint(forest_tint.lerp(coastal_tint, ecotone_t))
+
+	var occluded: bool = (
+		_living_forest.compute_forest_player_occlusion(ppos)
+		or _broken_shore.compute_coastal_player_occlusion(ppos)
+	)
+	_player.set_occluded_peek(occluded)
+
+	var gust: float = maxf(
+		_living_forest.get_current_gust_strength(),
+		_broken_shore.get_current_gust_strength()
+	)
+	AudioDirector.update_biome_ambience(ppos.y, gust, _broken_shore.is_in_meridian_interior())
 
 
 func _refresh_hud(delta: float, surf: String, in_shore: bool) -> void:
@@ -193,8 +216,10 @@ func _warp_to_zone(zone_idx: int) -> void:
 	var cam: Camera2D = _player.get_camera()
 	if cam != null:
 		cam.reset_smoothing()
+	_broken_shore.force_settle_interior_state(_player.global_position)
 	_broken_shore.step_broken_shore(0.016, _player)
 	_living_forest.step_living_ecosystem(0.016, _player)
+	_sync_unified_player_atmosphere(_player.global_position)
 
 
 func _warp_to_forest_zone(forest_idx: int) -> void:
@@ -210,8 +235,25 @@ func _warp_to_forest_zone(forest_idx: int) -> void:
 	var cam: Camera2D = _player.get_camera()
 	if cam != null:
 		cam.reset_smoothing()
+	_broken_shore.force_settle_interior_state(_player.global_position)
 	_broken_shore.step_broken_shore(0.016, _player)
 	_living_forest.step_living_ecosystem(0.016, _player)
+	_sync_unified_player_atmosphere(_player.global_position)
+
+
+func _on_player_footstep(is_running: bool) -> void:
+	var surf: String = _player.current_surface
+	var kind: String = "grass"
+	if surf == "shallow_water":
+		kind = "water"
+	elif (
+		surf == "dry_sand"
+		or surf == "damp_sand"
+		or surf == "wet_sand"
+		or surf == "spacecraft_grating"
+	):
+		kind = "sand"
+	AudioDirector.play_footstep(kind, is_running)
 
 
 func _on_player_acoustic_pulse(world_pos: Vector2, scan_radius: float) -> void:
@@ -232,6 +274,7 @@ func _on_player_acoustic_pulse(world_pos: Vector2, scan_radius: float) -> void:
 				var species_name: String = flora.trigger_acoustic_scan_response()
 				if not hits.has(species_name):
 					hits.append(species_name)
+	AudioDirector.play_acoustic_lens_chime(not hits.is_empty())
 	if hits.is_empty():
 		_last_scan_text = "no resonant features within %d px" % int(scan_radius)
 		return

@@ -40,6 +40,7 @@ const TEX_COASTAL_TUFTS: Texture2D = preload("res://assets/world/broken_shore/an
 const TEX_AMBER_KELP: Texture2D = preload("res://assets/world/broken_shore/animated/amber_tide_kelp_48x40_4f.png")
 const TEX_SURF_FOAM: Texture2D = preload("res://assets/world/broken_shore/animated/ocean_surf_foam_64x48_8f.png")
 const TEX_COASTAL_FAUNA: Texture2D = preload("res://assets/world/broken_shore/animated/coastal_fauna_24x20_4x2.png")
+const TEX_SPORE_MOTHS: Texture2D = preload("res://assets/world/broken_shore/animated/coastal_spore_moths_16x16_4x2.png")
 const TEX_COASTAL_FX: Texture2D = preload("res://assets/world/broken_shore/animated/coastal_fx_decals_16x16_4x3.png")
 
 const SPRITE_PATHS: Dictionary = {
@@ -48,6 +49,12 @@ const SPRITE_PATHS: Dictionary = {
 	"meridian_debris_cowling": "res://assets/world/broken_shore/sprites/meridian_debris_cowling.png",
 	"meridian_cargo_crate": "res://assets/world/broken_shore/sprites/meridian_cargo_crate.png",
 	"meridian_rescue_beacon": "res://assets/world/broken_shore/sprites/meridian_rescue_beacon.png",
+	"meridian_field_relay": "res://assets/world/broken_shore/sprites/meridian_field_relay.png",
+	"meridian_specimen_pod": "res://assets/world/broken_shore/sprites/meridian_specimen_pod.png",
+	"ancient_waymarker_stone": "res://assets/world/broken_shore/sprites/ancient_waymarker_stone.png",
+	"ecotone_moss_boulder": "res://assets/world/broken_shore/sprites/ecotone_moss_boulder.png",
+	"coastal_biolum_coral": "res://assets/world/broken_shore/sprites/coastal_biolum_coral.png",
+	"coastal_canopy_fern_clump": "res://assets/world/broken_shore/sprites/coastal_canopy_fern_clump.png",
 	"basalt_cliff_monolith": "res://assets/world/broken_shore/sprites/basalt_cliff_monolith.png",
 	"basalt_sea_stack": "res://assets/world/broken_shore/sprites/basalt_sea_stack.png",
 	"basalt_sea_stack_med": "res://assets/world/broken_shore/sprites/basalt_sea_stack_med.png",
@@ -115,6 +122,10 @@ var _glider_nodes: Array[Sprite2D] = []
 var _glider_meta: Array[Dictionary] = []
 var _crab_nodes: Array[Sprite2D] = []
 var _crab_meta: Array[Dictionary] = []
+var _moth_nodes: Array[Sprite2D] = []
+var _moth_meta: Array[Dictionary] = []
+var _coastal_occluders: Array[Rect2] = []
+var _interior_zone_poly: PackedVector2Array = PackedVector2Array()
 
 var _decal_pool: Array[Sprite2D] = []
 var _decal_life: PackedFloat32Array = PackedFloat32Array()
@@ -133,8 +144,15 @@ var _decal_kind: PackedInt32Array = PackedInt32Array() # 0 = sand footprint, 1 =
 @onready var _cockpit_cyan_glow: Sprite2D = $CoastalAtmosphereLayer/CockpitCyanGlow
 @onready var _interior_console_glow: Sprite2D = $CoastalAtmosphereLayer/InteriorConsoleGlow
 @onready var _tidepool_amber_glow: Sprite2D = $CoastalAtmosphereLayer/TidepoolAmberGlow
+@onready var _field_relay_glow: Sprite2D = $CoastalAtmosphereLayer/FieldRelayGlow
+@onready var _specimen_pod_glow: Sprite2D = $CoastalAtmosphereLayer/SpecimenPodGlow
+@onready var _waymarker_glow: Sprite2D = $CoastalAtmosphereLayer/WaymarkerGlow
+@onready var _sunbeam_gw_west: Sprite2D = $CoastalAtmosphereLayer/GatewaySunbeamWest
+@onready var _sunbeam_gw_east: Sprite2D = $CoastalAtmosphereLayer/GatewaySunbeamEast
+@onready var _sunbeam_shore: Sprite2D = $CoastalAtmosphereLayer/ShoreSunbeamMorning
 @onready var _sea_spray_particles: CPUParticles2D = $CoastalAtmosphereLayer/SeaSprayParticles
 @onready var _seed_particles: CPUParticles2D = $CoastalAtmosphereLayer/CoastalSeedParticles
+@onready var _moth_layer: Node2D = $MothSporeLayer
 @onready var _glider_layer: Node2D = $GliderSkyLayer
 @onready var _debug_drawer: Node2D = $CollisionDebugDrawer
 
@@ -197,7 +215,45 @@ func get_active_bent_tuft_count() -> int:
 
 
 func get_fauna_count() -> int:
-	return _glider_nodes.size() + _crab_nodes.size()
+	return _glider_nodes.size() + _crab_nodes.size() + _moth_nodes.size()
+
+
+func get_current_gust_strength() -> float:
+	return _current_gust_strength
+
+
+func compute_coastal_player_occlusion(world_pos: Vector2) -> bool:
+	if _in_meridian_interior:
+		return false
+	for occ: Rect2 in _coastal_occluders:
+		if occ.has_point(world_pos):
+			return true
+	return false
+
+
+func compute_coastal_player_tint(world_pos: Vector2) -> Color:
+	if _in_meridian_interior:
+		return Color(0.84, 0.98, 1.0, 1.0)
+	if compute_coastal_player_occlusion(world_pos):
+		return Color(0.84, 0.90, 0.98, 1.0)
+	if world_pos.y < 1660.0:
+		# Cool dappled rainforest-edge canopy shade smoothly matching V8.0 Forest!
+		return Color(0.92, 0.98, 0.94, 1.0)
+	if _mood_idx == 2:
+		return Color(0.86, 0.94, 1.0, 1.0)
+	if world_pos.y >= 1980.0:
+		# Crisp warm golden morning sunlight on the open sandy shore!
+		return Color(1.03, 1.01, 0.96, 1.0)
+	return Color(0.98, 1.0, 0.98, 1.0)
+
+
+func force_settle_interior_state(world_pos: Vector2) -> void:
+	if not _interior_zone_poly.is_empty():
+		_in_meridian_interior = Geometry2D.is_point_in_polygon(world_pos, _interior_zone_poly)
+	_interior_blend = 1.0 if _in_meridian_interior else 0.0
+	if _meridian_interior_sprite != null:
+		_meridian_interior_sprite.visible = _interior_blend > 0.01
+		_meridian_interior_sprite.modulate = Color(1.0, 1.0, 1.0, _interior_blend)
 
 
 func get_warp_zones() -> Array[Dictionary]:
@@ -341,7 +397,9 @@ func step_broken_shore(delta: float, player: PlayerController) -> void:
 	for m: ShaderMaterial in _sway_materials:
 		m.set_shader_parameter("gust_factor", _current_gust_strength)
 
-	# Smooth breached ICV Meridian cutaway interior reveal!
+	# Smooth breached ICV Meridian cutaway interior reveal (Area2D + geometric polygon sync)!
+	if not _interior_zone_poly.is_empty():
+		_in_meridian_interior = Geometry2D.is_point_in_polygon(player_pos, _interior_zone_poly)
 	var target_blend: float = 1.0 if _in_meridian_interior else 0.0
 	_interior_blend = move_toward(_interior_blend, target_blend, delta * 5.2)
 	if _meridian_interior_sprite != null:
@@ -351,7 +409,7 @@ func step_broken_shore(delta: float, player: PlayerController) -> void:
 	_update_ocean_surf_and_kelp()
 	_update_crash_fx_and_atmosphere()
 	_update_coastal_tufts(delta, player)
-	_update_coastal_fauna(delta, player_pos)
+	_update_coastal_fauna(delta, player)
 	_update_footprints_and_splashes(delta, player)
 
 
@@ -381,6 +439,12 @@ func _load_and_build_broken_shore() -> void:
 	var scan_v: Variant = data.get("scan_sites", [])
 	if scan_v is Array:
 		for item: Variant in (scan_v as Array):
+			if item is Dictionary:
+				_scan_sites.append(item as Dictionary)
+
+	var v100_scan_v: Variant = data.get("v100_ecological_sites", [])
+	if v100_scan_v is Array:
+		for item: Variant in (v100_scan_v as Array):
 			if item is Dictionary:
 				_scan_sites.append(item as Dictionary)
 
@@ -547,6 +611,16 @@ func _build_props_and_interior(props_raw: Variant) -> void:
 			sp.position = pos
 			_mounted_ysort.add_child(sp)
 
+		# Register tall coastal landmarks for natural Mara silhouette occlusion peek!
+		if base_key == "meridian_wreck_hull":
+			_coastal_occluders.append(Rect2(pos.x - 165.0, pos.y - 168.0, 330.0, 152.0))
+		elif base_key == "basalt_cliff_monolith":
+			_coastal_occluders.append(Rect2(pos.x - 68.0, pos.y - 134.0, 136.0, 122.0))
+		elif base_key == "forest_tree_redwood" or base_key == "forest_tree_rock":
+			_coastal_occluders.append(Rect2(pos.x - 74.0, pos.y - 196.0, 148.0, 182.0))
+		elif base_key == "ancient_waymarker_stone":
+			_coastal_occluders.append(Rect2(pos.x - 28.0, pos.y - 78.0, 56.0, 68.0))
+
 		# Mount ICV Meridian breached interior cutaway + live crash sparks right at y = 2193!
 		if pid == "icv_meridian_wreck":
 			var bay_tex: Texture2D = _load_sprite_tex("meridian_interior_bay")
@@ -607,8 +681,9 @@ func _build_walkable_zones(zones_raw: Variant) -> void:
 		var area := Area2D.new()
 		area.name = _dict_str(d, "id", "Zone")
 		area.position = pos
-		area.collision_layer = 0
-		area.collision_mask = 1
+		# V10.0 CRITICAL FIX: Match Player Layer 3 (player_body = 4) & Canopy/Zone Layer 8 (128)!
+		area.collision_layer = 128
+		area.collision_mask = 4
 		var cp := CollisionPolygon2D.new()
 		cp.polygon = local_poly
 		area.add_child(cp)
@@ -616,6 +691,8 @@ func _build_walkable_zones(zones_raw: Variant) -> void:
 		area.body_exited.connect(_on_zone_exited.bind(role))
 		_walkable_zones_layer.add_child(area)
 		_area_poly_cache.append({"pts": world_poly, "role": role})
+		if role == "meridian_interior":
+			_interior_zone_poly = world_poly
 
 
 func _build_tuft_pool(tufts_raw: Variant) -> void:
@@ -652,11 +729,6 @@ func _build_coastal_fauna(fauna_raw: Variant) -> void:
 			continue
 		var d: Dictionary = item as Dictionary
 		var kind: int = _dict_int(d, "kind", 0)
-		var sp := Sprite2D.new()
-		sp.texture = TEX_COASTAL_FAUNA
-		sp.hframes = 4
-		sp.vframes = 2
-		sp.frame_coords = Vector2i(0, kind)
 		var meta: Dictionary = {
 			"x": _dict_float(d, "x", 780.0),
 			"y": _dict_float(d, "y", 2300.0),
@@ -664,7 +736,23 @@ func _build_coastal_fauna(fauna_raw: Variant) -> void:
 			"ry": _dict_float(d, "ry", 24.0),
 			"speed": _dict_float(d, "speed", 0.5),
 			"phase": _dict_float(d, "phase", 0.0),
+			"variant": _dict_int(d, "variant", 0),
 		}
+		if kind == 2:
+			var msp := Sprite2D.new()
+			msp.texture = TEX_SPORE_MOTHS
+			msp.hframes = 4
+			msp.vframes = 2
+			msp.frame_coords = Vector2i(0, clampi(_dict_int(d, "variant", 0), 0, 1))
+			_moth_layer.add_child(msp)
+			_moth_nodes.append(msp)
+			_moth_meta.append(meta)
+			continue
+		var sp := Sprite2D.new()
+		sp.texture = TEX_COASTAL_FAUNA
+		sp.hframes = 4
+		sp.vframes = 2
+		sp.frame_coords = Vector2i(0, clampi(kind, 0, 1))
 		if kind == 0:
 			_glider_layer.add_child(sp)
 			_glider_nodes.append(sp)
@@ -714,6 +802,24 @@ func _update_crash_fx_and_atmosphere() -> void:
 	_cockpit_cyan_glow.modulate = Color(0.42, 0.94, 0.92, (0.24 + _scan_glow_boost * 0.35) * twilight_boost)
 	_interior_console_glow.modulate = Color(0.48, 0.96, 0.94, _interior_blend * (0.48 + 0.14 * sin(_time_sec * 5.2)))
 	_tidepool_amber_glow.modulate = Color(0.96, 0.72, 0.36, (0.14 + 0.10 * sin(_time_sec * 1.8) + _scan_glow_boost * 0.3) * twilight_boost)
+
+	# V10.0 Storytelling Landmarks & Bioluminescent Resonance Halos
+	var relay_ping: float = 0.5 + 0.5 * sin(_time_sec * 4.4 + 1.1)
+	_field_relay_glow.modulate = Color(1.0, 0.74, 0.34, (0.18 + relay_ping * 0.44 + _scan_glow_boost * 0.25) * twilight_boost)
+	_specimen_pod_glow.modulate = Color(0.46, 0.96, 0.92, (0.20 + 0.12 * sin(_time_sec * 2.3) + _scan_glow_boost * 0.35) * twilight_boost)
+	_waymarker_glow.modulate = Color(0.42, 0.95, 0.92, (0.16 + 0.12 * sin(_time_sec * 1.65) + _scan_glow_boost * 0.45) * twilight_boost)
+
+	# V10.0 Gentle Coastal & Ecotone Morning Sunbeam Shafts (fade gracefully into Twilight!)
+	var beam_mood: float = 0.0 if _mood_idx == 2 else (0.72 if _mood_idx == 1 else 1.0)
+	var b1: float = (0.17 + 0.05 * sin(_time_sec * 0.75)) * beam_mood
+	var b2: float = (0.14 + 0.04 * sin(_time_sec * 0.62 + 1.8)) * beam_mood
+	var b3: float = (0.11 + 0.04 * sin(_time_sec * 0.52 + 3.1)) * beam_mood
+	_sunbeam_gw_west.visible = beam_mood > 0.01
+	_sunbeam_gw_east.visible = beam_mood > 0.01
+	_sunbeam_shore.visible = beam_mood > 0.01
+	_sunbeam_gw_west.modulate = Color(1.0, 0.94, 0.74, b1)
+	_sunbeam_gw_east.modulate = Color(1.0, 0.93, 0.72, b2)
+	_sunbeam_shore.modulate = Color(1.0, 0.90, 0.68, b3)
 
 	if _meridian_spark_sprite != null:
 		var spark_active: bool = spark_pulse < 0.38
@@ -811,11 +917,16 @@ func _update_coastal_tufts(delta: float, player: PlayerController) -> void:
 	_visible_tufts_drawn = used
 
 
-func _update_coastal_fauna(delta: float, player_pos: Vector2) -> void:
-	# 4 Soaring Chime-Wing Gliders (fa_03) circling organically over ocean & shore!
+func _update_coastal_fauna(delta: float, player: PlayerController) -> void:
+	var player_pos: Vector2 = player.global_position
+	var player_fast: bool = player.velocity.length_squared() > 6400.0
+	var player_scanning: bool = player.is_scanning
+
+	# 4 Soaring Chime-Wing Gliders (fa_03) riding thermal gusts across ocean & cliffs!
 	for i: int in range(_glider_nodes.size()):
 		var m: Dictionary = _glider_meta[i]
-		var ang: float = _time_sec * _dict_float(m, "speed", 0.4) + _dict_float(m, "phase", 0.0)
+		var spd: float = _dict_float(m, "speed", 0.4) * (1.0 + _current_gust_strength * 0.25)
+		var ang: float = _time_sec * spd + _dict_float(m, "phase", 0.0)
 		var cx: float = _dict_float(m, "x", 900.0)
 		var cy: float = _dict_float(m, "y", 2300.0)
 		var rx: float = _dict_float(m, "rx", 120.0)
@@ -825,26 +936,61 @@ func _update_coastal_fauna(delta: float, player_pos: Vector2) -> void:
 		var sp: Sprite2D = _glider_nodes[i]
 		sp.flip_h = (-sin(ang) < 0.0)
 		sp.position = Vector2(nx, ny)
-		sp.frame_coords = Vector2i(int(floor(_time_sec * 5.2 + float(i))) % 4, 0)
+		# Glide quietly on down-breeze, flap naturally on climb!
+		var flap_rate: float = 2.6 if sin(ang * 1.5) > 0.2 else 5.8
+		sp.frame_coords = Vector2i(int(floor(_time_sec * flap_rate + float(i))) % 4, 0)
 
-	# 4 Mirror-Shell Crabs (fa_02) skittering playfully near tidepools & dodging Mara!
+	# 4 Mirror-Shell Crabs (fa_02) — natural pause-and-forage cadence + alert scuttle away from Mara!
 	for i: int in range(_crab_nodes.size()):
 		var m: Dictionary = _crab_meta[i]
-		var ang: float = _time_sec * _dict_float(m, "speed", 0.9) + _dict_float(m, "phase", 0.0)
+		var phase: float = _dict_float(m, "phase", 0.0)
+		var cyc: float = _time_sec * _dict_float(m, "speed", 0.9) + phase
+		# Natural start-stop foraging rhythm (smooth plateau steps instead of robotic continuous circle!)
+		var step_wave: float = cyc - 0.35 * sin(cyc * 2.0)
 		var cx: float = _dict_float(m, "x", 1742.0)
 		var cy: float = _dict_float(m, "y", 2182.0)
 		var rx: float = _dict_float(m, "rx", 28.0)
 		var ry: float = _dict_float(m, "ry", 10.0)
-		var pos := Vector2(cx + sin(ang) * rx, cy + cos(ang * 2.0) * ry)
+		var pos := Vector2(cx + sin(step_wave) * rx, cy + cos(step_wave * 2.0) * ry)
 		var to_crab: Vector2 = pos - player_pos
-		if to_crab.length_squared() < 2304.0 and to_crab.length_squared() > 1.0:
-			pos += to_crab.normalized() * (14.0 * (1.0 - to_crab.length() / 48.0))
+		var alert_r: float = 68.0 if player_fast else 52.0
+		var scuttling: bool = false
+		if to_crab.length_squared() < alert_r * alert_r and to_crab.length_squared() > 1.0:
+			var dist: float = to_crab.length()
+			pos += to_crab.normalized() * ((22.0 if player_fast else 15.0) * (1.0 - dist / alert_r))
+			scuttling = true
 		var sp: Sprite2D = _crab_nodes[i]
 		sp.position = pos
-		sp.frame_coords = Vector2i(int(floor(_time_sec * 6.5 + float(i))) % 4, 1)
-	# delta kept intentionally typed for future crab velocity easing
-	if delta < 0.0:
-		return
+		var moving_now: bool = scuttling or (cos(cyc * 2.0) > -0.35)
+		var anim_rate: float = 10.5 if scuttling else (6.0 if moving_now else 1.8)
+		sp.frame_coords = Vector2i(int(floor(_time_sec * anim_rate + float(i))) % 4, 1)
+
+	# 6 V10.0 Bioluminescent Coastal Spore-Moths — figure-8 fluttering + Acoustic Lens curiosity!
+	var twilight_glow_mul: float = 1.25 if _mood_idx == 2 else 1.0
+	for i: int in range(_moth_nodes.size()):
+		var m: Dictionary = _moth_meta[i]
+		var ph: float = _dict_float(m, "phase", 0.0)
+		var t: float = _time_sec * _dict_float(m, "speed", 0.75) + ph
+		var cx: float = _dict_float(m, "x", 1044.0)
+		var cy: float = _dict_float(m, "y", 1522.0)
+		var rx: float = _dict_float(m, "rx", 44.0)
+		var ry: float = _dict_float(m, "ry", 22.0)
+		var row_v: int = clampi(_dict_int(m, "variant", 0), 0, 1)
+		var target := Vector2(
+			cx + sin(t) * rx + _current_gust_strength * 14.0,
+			cy + sin(t * 2.0) * ry * 0.55 - 20.0 - absf(sin(t * 1.4)) * 8.0
+		)
+		# Gentle curiosity drift toward Mara when she emits an Acoustic Field Lens harmonic!
+		if player_scanning:
+			var to_player: Vector2 = (player_pos + Vector2(0.0, -32.0)) - target
+			if to_player.length_squared() < 25600.0: # 160 px
+				target += to_player * 0.28
+		var msp: Sprite2D = _moth_nodes[i]
+		msp.position = msp.position.lerp(target, minf(1.0, delta * 4.5)) if msp.position != Vector2.ZERO else target
+		msp.flip_h = cos(t) < 0.0
+		msp.frame_coords = Vector2i(int(floor(_time_sec * 8.5 + float(i) * 1.3)) % 4, row_v)
+		var shimmer: float = 0.84 + 0.16 * sin(_time_sec * 4.2 + ph)
+		msp.modulate = Color(shimmer * twilight_glow_mul, shimmer * twilight_glow_mul, shimmer * twilight_glow_mul, 0.94)
 
 
 func _update_footprints_and_splashes(delta: float, player: PlayerController) -> void:
