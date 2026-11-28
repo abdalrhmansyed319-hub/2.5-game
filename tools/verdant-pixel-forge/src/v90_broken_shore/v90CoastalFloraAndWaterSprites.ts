@@ -295,21 +295,28 @@ export function buildOceanFoamAndBreakAtlas(): SpriteBitmap {
       }
     }
 
-    // Row 1: Elliptical rock-collar wave break + animated upward sea-spray droplets
+    // Row 1: Organic asymmetric breaking-wave froth & arcing sea-spray hugging seaward side of sea stacks!
     const ry = ch;
-    const expand = 0.78 + 0.22 * Math.sin(phase);
+    const expand = 0.82 + 0.18 * Math.sin(phase);
     const rx = 25 * expand;
     const rry = 7.5 * expand;
-    for (let a = 0; a < 96; a++) {
-      const ang = (a / 96) * Math.PI * 2;
-      // Stronger breaking foam on seaward (south, sin > 0) half!
-      const seaward = Math.sin(ang) > -0.25 ? 1 : 0.45;
-      const wobble = 1 + 0.14 * Math.sin(ang * 5 + phase);
-      const px = Math.round(ox + 32 + Math.cos(ang) * rx * wobble);
-      const py = Math.round(ry + 13 + Math.sin(ang) * rry * wobble);
-      setPx(bmp, px, py, seaward > 0.8 ? foamHi : foamMid, 230);
-      if (seaward > 0.8) {
-        setPx(bmp, px, py + 1, foamSoft, 180);
+    // Clustered curling froth crescents concentrated on the seaward south arc (zero geometric O-ring!)
+    for (let x = 7; x < cw - 7; x++) {
+      const nx = (x - 32) / rx;
+      if (Math.abs(nx) > 1.0) continue;
+      const baseArc = Math.sqrt(Math.max(0, 1 - nx * nx)) * rry;
+      const breakup = Math.sin(x * 0.45 + phase * 1.5) + Math.cos(x * 0.9 - phase);
+      if (breakup < -0.55) continue;
+      const py = Math.round(ry + 12 + baseArc + Math.sin(x * 0.25 + phase) * 1.2);
+      const thick = Math.abs(nx) < 0.65 && breakup > 0.35 ? 2 : 1;
+      for (let dy = 0; dy <= thick; dy++) {
+        const col = dy === 0 ? foamHi : dy === 1 ? foamMid : foamSoft;
+        setPx(bmp, ox + x, py + dy, col, dy === 2 ? 155 : 225);
+      }
+      // Subtle broken trailing side-curl foam wisps
+      if (Math.abs(nx) > 0.55 && breakup > 0.65) {
+        const ty = Math.round(ry + 11 - baseArc * 0.45);
+        setPx(bmp, ox + x, ty, foamSoft, 165);
       }
     }
     // Animated sea-spray droplets arcing off the seaward side of the rock!

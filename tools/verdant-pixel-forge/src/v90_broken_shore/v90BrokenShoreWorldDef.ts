@@ -36,13 +36,14 @@ export interface V90LivingCoastalTuft {
 }
 
 export interface V90CoastalFauna {
-  kind: 0 | 1; // 0 = Chime-Wing Glider, 1 = Mirror-Shell Crab
+  kind: 0 | 1 | 2; // 0 = Chime-Wing Glider, 1 = Mirror-Shell Crab, 2 = V10.0 Coastal Spore-Moth
   x: number;
   y: number;
   rx: number;
   ry: number;
   speed: number;
   phase: number;
+  variant?: 0 | 1; // For kind=2: 0 = Cyan Biolum Spore-Moth, 1 = Warm Amber Dune Moth
 }
 
 export interface V90TidepoolDef {
@@ -109,10 +110,45 @@ export function getCoastalVegBeltY(x: number): number {
 
 export const V90_TIDEPOOLS: V90TidepoolDef[] = [
   { id: 'tp_east_main', x: 1756, y: 2196, rx: 82, ry: 34 },
-  { id: 'tp_east_outer', x: 1902, y: 2262, rx: 64, ry: 28 },
+  { id: 'tp_east_outer', x: 1906, y: 2244, rx: 56, ry: 24 },
   { id: 'tp_east_north', x: 1848, y: 2096, rx: 56, ry: 24 },
   { id: 'tp_wreck_edge', x: 1588, y: 2292, rx: 52, ry: 22 },
   { id: 'tp_west_basalt', x: 562, y: 2298, rx: 58, ry: 24 },
+];
+
+export const V100_ECOLOGICAL_SITES: V90ScanSite[] = [
+  {
+    id: 'meridian_field_relay',
+    name: 'Meridian Field Telemetry Relay',
+    detail: 'Emergency uplink mast tilted into crash berm — pulsing fractured prime-harmonic ping',
+    x: 1098,
+    y: 2144,
+    radius: 96,
+  },
+  {
+    id: 'meridian_specimen_pod',
+    name: 'Cracked Exo-Survey Specimen Pod',
+    detail: 'Shattered Solstice stasis cylinder releasing faint turquoise Oura-IV pollen drift',
+    x: 1466,
+    y: 2236,
+    radius: 92,
+  },
+  {
+    id: 'ancient_waymarker_stone',
+    name: 'Pre-Arrival Harmonic Waymarker',
+    detail: 'Moss-draped alien piezo-basalt monolith resonating with the Singing Canopy spire',
+    x: 1032,
+    y: 1528,
+    radius: 118,
+  },
+  {
+    id: 'tidal_biolum_coral',
+    name: 'Tidal Bioluminescent Coral Fan',
+    detail: 'Symbiotic coastal marine polyps pulsing softly with ocean swell acoustics',
+    x: 1736,
+    y: 2208,
+    radius: 100,
+  },
 ];
 
 export const V90_SCAN_SITES: V90ScanSite[] = [
@@ -405,6 +441,39 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
         },
       ],
     },
+    // V10.0 Deepened Crash-Site Storytelling Landmarks
+    {
+      id: 'meridian_field_relay',
+      spriteKey: 'meridian_field_relay',
+      x: 1098,
+      y: 2144,
+      offsetY: -34,
+      layer: 'ysort',
+      embedKind: 'sand_berm',
+      colliders: [
+        {
+          name: 'Col_field_relay',
+          role: 'solid_debris',
+          points: [[-18, -10], [18, -10], [20, 4], [-18, 4]],
+        },
+      ],
+    },
+    {
+      id: 'meridian_specimen_pod',
+      spriteKey: 'meridian_specimen_pod',
+      x: 1466,
+      y: 2236,
+      offsetY: -18,
+      layer: 'ysort',
+      embedKind: 'sand_berm',
+      colliders: [
+        {
+          name: 'Col_specimen_pod',
+          role: 'solid_debris',
+          points: [[-20, -9], [20, -9], [22, 4], [-20, 4]],
+        },
+      ],
+    },
 
     // =========================================================================
     // ZONE A — THE WAKING SHORE (Framing Driftwood, Coastal Boulders & Flora)
@@ -544,6 +613,55 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
       swayAmp: 0.5,
       swayPhase: 3.1,
       embedKind: 'dune_plant',
+    },
+    // V10.0 Tidepool Alien Bioluminescent Coral Colonies
+    {
+      id: 'tidepool_coral_main',
+      spriteKey: 'coastal_biolum_coral',
+      x: 1736,
+      y: 2208,
+      offsetY: -16,
+      layer: 'ysort',
+      swayKind: 1,
+      swayAmp: 0.45,
+      swayPhase: 1.1,
+      embedKind: 'none',
+    },
+    {
+      id: 'tidepool_coral_outer',
+      spriteKey: 'coastal_biolum_coral_flip',
+      x: 1894,
+      y: 2248,
+      offsetY: -16,
+      layer: 'ysort',
+      swayKind: 1,
+      swayAmp: 0.45,
+      swayPhase: 2.8,
+      embedKind: 'none',
+    },
+    {
+      id: 'tidepool_coral_north',
+      spriteKey: 'coastal_biolum_coral',
+      x: 1854,
+      y: 2092,
+      offsetY: -16,
+      layer: 'ysort',
+      swayKind: 1,
+      swayAmp: 0.4,
+      swayPhase: 4.3,
+      embedKind: 'none',
+    },
+    {
+      id: 'tidepool_coral_west',
+      spriteKey: 'coastal_biolum_coral_flip',
+      x: 544,
+      y: 2292,
+      offsetY: -16,
+      layer: 'ysort',
+      swayKind: 1,
+      swayAmp: 0.45,
+      swayPhase: 0.6,
+      embedKind: 'none',
     },
 
     // =========================================================================
@@ -746,11 +864,11 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
     {
       id: 'veg_driftwood_dune',
       spriteKey: 'coastal_driftwood_log',
-      x: 1022,
+      x: 1018,
       y: 1808,
       offsetY: -34,
       layer: 'ysort',
-      embedKind: 'sand_berm',
+      embedKind: 'dune_plant',
       colliders: [
         {
           name: 'Col_drift_dune',
@@ -761,19 +879,96 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
     },
     {
       id: 'veg_boulder_mid',
-      spriteKey: 'coastal_boulder_cluster',
+      spriteKey: 'ecotone_moss_boulder',
       x: 1476,
       y: 1756,
-      offsetY: -32,
+      offsetY: -26,
       layer: 'ysort',
       embedKind: 'dune_plant',
       colliders: [
         {
           name: 'Col_veg_boulder',
           role: 'solid_rock',
-          points: [[-42, -20], [40, -22], [46, -2], [22, 10], [-38, 8]],
+          points: [[-36, -18], [34, -18], [38, -2], [20, 10], [-34, 8]],
         },
       ],
+    },
+    // V10.0 Richer Asymmetrical Zone E Coastal Ecotone Understory
+    {
+      id: 'veg_moss_boulder_w',
+      spriteKey: 'ecotone_moss_boulder_flip',
+      x: 742,
+      y: 1742,
+      offsetY: -26,
+      layer: 'ysort',
+      embedKind: 'dune_plant',
+      colliders: [
+        {
+          name: 'Col_veg_moss_w',
+          role: 'solid_rock',
+          points: [[-34, -18], [34, -18], [38, -2], [20, 10], [-34, 8]],
+        },
+      ],
+    },
+    {
+      id: 'veg_canopy_fern_w1',
+      spriteKey: 'coastal_canopy_fern_clump',
+      x: 914,
+      y: 1762,
+      offsetY: -20,
+      layer: 'ysort',
+      swayKind: 1,
+      swayAmp: 1.05,
+      swayPhase: 0.8,
+      embedKind: 'dune_plant',
+    },
+    {
+      id: 'veg_canopy_fern_w2',
+      spriteKey: 'coastal_canopy_fern_clump_flip',
+      x: 824,
+      y: 1836,
+      offsetY: -20,
+      layer: 'ysort',
+      swayKind: 1,
+      swayAmp: 1.15,
+      swayPhase: 2.3,
+      embedKind: 'dune_plant',
+    },
+    {
+      id: 'veg_canopy_fern_c1',
+      spriteKey: 'coastal_canopy_fern_clump',
+      x: 1308,
+      y: 1778,
+      offsetY: -20,
+      layer: 'ysort',
+      swayKind: 1,
+      swayAmp: 1.0,
+      swayPhase: 3.7,
+      embedKind: 'dune_plant',
+    },
+    {
+      id: 'veg_canopy_fern_e1',
+      spriteKey: 'coastal_canopy_fern_clump_flip',
+      x: 1572,
+      y: 1792,
+      offsetY: -20,
+      layer: 'ysort',
+      swayKind: 1,
+      swayAmp: 1.1,
+      swayPhase: 1.4,
+      embedKind: 'dune_plant',
+    },
+    {
+      id: 'veg_canopy_fern_e2',
+      spriteKey: 'coastal_canopy_fern_clump',
+      x: 1742,
+      y: 1748,
+      offsetY: -20,
+      layer: 'ysort',
+      swayKind: 1,
+      swayAmp: 0.95,
+      swayPhase: 4.8,
+      embedKind: 'dune_plant',
     },
     {
       id: 'veg_succulent_d1',
@@ -813,14 +1008,14 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
     },
 
     // =========================================================================
-    // ZONE F — THE INLAND GATEWAY (Bridging Seamlessly Into V8.0 Living Forest!)
+    // ZONE F — THE INLAND GATEWAY (Asymmetrical Organic Rainforest Threshold!)
     // Open walkable threshold x = 1040..1240, y = 1320..1640!
     // =========================================================================
     {
       id: 'gateway_basalt_west_pillar',
       spriteKey: 'basalt_cliff_monolith',
-      x: 886,
-      y: 1584,
+      x: 868,
+      y: 1554,
       offsetY: -66,
       layer: 'ysort',
       embedKind: 'cliff_base',
@@ -835,8 +1030,8 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
     {
       id: 'gateway_basalt_east_pillar',
       spriteKey: 'basalt_cliff_monolith_flip',
-      x: 1412,
-      y: 1588,
+      x: 1434,
+      y: 1622,
       offsetY: -66,
       layer: 'ysort',
       embedKind: 'cliff_base',
@@ -845,6 +1040,39 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
           name: 'Col_gw_east',
           role: 'solid_cliff',
           points: [[-64, -40], [58, -40], [68, -4], [40, 14], [-54, 12]],
+        },
+      ],
+    },
+    // V10.0 Pre-Arrival Alien Waymarker Monolith anchoring the western sightline into the Forest!
+    {
+      id: 'gateway_ancient_waymarker',
+      spriteKey: 'ancient_waymarker_stone',
+      x: 1032,
+      y: 1528,
+      offsetY: -40,
+      layer: 'ysort',
+      embedKind: 'dune_plant',
+      colliders: [
+        {
+          name: 'Col_waymarker',
+          role: 'solid_rock',
+          points: [[-20, -14], [18, -14], [22, 4], [-20, 6]],
+        },
+      ],
+    },
+    {
+      id: 'gateway_moss_boulder_east',
+      spriteKey: 'ecotone_moss_boulder',
+      x: 1324,
+      y: 1552,
+      offsetY: -26,
+      layer: 'ysort',
+      embedKind: 'dune_plant',
+      colliders: [
+        {
+          name: 'Col_gw_moss_e',
+          role: 'solid_rock',
+          points: [[-34, -16], [34, -16], [36, 0], [18, 10], [-32, 8]],
         },
       ],
     },
@@ -867,8 +1095,8 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
     {
       id: 'gateway_tree_east',
       spriteKey: 'forest_tree_rock_flip',
-      x: 1672,
-      y: 1632,
+      x: 1664,
+      y: 1648,
       offsetY: -108,
       layer: 'ysort',
       embedKind: 'dune_plant',
@@ -915,8 +1143,8 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
     {
       id: 'gateway_shrub_w',
       spriteKey: 'coastal_salt_shrub',
-      x: 996,
-      y: 1516,
+      x: 964,
+      y: 1588,
       offsetY: -30,
       layer: 'ysort',
       swayKind: 1,
@@ -927,8 +1155,8 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
     {
       id: 'gateway_shrub_e',
       spriteKey: 'coastal_salt_shrub_flip',
-      x: 1296,
-      y: 1522,
+      x: 1358,
+      y: 1492,
       offsetY: -30,
       layer: 'ysort',
       swayKind: 1,
@@ -939,8 +1167,8 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
     {
       id: 'gateway_fern_1',
       spriteKey: 'forest_fern_cluster',
-      x: 1036,
-      y: 1468,
+      x: 994,
+      y: 1466,
       offsetY: -28,
       layer: 'ysort',
       swayKind: 1,
@@ -950,10 +1178,10 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
     },
     {
       id: 'gateway_fern_2',
-      spriteKey: 'forest_fern_cluster_flip',
-      x: 1244,
-      y: 1474,
-      offsetY: -28,
+      spriteKey: 'coastal_canopy_fern_clump',
+      x: 1264,
+      y: 1478,
+      offsetY: -20,
       layer: 'ysort',
       swayKind: 1,
       swayAmp: 1.1,
@@ -962,10 +1190,10 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
     },
     {
       id: 'gateway_fern_3',
-      spriteKey: 'forest_fern_cluster',
-      x: 974,
-      y: 1648,
-      offsetY: -28,
+      spriteKey: 'coastal_canopy_fern_clump_flip',
+      x: 988,
+      y: 1658,
+      offsetY: -20,
       layer: 'ysort',
       swayKind: 1,
       swayAmp: 1.0,
@@ -975,13 +1203,25 @@ export function getV90BrokenShoreProps(): V90PropPlacement[] {
     {
       id: 'gateway_fern_4',
       spriteKey: 'forest_fern_cluster_flip',
-      x: 1312,
-      y: 1656,
+      x: 1278,
+      y: 1624,
       offsetY: -28,
       layer: 'ysort',
       swayKind: 1,
       swayAmp: 1.0,
       swayPhase: 4.1,
+      embedKind: 'dune_plant',
+    },
+    {
+      id: 'gateway_fern_5',
+      spriteKey: 'forest_fern_cluster',
+      x: 1518,
+      y: 1672,
+      offsetY: -28,
+      layer: 'ysort',
+      swayKind: 1,
+      swayAmp: 1.05,
+      swayPhase: 1.7,
       embedKind: 'dune_plant',
     },
   ];
@@ -1010,9 +1250,9 @@ export function getV90WalkableZones(): V90WalkableZone[] {
     {
       id: 'Zone_tidepool_east_outer',
       role: 'tidepool_shallow',
-      x: 1902,
-      y: 2262,
-      points: [[-62, -14], [0, -28], [62, -14], [62, 14], [0, 28], [-62, 14]],
+      x: 1906,
+      y: 2244,
+      points: [[-56, -12], [0, -24], [56, -12], [56, 12], [0, 24], [-56, 12]],
     },
     {
       id: 'Zone_coastal_veg_belt_slow_w',
@@ -1040,9 +1280,16 @@ export function getV90CoastalFauna(): V90CoastalFauna[] {
     { kind: 0, x: 520, y: 2040, rx: 112, ry: 48, speed: 0.39, phase: 1.5 },
     // 4 Skittering Mirror-Shell Crabs (fa_02) patrolling tidepools & wet shore!
     { kind: 1, x: 1742, y: 2182, rx: 32, ry: 12, speed: 0.92, phase: 0.2 },
-    { kind: 1, x: 1882, y: 2248, rx: 28, ry: 10, speed: 1.05, phase: 1.8 },
+    { kind: 1, x: 1888, y: 2236, rx: 24, ry: 10, speed: 1.05, phase: 1.8 },
     { kind: 1, x: 842, y: 2368, rx: 36, ry: 11, speed: 0.86, phase: 3.4 },
     { kind: 1, x: 1592, y: 2314, rx: 26, ry: 10, speed: 0.98, phase: 5.1 },
+    // 6 V10.0 Bioluminescent Coastal Spore-Moths & Dune Lantern-Moths (kind = 2)
+    { kind: 2, variant: 0, x: 1044, y: 1522, rx: 44, ry: 22, speed: 0.78, phase: 0.4 },
+    { kind: 2, variant: 0, x: 1234, y: 1568, rx: 52, ry: 26, speed: 0.66, phase: 2.2 },
+    { kind: 2, variant: 1, x: 1106, y: 1806, rx: 58, ry: 24, speed: 0.72, phase: 4.1 },
+    { kind: 2, variant: 0, x: 1474, y: 2224, rx: 36, ry: 18, speed: 0.88, phase: 1.3 },
+    { kind: 2, variant: 0, x: 1764, y: 2192, rx: 48, ry: 20, speed: 0.82, phase: 3.5 },
+    { kind: 2, variant: 1, x: 868, y: 2032, rx: 56, ry: 22, speed: 0.70, phase: 5.0 },
   ];
 }
 
@@ -1050,8 +1297,8 @@ export function getV90AmberKelpPlacements(): Array<{ x: number; y: number; phase
   return [
     { x: 1724, y: 2196, phase: 0.1 },
     { x: 1796, y: 2212, phase: 1.4 },
-    { x: 1886, y: 2274, phase: 2.6 },
-    { x: 1938, y: 2254, phase: 3.9 },
+    { x: 1874, y: 2242, phase: 2.6 },
+    { x: 1938, y: 2250, phase: 3.9 },
     { x: 1838, y: 2102, phase: 0.8 },
     { x: 1592, y: 2298, phase: 2.1 },
     { x: 572, y: 2306, phase: 3.3 },

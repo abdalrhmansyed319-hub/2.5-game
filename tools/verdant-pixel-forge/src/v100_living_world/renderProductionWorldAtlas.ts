@@ -235,12 +235,13 @@ export function renderUnifiedProductionWorld(outDir: string, prefix: string): vo
     forest_tree_redwood: 'assets/world/living_forest/sprites/full_tree_redwood.png',
     forest_tree_rock: 'assets/world/living_forest/sprites/full_tree_rock.png',
     forest_fern_cluster: 'assets/world/living_forest/sprites/fern_cluster.png',
-    // V10.0 optional new sprites auto-discovered if present!
-    coastal_reed_arch: 'assets/world/broken_shore/sprites/coastal_reed_arch.png',
-    meridian_data_relay: 'assets/world/broken_shore/sprites/meridian_data_relay.png',
-    coastal_biolum_coral: 'assets/world/broken_shore/sprites/coastal_biolum_coral.png',
-    coastal_tidal_rib: 'assets/world/broken_shore/sprites/coastal_tidal_rib.png',
+    // V10.0 handcrafted storytelling & botanical sprites!
+    meridian_field_relay: 'assets/world/broken_shore/sprites/meridian_field_relay.png',
+    meridian_specimen_pod: 'assets/world/broken_shore/sprites/meridian_specimen_pod.png',
+    ancient_waymarker_stone: 'assets/world/broken_shore/sprites/ancient_waymarker_stone.png',
     ecotone_moss_boulder: 'assets/world/broken_shore/sprites/ecotone_moss_boulder.png',
+    coastal_biolum_coral: 'assets/world/broken_shore/sprites/coastal_biolum_coral.png',
+    coastal_canopy_fern_clump: 'assets/world/broken_shore/sprites/coastal_canopy_fern_clump.png',
   };
 
   // Helper to sample shoreline Y from JSON
@@ -360,6 +361,15 @@ export function renderUnifiedProductionWorld(outDir: string, prefix: string): vo
     if (fa.kind !== 0) continue;
     const glider = cropRegion(shoreFaunaSheet, 1, 0, 24, 20);
     blitAlpha(world, glider, fa.x - 12, fa.y - 64);
+  }
+  const mothPath = path.join(GAME_ROOT, 'assets/world/broken_shore/animated/coastal_spore_moths_16x16_4x2.png');
+  if (fs.existsSync(mothPath)) {
+    const mothSheet = getTex(mothPath);
+    for (const fa of shoreEco.fauna as Array<{ kind: number; x: number; y: number; variant?: number }>) {
+      if (fa.kind !== 2) continue;
+      const moth = cropRegion(mothSheet, 1, fa.variant === 1 ? 1 : 0, 16, 16);
+      blitAlpha(world, moth, fa.x - 8, fa.y - 24);
+    }
   }
 
   // Save Full World Overview (0.5x = 1152x1440)

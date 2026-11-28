@@ -1,5 +1,5 @@
 {
-  "version": "V9.0-BROKEN-SHORE",
+  "version": "V10.0_LIVING_WORLD_EVOLUTION",
   "masterPaletteHex": [
     "#1e0c1c",
     "#2a1b31",
@@ -70,7 +70,7 @@
     "#b8d372",
     "#4c7b72"
   ],
-  "totalAssets": 21,
+  "totalAssets": 28,
   "entries": [
     {
       "id": "meridian_wreck_hull",
@@ -597,6 +597,174 @@
         "Unified Production World Ground Layer (y=1344..2880)"
       ],
       "paletteCount": 4732
+    },
+    {
+      "id": "meridian_field_relay",
+      "category": "spacecraft",
+      "productionPath": "game/assets/world/broken_shore/sprites/meridian_field_relay.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/meridian_field_relay.vpf.json",
+      "canvasWidth": 64,
+      "canvasHeight": 76,
+      "frameWidth": 64,
+      "frameHeight": 76,
+      "frameCount": 1,
+      "frameOrder": "static",
+      "pivotOrigin": [
+        32,
+        68
+      ],
+      "sortingOriginYOffset": -34,
+      "visualHeightPx": 64,
+      "collisionFootprint": "polygon 36x14",
+      "materialRole": "solid_debris",
+      "sceneUses": [
+        "Zone B Crash Site Telemetry Uplink"
+      ],
+      "paletteCount": 22
+    },
+    {
+      "id": "meridian_specimen_pod",
+      "category": "spacecraft",
+      "productionPath": "game/assets/world/broken_shore/sprites/meridian_specimen_pod.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/meridian_specimen_pod.vpf.json",
+      "canvasWidth": 56,
+      "canvasHeight": 44,
+      "frameWidth": 56,
+      "frameHeight": 44,
+      "frameCount": 1,
+      "frameOrder": "static",
+      "pivotOrigin": [
+        28,
+        36
+      ],
+      "sortingOriginYOffset": -18,
+      "visualHeightPx": 27,
+      "collisionFootprint": "polygon 42x13",
+      "materialRole": "solid_debris",
+      "sceneUses": [
+        "Zone B Aft Bay Spilled Bio-Specimen Canister"
+      ],
+      "paletteCount": 17
+    },
+    {
+      "id": "ancient_waymarker_stone",
+      "category": "geology",
+      "productionPath": "game/assets/world/broken_shore/sprites/ancient_waymarker_stone.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/ancient_waymarker_stone.vpf.json",
+      "canvasWidth": 72,
+      "canvasHeight": 92,
+      "frameWidth": 72,
+      "frameHeight": 92,
+      "frameCount": 1,
+      "frameOrder": "static",
+      "pivotOrigin": [
+        36,
+        82
+      ],
+      "sortingOriginYOffset": -40,
+      "visualHeightPx": 74,
+      "collisionFootprint": "polygon 42x20",
+      "materialRole": "solid_rock",
+      "sceneUses": [
+        "Zone F Inland Gateway Ancient Harmonic Waymarker"
+      ],
+      "paletteCount": 21
+    },
+    {
+      "id": "ecotone_moss_boulder",
+      "category": "geology",
+      "productionPath": "game/assets/world/broken_shore/sprites/ecotone_moss_boulder.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/ecotone_moss_boulder.vpf.json",
+      "canvasWidth": 84,
+      "canvasHeight": 62,
+      "frameWidth": 84,
+      "frameHeight": 62,
+      "frameCount": 1,
+      "frameOrder": "static",
+      "pivotOrigin": [
+        42,
+        53
+      ],
+      "sortingOriginYOffset": -26,
+      "visualHeightPx": 43,
+      "collisionFootprint": "polygon 72x28",
+      "materialRole": "solid_rock",
+      "sceneUses": [
+        "Zone E & F Coastal-to-Forest Ecotone Moss Outcrops"
+      ],
+      "paletteCount": 17
+    },
+    {
+      "id": "coastal_biolum_coral",
+      "category": "coastal_flora",
+      "productionPath": "game/assets/world/broken_shore/sprites/coastal_biolum_coral.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/coastal_biolum_coral.vpf.json",
+      "canvasWidth": 48,
+      "canvasHeight": 42,
+      "frameWidth": 48,
+      "frameHeight": 42,
+      "frameCount": 1,
+      "frameOrder": "static",
+      "pivotOrigin": [
+        24,
+        37
+      ],
+      "sortingOriginYOffset": -16,
+      "visualHeightPx": 30,
+      "collisionFootprint": "walkable_tidepool_flora",
+      "materialRole": "tidepool_coral",
+      "sceneUses": [
+        "Zone C & D Alien Tidepool Marine Reefs"
+      ],
+      "paletteCount": 15
+    },
+    {
+      "id": "coastal_canopy_fern_clump",
+      "category": "coastal_flora",
+      "productionPath": "game/assets/world/broken_shore/sprites/coastal_canopy_fern_clump.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/coastal_canopy_fern_clump.vpf.json",
+      "canvasWidth": 64,
+      "canvasHeight": 50,
+      "frameWidth": 64,
+      "frameHeight": 50,
+      "frameCount": 1,
+      "frameOrder": "static",
+      "pivotOrigin": [
+        32,
+        43
+      ],
+      "sortingOriginYOffset": -20,
+      "visualHeightPx": 39,
+      "collisionFootprint": "walkable_understory",
+      "materialRole": "coastal_flora",
+      "sceneUses": [
+        "Zone E & F Coastal Ecotone Understory"
+      ],
+      "paletteCount": 11
+    },
+    {
+      "id": "coastal_spore_moths",
+      "category": "fauna",
+      "productionPath": "game/assets/world/broken_shore/animated/coastal_spore_moths_16x16_4x2.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/coastal_spore_moths.vpf.json",
+      "canvasWidth": 64,
+      "canvasHeight": 32,
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "frameCount": 8,
+      "frameOrder": "row0=cyan_spore_moth(4f);row1=amber_dune_moth(4f)",
+      "pivotOrigin": [
+        8,
+        8
+      ],
+      "sortingOriginYOffset": 0,
+      "visualHeightPx": 24,
+      "collisionFootprint": "aerial_ambient_fauna",
+      "materialRole": "coastal_fauna",
+      "sceneUses": [
+        "Zones B, C, E, F Ambient Living Wildlife"
+      ],
+      "paletteCount": 8
     }
   ]
 }
