@@ -1,0 +1,602 @@
+{
+  "version": "V9.0-BROKEN-SHORE",
+  "masterPaletteHex": [
+    "#1e0c1c",
+    "#2a1b31",
+    "#331725",
+    "#46202a",
+    "#48434e",
+    "#485565",
+    "#5d6c7a",
+    "#777575",
+    "#8f969a",
+    "#a19f93",
+    "#c5ae88",
+    "#d1c7a7",
+    "#e3dec8",
+    "#eff2e5",
+    "#57252b",
+    "#67272d",
+    "#762c2d",
+    "#8a3524",
+    "#a44522",
+    "#bf5c27",
+    "#d67831",
+    "#e69242",
+    "#f2b25f",
+    "#fce09b",
+    "#163042",
+    "#235066",
+    "#3a7c8c",
+    "#71969c",
+    "#58c9c8",
+    "#8cf2ea",
+    "#d0fcf8",
+    "#101d32",
+    "#172c48",
+    "#1e4260",
+    "#255c78",
+    "#2d768c",
+    "#3c949c",
+    "#56b2a6",
+    "#7ec7ad",
+    "#a7d9bc",
+    "#cfece2",
+    "#534438",
+    "#6b533c",
+    "#826446",
+    "#9e7c55",
+    "#ba9666",
+    "#d0af7b",
+    "#e0c592",
+    "#eed9ad",
+    "#62767e",
+    "#829aa0",
+    "#242a38",
+    "#343e4e",
+    "#4d5c6c",
+    "#697a88",
+    "#8798a2",
+    "#4e3528",
+    "#704c36",
+    "#8d684a",
+    "#ab8b6b",
+    "#162922",
+    "#234232",
+    "#335c3e",
+    "#497b49",
+    "#679c52",
+    "#8db95e",
+    "#b8d372",
+    "#4c7b72"
+  ],
+  "totalAssets": 21,
+  "entries": [
+    {
+      "id": "meridian_wreck_hull",
+      "category": "spacecraft",
+      "productionPath": "game/assets/world/broken_shore/sprites/meridian_wreck_hull.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/meridian_wreck_hull.vpf.json",
+      "canvasWidth": 358,
+      "canvasHeight": 184,
+      "frameWidth": 358,
+      "frameHeight": 184,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        179,
+        180
+      ],
+      "sortingOriginYOffset": -88,
+      "visualHeightPx": 182,
+      "collisionFootprint": "3-polygon solid hull/nose/thrusters + open breached aft ramp at (+56..+122, -6..+42)",
+      "materialRole": "Terracotta/titanium painted hull plating, scorched ceramic heat tiles, cracked cyan canopy, breached cargo deck",
+      "sceneUses": [
+        "Zone B: Crash Impact Field (Hero Centerpiece)"
+      ],
+      "paletteCount": 60
+    },
+    {
+      "id": "meridian_interior_bay",
+      "category": "spacecraft",
+      "productionPath": "game/assets/world/broken_shore/sprites/meridian_interior_bay.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/meridian_interior_bay.vpf.json",
+      "canvasWidth": 230,
+      "canvasHeight": 119,
+      "frameWidth": 230,
+      "frameHeight": 119,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        115,
+        102
+      ],
+      "sortingOriginYOffset": -42,
+      "visualHeightPx": 117,
+      "collisionFootprint": "Walkable interior grating deck revealed when player enters breached aft ramp Area2D",
+      "materialRole": "Industrial metal deck grating, cracked cyan nav console, emergency lockers, amber stasis cylinders",
+      "sceneUses": [
+        "Zone B2: Explorable ICV Meridian Aft Compartment Cutaway"
+      ],
+      "paletteCount": 57
+    },
+    {
+      "id": "meridian_debris_cowling",
+      "category": "spacecraft",
+      "productionPath": "game/assets/world/broken_shore/sprites/meridian_debris_cowling.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/meridian_debris_cowling.vpf.json",
+      "canvasWidth": 120,
+      "canvasHeight": 74,
+      "frameWidth": 120,
+      "frameHeight": 74,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        60,
+        71
+      ],
+      "sortingOriginYOffset": -34,
+      "visualHeightPx": 72,
+      "collisionFootprint": "5-vertex solid debris polygon [-42,-22 .. 48,-4 .. -38,8]",
+      "materialRole": "Torn scorched thruster cowling, fused twin retro-nozzles & dangling copper-orange conduits",
+      "sceneUses": [
+        "Zone B: Impact Trail",
+        "Zone C: Tidepool Debris Edge"
+      ],
+      "paletteCount": 36
+    },
+    {
+      "id": "meridian_cargo_crate",
+      "category": "spacecraft",
+      "productionPath": "game/assets/world/broken_shore/sprites/meridian_cargo_crate.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/meridian_cargo_crate.vpf.json",
+      "canvasWidth": 71,
+      "canvasHeight": 60,
+      "frameWidth": 71,
+      "frameHeight": 60,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        36,
+        52
+      ],
+      "sortingOriginYOffset": -22,
+      "visualHeightPx": 58,
+      "collisionFootprint": "4-vertex solid crate polygon [-24,-14 .. 26,4]",
+      "materialRole": "Battered Solstice UNIT-042 scientific exploration cargo crate with amber bio-vial rack",
+      "sceneUses": [
+        "Zone A: Waking Shore Debris",
+        "Zone B: Crash Perimeter"
+      ],
+      "paletteCount": 38
+    },
+    {
+      "id": "meridian_rescue_beacon",
+      "category": "spacecraft",
+      "productionPath": "game/assets/world/broken_shore/sprites/meridian_rescue_beacon.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/meridian_rescue_beacon.vpf.json",
+      "canvasWidth": 43,
+      "canvasHeight": 58,
+      "frameWidth": 43,
+      "frameHeight": 58,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        22,
+        51
+      ],
+      "sortingOriginYOffset": -22,
+      "visualHeightPx": 56,
+      "collisionFootprint": "4-vertex solid beacon base [-14,-10 .. 16,4]",
+      "materialRole": "Orange/titanium orbital rescue transponder dish with cyan LED grid & blinking strobe",
+      "sceneUses": [
+        "Zone A: Waking Shore Story Landmark"
+      ],
+      "paletteCount": 38
+    },
+    {
+      "id": "basalt_cliff_monolith",
+      "category": "geology",
+      "productionPath": "game/assets/world/broken_shore/sprites/basalt_cliff_monolith.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/basalt_cliff_monolith.vpf.json",
+      "canvasWidth": 160,
+      "canvasHeight": 154,
+      "frameWidth": 160,
+      "frameHeight": 154,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        80,
+        143
+      ],
+      "sortingOriginYOffset": -66,
+      "visualHeightPx": 152,
+      "collisionFootprint": "5-vertex solid cliff base [-66,-42 .. 72,-6 .. -56,14]",
+      "materialRole": "Stratified dark-slate coastal basalt monolith crowned with emerald moss & sunlit lichen",
+      "sceneUses": [
+        "Zone D: Basalt Shore Headland",
+        "Zone C: Eastern Cliff Wall",
+        "Zone F: Inland Gateway Pillars"
+      ],
+      "paletteCount": 41
+    },
+    {
+      "id": "basalt_sea_stack",
+      "category": "geology",
+      "productionPath": "game/assets/world/broken_shore/sprites/basalt_sea_stack.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/basalt_sea_stack.vpf.json",
+      "canvasWidth": 120,
+      "canvasHeight": 150,
+      "frameWidth": 120,
+      "frameHeight": 150,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        60,
+        133
+      ],
+      "sortingOriginYOffset": -58,
+      "visualHeightPx": 148,
+      "collisionFootprint": "Offshore landmark (beyond deep-water barrier)",
+      "materialRole": "Tall weathered offshore basalt sea stack with mossy crown and glistening wet tidal rock collar",
+      "sceneUses": [
+        "Vast Alien Ocean: Midground & Horizon Sea Stacks"
+      ],
+      "paletteCount": 37
+    },
+    {
+      "id": "basalt_sea_stack_med",
+      "category": "geology",
+      "productionPath": "game/assets/world/broken_shore/sprites/basalt_sea_stack_med.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/basalt_sea_stack_med.vpf.json",
+      "canvasWidth": 86,
+      "canvasHeight": 107,
+      "frameWidth": 86,
+      "frameHeight": 107,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        43,
+        98
+      ],
+      "sortingOriginYOffset": -44,
+      "visualHeightPx": 105,
+      "collisionFootprint": "scaled_variant_polygon",
+      "materialRole": "Tall weathered offshore basalt sea stack with mossy crown and glistening wet tidal rock collar",
+      "sceneUses": [
+        "Vast Alien Ocean: Midground & Horizon Sea Stacks"
+      ],
+      "paletteCount": 28
+    },
+    {
+      "id": "coastal_boulder_cluster",
+      "category": "geology",
+      "productionPath": "game/assets/world/broken_shore/sprites/coastal_boulder_cluster.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/coastal_boulder_cluster.vpf.json",
+      "canvasWidth": 110,
+      "canvasHeight": 71,
+      "frameWidth": 110,
+      "frameHeight": 71,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        55,
+        68
+      ],
+      "sortingOriginYOffset": -32,
+      "visualHeightPx": 69,
+      "collisionFootprint": "5-vertex solid boulder cluster [-44,-22 .. 48,-2 .. -40,10]",
+      "materialRole": "Barnacle-crusted coastal basalt boulders with turquoise wet bases & orange coastal moss",
+      "sceneUses": [
+        "Zone C: Tidepool Coast",
+        "Zone D: Basalt Passage",
+        "Zone E: Coastal Dune Rocks",
+        "Offshore Reefs"
+      ],
+      "paletteCount": 40
+    },
+    {
+      "id": "coastal_boulder_sm",
+      "category": "geology",
+      "productionPath": "game/assets/world/broken_shore/sprites/coastal_boulder_sm.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/coastal_boulder_sm.vpf.json",
+      "canvasWidth": 74,
+      "canvasHeight": 48,
+      "frameWidth": 74,
+      "frameHeight": 48,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        37,
+        44
+      ],
+      "sortingOriginYOffset": -20,
+      "visualHeightPx": 46,
+      "collisionFootprint": "scaled_variant_polygon",
+      "materialRole": "Barnacle-crusted coastal basalt boulders with turquoise wet bases & orange coastal moss",
+      "sceneUses": [
+        "Zone C: Tidepool Coast",
+        "Zone D: Basalt Passage",
+        "Zone E: Coastal Dune Rocks",
+        "Offshore Reefs"
+      ],
+      "paletteCount": 41
+    },
+    {
+      "id": "coastal_driftwood_log",
+      "category": "geology",
+      "productionPath": "game/assets/world/broken_shore/sprites/coastal_driftwood_log.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/coastal_driftwood_log.vpf.json",
+      "canvasWidth": 136,
+      "canvasHeight": 69,
+      "frameWidth": 136,
+      "frameHeight": 69,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        68,
+        69
+      ],
+      "sortingOriginYOffset": -34,
+      "visualHeightPx": 67,
+      "collisionFootprint": "5-vertex solid driftwood trunk [-54,-18 .. 58,-4 .. -48,8]",
+      "materialRole": "Sun-bleached salt-weathered coastal driftwood with warm ochre sand burrowing & sprouting moss",
+      "sceneUses": [
+        "Zone A: Waking Shore",
+        "Zone D: Basalt Shelter",
+        "Zone E: Dune Crest"
+      ],
+      "paletteCount": 44
+    },
+    {
+      "id": "coastal_salt_shrub",
+      "category": "coastal_flora",
+      "productionPath": "game/assets/world/broken_shore/sprites/coastal_salt_shrub.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/coastal_salt_shrub.vpf.json",
+      "canvasWidth": 94,
+      "canvasHeight": 70,
+      "frameWidth": 94,
+      "frameHeight": 70,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        47,
+        65
+      ],
+      "sortingOriginYOffset": -30,
+      "visualHeightPx": 68,
+      "collisionFootprint": "4-vertex woody stem base [-22,-12 .. 26,2] (small variant walkable sway)",
+      "materialRole": "Wind-bent gnarled coastal salt-shrub with sage-emerald foliage & warm golden blossom clusters",
+      "sceneUses": [
+        "Zone E: Coastal Vegetation Belt",
+        "Zone F: Inland Gateway Ecotone"
+      ],
+      "paletteCount": 44
+    },
+    {
+      "id": "coastal_salt_shrub_sm",
+      "category": "coastal_flora",
+      "productionPath": "game/assets/world/broken_shore/sprites/coastal_salt_shrub_sm.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/coastal_salt_shrub_sm.vpf.json",
+      "canvasWidth": 66,
+      "canvasHeight": 49,
+      "frameWidth": 66,
+      "frameHeight": 49,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        33,
+        47
+      ],
+      "sortingOriginYOffset": -22,
+      "visualHeightPx": 47,
+      "collisionFootprint": "scaled_variant_polygon",
+      "materialRole": "Wind-bent gnarled coastal salt-shrub with sage-emerald foliage & warm golden blossom clusters",
+      "sceneUses": [
+        "Zone E: Coastal Vegetation Belt",
+        "Zone F: Inland Gateway Ecotone"
+      ],
+      "paletteCount": 41
+    },
+    {
+      "id": "coastal_succulent",
+      "category": "coastal_flora",
+      "productionPath": "game/assets/world/broken_shore/sprites/coastal_succulent.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/coastal_succulent.vpf.json",
+      "canvasWidth": 54,
+      "canvasHeight": 56,
+      "frameWidth": 54,
+      "frameHeight": 56,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        27,
+        50
+      ],
+      "sortingOriginYOffset": -22,
+      "visualHeightPx": 54,
+      "collisionFootprint": "Walkable ornamental alien flora (reactive sway)",
+      "materialRole": "Alien translucent Mirror Glasswort (fl_02) coastal succulent with crystalline cyan-jade tips",
+      "sceneUses": [
+        "Zone C: Tidepool Coast",
+        "Zone D: Basalt Shore",
+        "Zone E: Dune Edge"
+      ],
+      "paletteCount": 47
+    },
+    {
+      "id": "coastal_succulent_sm",
+      "category": "coastal_flora",
+      "productionPath": "game/assets/world/broken_shore/sprites/coastal_succulent_sm.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/coastal_succulent_sm.vpf.json",
+      "canvasWidth": 36,
+      "canvasHeight": 38,
+      "frameWidth": 36,
+      "frameHeight": 38,
+      "frameCount": 1,
+      "frameOrder": "single_static",
+      "pivotOrigin": [
+        18,
+        34
+      ],
+      "sortingOriginYOffset": -15,
+      "visualHeightPx": 36,
+      "collisionFootprint": "scaled_variant_polygon",
+      "materialRole": "Alien translucent Mirror Glasswort (fl_02) coastal succulent with crystalline cyan-jade tips",
+      "sceneUses": [
+        "Zone C: Tidepool Coast",
+        "Zone D: Basalt Shore",
+        "Zone E: Dune Edge"
+      ],
+      "paletteCount": 34
+    },
+    {
+      "id": "coastal_grass_tufts_24x24_6x8",
+      "category": "coastal_flora",
+      "productionPath": "game/assets/world/broken_shore/animated/coastal_grass_tufts_24x24_6x8.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/coastal_grass_tufts_24x24_6x8.vpf.json",
+      "canvasWidth": 144,
+      "canvasHeight": 192,
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frameCount": 48,
+      "frameOrder": "8 species rows x 6 horizontal sway/bend columns (bendL, idle, swayR1, swayR2, gustR, bendR)",
+      "pivotOrigin": [
+        12,
+        22
+      ],
+      "sortingOriginYOffset": -12,
+      "visualHeightPx": 24,
+      "collisionFootprint": "none (animated reactive flora/water/fauna/fx)",
+      "materialRole": "Sea oats, salt sedge, dune grass, tidal blossoms, coastal moss, Amber Tide-Kelp tufts, lichen & inland grass",
+      "sceneUses": [
+        "Zones A–F reactive wind & player-parting coastal flora pool"
+      ],
+      "paletteCount": 19
+    },
+    {
+      "id": "amber_tide_kelp_48x40_4f",
+      "category": "coastal_flora",
+      "productionPath": "game/assets/world/broken_shore/animated/amber_tide_kelp_48x40_4f.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/amber_tide_kelp_48x40_4f.vpf.json",
+      "canvasWidth": 192,
+      "canvasHeight": 40,
+      "frameWidth": 48,
+      "frameHeight": 40,
+      "frameCount": 4,
+      "frameOrder": "4 horizontal frames cycling smooth underwater ocean swell & glowing honey-amber bladder shimmer",
+      "pivotOrigin": [
+        24,
+        38
+      ],
+      "sortingOriginYOffset": -20,
+      "visualHeightPx": 40,
+      "collisionFootprint": "none (animated reactive flora/water/fauna/fx)",
+      "materialRole": "Amber Tide-Kelp (fl_01) luminous coastal kelp colonies anchored in tidepools & translucent shallows",
+      "sceneUses": [
+        "Zone C: Tidepool Coast",
+        "Shallow Translucent Reef Margin"
+      ],
+      "paletteCount": 9
+    },
+    {
+      "id": "ocean_surf_foam_64x48_8f",
+      "category": "ocean_water",
+      "productionPath": "game/assets/world/broken_shore/animated/ocean_surf_foam_64x48_8f.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/ocean_surf_foam_64x48_8f.vpf.json",
+      "canvasWidth": 512,
+      "canvasHeight": 48,
+      "frameWidth": 64,
+      "frameHeight": 48,
+      "frameCount": 8,
+      "frameOrder": "8 horizontal frames looping organic shoreline surge wash (top) and basalt rock wave-break spray collar (bottom)",
+      "pivotOrigin": [
+        32,
+        46
+      ],
+      "sortingOriginYOffset": -24,
+      "visualHeightPx": 48,
+      "collisionFootprint": "none (animated reactive flora/water/fauna/fx)",
+      "materialRole": "Lacy sea-foam surge bands, turquoise surf crest highlights & rock-impact ocean mist spray",
+      "sceneUses": [
+        "Organic Shoreline Waterline Contour",
+        "Offshore Basalt Sea Stacks & Headland Cliffs"
+      ],
+      "paletteCount": 4
+    },
+    {
+      "id": "coastal_fauna_24x20_4x2",
+      "category": "fauna",
+      "productionPath": "game/assets/world/broken_shore/animated/coastal_fauna_24x20_4x2.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/coastal_fauna_24x20_4x2.vpf.json",
+      "canvasWidth": 96,
+      "canvasHeight": 40,
+      "frameWidth": 24,
+      "frameHeight": 20,
+      "frameCount": 8,
+      "frameOrder": "Row 0: 4-frame Chime-Wing Glider (fa_03) wing-beat; Row 1: 4-frame Mirror-Shell Crab (fa_02) tidepool scuttle",
+      "pivotOrigin": [
+        12,
+        18
+      ],
+      "sortingOriginYOffset": -10,
+      "visualHeightPx": 20,
+      "collisionFootprint": "none (animated reactive flora/water/fauna/fx)",
+      "materialRole": "Luminous coastal wildlife echoing Oura-IV ecological biodiversity",
+      "sceneUses": [
+        "Zones A–D sky & tidepool living ambient fauna"
+      ],
+      "paletteCount": 7
+    },
+    {
+      "id": "coastal_fx_decals_16x16_4x3",
+      "category": "fx",
+      "productionPath": "game/assets/world/broken_shore/animated/coastal_fx_decals_16x16_4x3.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/coastal_fx_decals_16x16_4x3.vpf.json",
+      "canvasWidth": 64,
+      "canvasHeight": 48,
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "frameCount": 12,
+      "frameOrder": "Row 0: dry/wet sand footprints; Row 1: 4-frame shallow-water wade splash & ripple rings; Row 2: crash sparks & beacon strobe",
+      "pivotOrigin": [
+        8,
+        14
+      ],
+      "sortingOriginYOffset": -8,
+      "visualHeightPx": 16,
+      "collisionFootprint": "none (animated reactive flora/water/fauna/fx)",
+      "materialRole": "Interactive player traversal decals & crash-site environmental detail",
+      "sceneUses": [
+        "Sand Footprints",
+        "Shallow Water Wading Splashes",
+        "ICV Meridian Electrical Arcs & Rescue Beacon"
+      ],
+      "paletteCount": 6
+    },
+    {
+      "id": "v90_broken_shore_floor_2304x1536",
+      "category": "terrain",
+      "productionPath": "game/assets/world/broken_shore/v90_broken_shore_floor_2304x1536.png",
+      "vpfSourcePath": "game/assets/_vpf_sources/broken_shore/v90_broken_shore_floor_2304x1536.vpf.json",
+      "canvasWidth": 2304,
+      "canvasHeight": 1536,
+      "frameWidth": 2304,
+      "frameHeight": 1536,
+      "frameCount": 1,
+      "frameOrder": "single_world_canvas",
+      "pivotOrigin": [
+        0,
+        0
+      ],
+      "sortingOriginYOffset": 0,
+      "visualHeightPx": 1536,
+      "collisionFootprint": "organic multi-segment DeepWaterBarrier following waterlineY(x)+40",
+      "materialRole": "8-zone alien ocean, sunlit reflection column, wet/damp/dry beach sand, 5 tidepools, crash skid trench & V8.0 forest seam",
+      "sceneUses": [
+        "Unified Production World Ground Layer (y=1344..2880)"
+      ],
+      "paletteCount": 4732
+    }
+  ]
+}
