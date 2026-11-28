@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VERDANT SIGNAL V8.0 — Living World Forest Preview (640x360 Native)</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; background: #061010; color: #e2f5f1;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 10px; gap: 7px;
+    }
+    .bar { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; max-width: 1280px; font-size: 11px; align-items: center; }
+    button {
+      background: #0f2928; color: #baf7ef; border: 1px solid #2b6b66;
+      padding: 4px 8px; cursor: pointer; font-family: inherit; font-size: 11px; border-radius: 4px;
+    }
+    button:hover { background: #18423f; }
+    button.active { background: #266b63; color: #fff; border-color: #ffe573; }
+    .stage { border: 2px solid #264d4a; background: #040b0b; line-height: 0; box-shadow: 0 12px 36px rgba(0,0,0,0.75); }
+    canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; }
+    .hud { font-size: 11px; color: #9ec9c4; text-align: center; max-width: 1240px; line-height: 1.45; }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <strong>VERDANT SIGNAL V8.0 — LIVING WORLD PREVIEW (SUPPLEMENTARY — NOT GODOT RUNTIME PROOF)</strong>
+    <button id="b1">1: Hub</button>
+    <button id="b2">2: NW Grove</button>
+    <button id="b3">3: Root Arch</button>
+    <button id="b4">4: Waystone</button>
+    <button id="b5">5: Clearing</button>
+    <button id="b6">6: Wet Pools</button>
+    <button id="b7">7: Rocks</button>
+    <button id="b8">8: Fallen Log</button>
+    <button id="btnMood" class="active">F5: Afternoon</button>
+    <button id="btnGust">F6: Wind Gust</button>
+    <button id="btnDbg">F3: ColDebug</button>
+    <button id="btn1x">1x</button>
+    <button id="btn2x" class="active">2x</button>
+  </div>
+  <div class="stage">
+    <canvas id="game" width="640" height="360" style="width:1280px;height:720px;"></canvas>
+  </div>
+  <div class="hud" id="status">
+    WASD / Arrows (8-dir normalized) · Shift: Run · F5: Mood (Afternoon/Dawn/Shaded) · F6: Wind Gust · F3: Collision-Debug · Real Godot 4.7.2 project in ../godot_project/
+  </div>
+  <script>
+    (async () => {
+      const m = await (await fetch('./v80_living_manifest.json')).json();
+      const loadImg = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+      const floorImg = await loadImg('../sprites/v80_living_floor_2304x1536.png');
+      const tuftImg = await loadImg('../sprites/living_grass_tufts_24x24_6x8.png');
+      const critterImg = await loadImg('../sprites/living_critters_12x12_4x3.png');
+      const beamsImg = await loadImg('../godot_project/sprites/sunbeams_1152x768.png');
+      const bioHaloImg = await loadImg('../godot_project/sprites/biolum_halo_64x64.png');
+      const charTex = {
+        idle: await loadImg('../sprites/char_idle_88x88_8x4.png'),
+        walking: await loadImg('../sprites/char_walking_88x88_8x4.png'),
+        running: await loadImg('../sprites/char_running_88x88_8x4.png'),
+      };
+      const sprites = {};
+      for (const k of Object.keys(m.spriteSizes)) sprites[k] = await loadImg('../sprites/' + k + '.png');
+
+      const canvas = document.getElementById('game');
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      const statusEl = document.getElementById('status');
+
+      let px = m.presets.hub_center.playerX, py = m.presets.hub_center.playerY;
+      let camX = Math.max(m.camBounds.minX, Math.min(m.camBounds.maxX, px - 320));
+      let camY = Math.max(m.camBounds.minY, Math.min(m.camBounds.maxY, py - 198));
+      let dirRow = 2, anim = 'idle', animAcc = 0, debugCol = false, moodIdx = 0, manualGust = 0;
+      const moodNames = ['Afternoon', 'Misty Dawn', 'Shaded Forest'];
+      const keys = new Set();
+      const bends = new Map();
+
+      const presetKeys = ['hub_center','dense_nw','root_arch','waystone_ne','clearing_e','wet_pools_s','mossy_rocks_sw','fallen_log_w'];
+      const jump = (k) => {
+        const p = m.presets[k]; px = p.playerX; py = p.playerY;
+        dirRow = { south: 0, north: 1, east: 2, west: 3 }[p.dir];
+        camX = Math.max(m.camBounds.minX, Math.min(m.camBounds.maxX, px - 320));
+        camY = Math.max(m.camBounds.minY, Math.min(m.camBounds.maxY, py - 198));
+      };
+      presetKeys.forEach((pk, idx) => document.getElementById('b' + (idx + 1)).onclick = () => jump(pk));
+      document.getElementById('btnDbg').onclick = () => { debugCol = !debugCol; document.getElementById('btnDbg').classList.toggle('active', debugCol); };
+      document.getElementById('btnMood').onclick = () => { moodIdx = (moodIdx + 1) % 3; document.getElementById('btnMood').textContent = 'F5: ' + moodNames[moodIdx]; };
+      document.getElementById('btnGust').onclick = () => { manualGust = 3.0; };
+      document.getElementById('btn1x').onclick = () => { canvas.style.width = '640px'; canvas.style.height = '360px'; document.getElementById('btn1x').classList.add('active'); document.getElementById('btn2x').classList.remove('active'); };
+      document.getElementById('btn2x').onclick = () => { canvas.style.width = '1280px'; canvas.style.height = '720px'; document.getElementById('btn2x').classList.add('active'); document.getElementById('btn1x').classList.remove('active'); };
+
+      window.addEventListener('keydown', (e) => {
+        if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','F3','F5','F6'].includes(e.key)) e.preventDefault();
+        if (e.key === 'F3') { document.getElementById('btnDbg').click(); return; }
+        if (e.key === 'F5') { document.getElementById('btnMood').click(); return; }
+        if (e.key === 'F6') { manualGust = 3.0; return; }
+        if (e.key >= '1' && e.key <= '8') { jump(presetKeys[Number(e.key) - 1]); return; }
+        keys.add(e.key.toLowerCase());
+      });
+      window.addEventListener('keyup', (e) => keys.delete(e.key.toLowerCase()));
+
+      const ptInPoly = (x, y, pts) => {
+        let sign = 0;
+        for (let i = 0; i < pts.length; i++) {
+          const a = pts[i], b = pts[(i + 1) % pts.length];
+          const c = (b.x - a.x) * (y - a.y) - (b.y - a.y) * (x - a.x);
+          if (Math.abs(c) < 1e-6) continue;
+          const s = c > 0 ? 1 : -1;
+          if (!sign) sign = s; else if (sign !== s) return false;
+        }
+        return true;
+      };
+      const distSeg = (x, y, ax, ay, bx, by) => {
+        const dx = bx - ax, dy = by - ay, l2 = dx*dx + dy*dy;
+        if (l2 < 1e-6) return Math.hypot(x - ax, y - ay);
+        const t = Math.max(0, Math.min(1, ((x - ax)*dx + (y - ay)*dy) / l2));
+        return Math.hypot(x - (ax + t*dx), y - (ay + t*dy));
+      };
+      const hitsPoly = (cx, cy, rx, ry, pts) => {
+        const sy = rx / ry, scy = cy * sy;
+        const sp = pts.map(p => ({ x: p.x, y: p.y * sy }));
+        if (ptInPoly(cx, scy, sp)) return true;
+        for (let i = 0; i < sp.length; i++) if (distSeg(cx, scy, sp[i].x, sp[i].y, sp[(i + 1) % sp.length].x, sp[(i + 1) % sp.length].y) < rx) return true;
+        return false;
+      };
+      const isSolid = (r) => ['solid_trunk','solid_root','solid_rock','solid_log','solid_thicket'].includes(r);
+      const blockedAt = (x, y) => {
+        if (x < m.walkBounds.minX || x > m.walkBounds.maxX || y < m.walkBounds.minY || y > m.walkBounds.maxY) return true;
+        for (const c of m.colliders) if (isSolid(c.role) && hitsPoly(x, y, 11, 6, c.points)) return true;
+        return false;
+      };
+      const roleColors = { solid_trunk:'#ff4a4a', solid_root:'#ffa438', solid_rock:'#4cc3ff', solid_log:'#ff7a40', solid_thicket:'#d86cff', slow_thicket:'#b8ff4a', walkable_arch:'#38f2ff' };
+
+      let last = performance.now(), start = last;
+      function tick(now) {
+        const dt = Math.min(0.05, (now - last) / 1000);
+        const tSec = (now - start) / 1000;
+        last = now;
+        if (manualGust > 0) manualGust = Math.max(0, manualGust - dt);
+        const gustWave = Math.max(0, Math.sin(tSec * 0.44 - 0.8));
+        const gust = Math.max(manualGust / 3.0, Math.pow(gustWave, 4));
+
+        for (const [k, v] of bends.entries()) { v.timer -= dt; if (v.timer <= 0) bends.delete(k); }
+
+        let vx = 0, vy = 0;
+        if (keys.has('a') || keys.has('arrowleft')) vx -= 1;
+        if (keys.has('d') || keys.has('arrowright')) vx += 1;
+        if (keys.has('w') || keys.has('arrowup')) vy -= 1;
+        if (keys.has('s') || keys.has('arrowdown')) vy += 1;
+
+        let terrainMul = 1.0;
+        for (const c of m.colliders) if (c.role === 'slow_thicket' && hitsPoly(px, py, 11, 6, c.points)) terrainMul = 0.78;
+        for (const p of m.pools) if (Math.hypot((px - p.x)/p.rx, (py - p.y)/p.ry) < 0.92) terrainMul = Math.min(terrainMul, 0.90);
+
+        const wantsRun = keys.has('shift');
+        let moving = false;
+        if (vx || vy) {
+          const len = Math.hypot(vx, vy), nx = vx / len, ny = vy / len;
+          const sp = (wantsRun ? 128 : 84) * terrainMul;
+          const ox = px, oy = py;
+          if (!blockedAt(px + nx * sp * dt, py + ny * sp * dt)) { px += nx * sp * dt; py += ny * sp * dt; }
+          else {
+            if (!blockedAt(px + nx * sp * dt, py)) px += nx * sp * dt;
+            if (!blockedAt(px, py + ny * sp * dt)) py += ny * sp * dt;
+          }
+          if (Math.abs(nx) > Math.abs(ny) * 1.12) dirRow = nx > 0 ? 2 : 3;
+          else if (Math.abs(ny) > Math.abs(nx) * 1.12) dirRow = ny > 0 ? 0 : 1;
+          const actualSp = Math.hypot(px - ox, py - oy) / Math.max(dt, 0.0001);
+          moving = actualSp >= 8;
+          anim = !moving ? 'idle' : (wantsRun && actualSp > 94 ? 'running' : 'walking');
+        } else { anim = 'idle'; }
+        animAcc += dt * (anim === 'running' ? 12.5 : anim === 'walking' ? 9.5 : 5.0);
+        const fCol = Math.floor(animAcc) % 8;
+
+        const tcx = Math.max(m.camBounds.minX, Math.min(m.camBounds.maxX, px - 320));
+        const tcy = Math.max(m.camBounds.minY, Math.min(m.camBounds.maxY, py - 198));
+        camX += (tcx - camX) * Math.min(1, dt * 7);
+        camY += (tcy - camY) * Math.min(1, dt * 7);
+        const ix = Math.round(camX), iy = Math.round(camY);
+
+        ctx.drawImage(floorImg, ix, iy, 640, 360, 0, 0, 640, 360);
+
+        // Water ripples & droplets
+        ctx.strokeStyle = 'rgba(226,252,255,0.65)';
+        for (let pi = 0; pi < m.pools.length; pi++) {
+          const p = m.pools[pi];
+          const cyc = ((tSec / p.ripplePeriod) + p.ripplePhase) % 1;
+          if (cyc >= 0.14 && cyc < 0.70) {
+            const u = (cyc - 0.14) / 0.56;
+            ctx.beginPath(); ctx.ellipse(Math.round(p.x - ix), Math.round(p.y - iy), 2 + u * 13, 1 + u * 5, 0, 0, Math.PI * 2); ctx.stroke();
+          }
+        }
+
+        // Y-sorted props + live frustum-culled animated grass tufts + explorer
+        const ys = [];
+        for (const p of m.props) {
+          if (p.layer !== 'ysort' && p.layer !== 'overhead_arch') continue;
+          const img = sprites[p.spriteKey];
+          const dx = Math.round(p.x - ix - img.width / 2), dy = Math.round(p.y - iy - img.height);
+          if (dx + img.width < -16 || dx > 656 || dy + img.height < -16 || dy > 376) continue;
+          ys.push({ kind: 'prop', y: p.y + (p.sortOffsetY || 0), p, img, dx, dy });
+        }
+        let visTufts = 0;
+        for (const t of m.tufts) {
+          if (t.x < ix - 24 || t.x > ix + 664 || t.y < iy - 24 || t.y > iy + 384) continue;
+          if (moving && Math.abs(t.x - px) < 22 && Math.abs(t.y - py) < 15 && Math.hypot(t.x - px, (t.y - py) * 1.35) < 21) {
+            bends.set(t.id, { timer: 0.48, side: t.x >= px ? 1 : -1 });
+          }
+          ys.push({ kind: 'tuft', y: t.y, t });
+          visTufts++;
+        }
+        ys.push({ kind: 'player', y: py });
+        ys.sort((a, b) => a.y - b.y);
+
+        let pDrawn = false, occ = false;
+        const cdx = Math.round(px - ix - 44), cdy = Math.round(py - iy - 75);
+        for (const item of ys) {
+          if (item.kind === 'player') {
+            ctx.fillStyle = 'rgba(7,22,17,0.42)';
+            ctx.beginPath(); ctx.ellipse(Math.round(px - ix), Math.round(py - iy), 13, 4, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.drawImage(charTex[anim], fCol * 88, dirRow * 88, 88, 88, cdx, cdy, 88, 88);
+            pDrawn = true;
+          } else if (item.kind === 'tuft') {
+            const t = item.t;
+            const b = bends.get(t.id);
+            let tf = 0;
+            if (b && b.timer > 0.14) tf = b.side < 0 ? 4 : 5;
+            else {
+              const tw = Math.sin(tSec * (1.35 + gust * 1.1) - t.x * 0.011 + t.y * 0.0038);
+              const lw = (0.22 + tw * (0.46 + gust * 0.72) + gust * 0.48 + Math.sin(tSec * 1.2 + t.phase) * 0.28) * t.sens;
+              tf = lw > 0.88 ? 2 : lw > 0.26 ? 1 : lw < -0.26 ? 3 : 0;
+            }
+            ctx.drawImage(tuftImg, tf * 24, t.row * 24, 24, 24, Math.round(t.x - ix - 12), Math.round(t.y - iy - 21), 24, 24);
+          } else {
+            ctx.drawImage(item.img, item.dx, item.dy);
+            if (pDrawn && cdx + 62 > item.dx + 22 && cdx + 26 < item.dx + item.img.width - 22 && cdy + 74 > item.dy + 16 && cdy + 14 < item.dy + item.img.height) occ = true;
+          }
+        }
+        for (const ln of ['canopy', 'perimeter_canopy']) {
+          for (const p of m.props) {
+            if (p.layer !== ln) continue;
+            const img = sprites[p.spriteKey];
+            const sw = Math.round(Math.sin(tSec * 0.7 + (p.swayPhase || 0)) * (1 + gust * 1.6));
+            const dx = Math.round(p.x - ix - img.width / 2) + sw, dy = Math.round(p.y - iy - img.height / 2);
+            if (dx + img.width < -16 || dx > 656 || dy + img.height < -16 || dy > 376) continue;
+            ctx.drawImage(img, dx, dy);
+            if (cdx + 62 > dx + 24 && cdx + 26 < dx + img.width - 24 && cdy + 74 > dy + 16 && cdy + 14 < dy + img.height - 16) occ = true;
+          }
+        }
+        if (occ) { ctx.save(); ctx.globalAlpha = 0.44; ctx.drawImage(charTex[anim], fCol * 88, dirRow * 88, 88, 88, cdx, cdy, 88, 88); ctx.restore(); }
+
+        // Mood atmospheric tint + additive painterly canopy sunbeams + localized bioluminescence!
+        if (moodIdx === 1) { ctx.fillStyle = 'rgba(84,72,118,0.14)'; ctx.fillRect(0, 0, 640, 360); }
+        else if (moodIdx === 2) { ctx.fillStyle = 'rgba(10,24,48,0.34)'; ctx.fillRect(0, 0, 640, 360); }
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        const cloud = 0.82 + 0.18 * Math.sin(tSec * 0.28);
+        ctx.globalAlpha = (moodIdx === 0 ? 0.38 : moodIdx === 1 ? 0.44 : 0.14) * cloud;
+        ctx.drawImage(beamsImg, ix / 2, iy / 2, 320, 180, 0, 0, 640, 360);
+        ctx.globalAlpha = (moodIdx === 2 ? 0.75 : 0.42) * (0.78 + 0.22 * Math.sin(tSec * 1.45));
+        for (const [bx, by, sc] of [[1694,424,1.5],[1712,746,1.3],[1054,814,0.8],[574,902,0.85]]) {
+          ctx.drawImage(bioHaloImg, Math.round(bx - ix - 32 * sc), Math.round(by - iy - 32 * sc), 64 * sc, 64 * sc);
+        }
+        ctx.restore();
+
+        // Living critters (butterflies & glowing twilight moths) + falling autumn leaves + golden dust motes
+        for (const cr of m.critters) {
+          const cx = cr.homeX + Math.cos(tSec * cr.speed + cr.phase) * cr.radiusX + Math.sin(tSec * 1.7 + cr.phase) * 9;
+          const cy = cr.homeY + Math.sin(tSec * cr.speed * 1.3 + cr.phase) * cr.radiusY;
+          const wf = Math.floor(tSec * 9.5 + cr.phase * 4) % 4;
+          ctx.drawImage(critterImg, wf * 12, cr.kind * 12, 12, 12, Math.round(cx - ix - 6), Math.round(cy - iy - 6), 12, 12);
+        }
+        const lc = gust > 0.35 ? 22 : 12;
+        ctx.fillStyle = '#d9843b';
+        for (let i = 0; i < lc; i++) {
+          const lx = Math.round(((i * 197 + tSec * (11 + gust * 26 + (i % 4) * 3)) % 720) - 40);
+          const ly = Math.round(((i * 113 + tSec * (12 + (i % 3) * 3)) % 420) - 30);
+          ctx.fillRect(lx, ly, 2, 1);
+        }
+        ctx.fillStyle = 'rgba(255,244,176,0.75)';
+        for (let i = 0; i < 16; i++) {
+          const dx = Math.round(((i * 97 + tSec * (5 + (i % 3) * 2)) % 640));
+          const dy = Math.round(((i * 71 + Math.cos(tSec * 0.6 + i) * 14) % 360 + 360) % 360);
+          ctx.fillRect(dx, dy, 1, 1);
+        }
+
+        if (debugCol) {
+          for (const c of m.colliders) {
+            ctx.save(); ctx.strokeStyle = roleColors[c.role] || '#fff'; ctx.fillStyle = (roleColors[c.role] || '#fff') + '35';
+            if (!isSolid(c.role)) ctx.setLineDash([3, 3]);
+            ctx.beginPath(); c.points.forEach((pt, idx) => idx === 0 ? ctx.moveTo(pt.x - ix, pt.y - iy) : ctx.lineTo(pt.x - ix, pt.y - iy));
+            ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+          }
+          ctx.strokeStyle = '#ffffff'; ctx.beginPath(); ctx.ellipse(Math.round(px - ix), Math.round(py - iy), 11, 6, 0, 0, Math.PI * 2); ctx.stroke();
+        }
+        statusEl.textContent = 'V8.0 LIVING WORLD | Pos=(' + Math.round(px) + ',' + Math.round(py) + ') | Mood=' + moodNames[moodIdx] + ' | VisibleTufts=' + visTufts + ' | Gust=' + gust.toFixed(2) + ' | F5:Mood F6:Gust F3:ColDebug | Real Godot 4.7.2 in ../godot_project/';
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>
