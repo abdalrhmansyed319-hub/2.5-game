@@ -1,11 +1,10 @@
 class_name AssetPaths
 extends RefCounted
-## Central Milestone 01 asset registry resolving production artwork vs clearly
-## labeled temporary debug placeholders (AST-001 through AST-007).
+## Central production asset registry resolving Milestone 01 assets (AST-001..AST-007)
+## alongside approved V8.0 Living World environmental assets & unmodified Mara artwork.
 ##
-## Every production path maps 1:1 to docs/asset-production/ASSET_REQUESTS.md.
 ## Temporary placeholders live strictly under res://assets/debug_placeholders/
-## and NEVER count toward Stage 05 Visual Prototype Gate completion.
+## and NEVER count toward production visual completion.
 
 const ASSET_IDS: PackedStringArray = [
 	"AST-001",
@@ -15,6 +14,25 @@ const ASSET_IDS: PackedStringArray = [
 	"AST-005",
 	"AST-006",
 	"AST-007",
+]
+
+const MARA_ORIG_IDLE_PATH: String = "res://assets/characters/player/mara_original/char_idle_88x88_8x4.png"
+const MARA_ORIG_WALK_PATH: String = "res://assets/characters/player/mara_original/char_walking_88x88_8x4.png"
+const MARA_ORIG_RUN_PATH: String = "res://assets/characters/player/mara_original/char_running_88x88_8x4.png"
+
+const V80_REQUIRED_PATHS: PackedStringArray = [
+	"res://assets/world/living_forest/sprites/v80_living_floor_2304x1536.png",
+	"res://assets/world/living_forest/sprites/living_grass_tufts_24x24_6x8.png",
+	"res://assets/world/living_forest/sprites/living_critters_12x12_4x3.png",
+	"res://assets/world/living_forest/sprites/sunbeams_1152x768.png",
+	"res://assets/world/living_forest/sprites/biolum_halo_64x64.png",
+	"res://assets/world/living_forest/data/living_ecosystem_data.json",
+	"res://shaders/foliage_sway.gdshader",
+	"res://shaders/puddle_ripples.gdshader",
+	"res://shaders/mara_natural_occlusion.gdshader",
+	MARA_ORIG_IDLE_PATH,
+	MARA_ORIG_WALK_PATH,
+	MARA_ORIG_RUN_PATH,
 ]
 
 
@@ -94,6 +112,23 @@ static func load_texture(asset_id: String) -> Texture2D:
 	if res is Texture2D:
 		return res as Texture2D
 	return null
+
+
+static func load_texture_path(res_path: String) -> Texture2D:
+	if res_path.is_empty() or not ResourceLoader.exists(res_path):
+		return null
+	var res: Resource = ResourceLoader.load(res_path)
+	if res is Texture2D:
+		return res as Texture2D
+	return null
+
+
+static func verify_v80_living_world_assets() -> PackedStringArray:
+	var missing: PackedStringArray = PackedStringArray()
+	for res_path: String in V80_REQUIRED_PATHS:
+		if not ResourceLoader.exists(res_path) and not FileAccess.file_exists(res_path):
+			missing.append(res_path)
+	return missing
 
 
 static func is_using_placeholder(asset_id: String) -> bool:

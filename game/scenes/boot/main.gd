@@ -1,9 +1,9 @@
 extends Control
-## VERDANT SIGNAL — Pre-Production Bootstrap & Windows Environment Diagnostics.
+## VERDANT SIGNAL — Production Bootstrap & Windows Environment Diagnostics.
 ##
-## Purpose: Verify Godot version, active renderer, GPU adapter, display resolution,
-## 480x270 scaling ratio, and 5-tier AudioBusLayout immediately on first Windows launch
-## (resolving DDL-015 before Stage 05 Visual & Streaming Prototype coding begins).
+## Verifies Godot version, active renderer (GL Compatibility / ANGLE), GPU adapter,
+## 640x360 integer scaling ratio, 5-tier AudioBusLayout, and integrated V8.0 Living
+## World + unmodified Mara assets before launching the playable production world.
 
 const PROTOTYPE_SCENE_PATH: String = "res://world/rimlands_prototype.tscn"
 
@@ -16,16 +16,23 @@ func _ready() -> void:
 	_status_label.text = report
 	print("\n" + report + "\n")
 
+	if "--capture-production-proofs" in OS.get_cmdline_user_args():
+		call_deferred("_open_main_world")
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey:
 		var key_ev: InputEventKey = event as InputEventKey
 		if key_ev.pressed and not key_ev.echo:
 			if key_ev.keycode == KEY_ENTER or key_ev.keycode == KEY_SPACE:
-				GameState.set_phase(&"m01_prototype")
-				var err: Error = get_tree().change_scene_to_file(PROTOTYPE_SCENE_PATH)
-				if err != OK:
-					push_warning("Could not open Milestone 01 prototype: %d" % err)
+				_open_main_world()
+
+
+func _open_main_world() -> void:
+	GameState.set_phase(&"verdant_living_world")
+	var err: Error = get_tree().change_scene_to_file(PROTOTYPE_SCENE_PATH)
+	if err != OK:
+		push_warning("Could not open VERDANT SIGNAL Living World: %d" % err)
 
 
 func _build_diagnostics_report() -> String:
@@ -49,11 +56,16 @@ func _build_diagnostics_report() -> String:
 
 	var placeholder_count: int = AssetPaths.get_placeholder_count()
 	var total_assets: int = AssetPaths.get_total_tracked_assets()
+	var missing_v80: PackedStringArray = AssetPaths.verify_v80_living_world_assets()
 	var art_status: String = (
-		"TEMP DEBUG PLACEHOLDERS (%d/%d) — Visual Gate Pending"
-		% [placeholder_count, total_assets]
-		if placeholder_count > 0
-		else "Production Art Loaded (0/%d placeholders)" % total_assets
+		"M01 Art OK (0/%d placeholders) | V8.0 Living World + 88x88 Mara OK (%d/%d)"
+		% [
+			total_assets,
+			AssetPaths.V80_REQUIRED_PATHS.size() - missing_v80.size(),
+			AssetPaths.V80_REQUIRED_PATHS.size(),
+		]
+		if placeholder_count == 0 and missing_v80.is_empty()
+		else "WARNING: M01 placeholders=%d | V8.0 missing=%d" % [placeholder_count, missing_v80.size()]
 	)
 
 	var lines: PackedStringArray = PackedStringArray([
@@ -61,23 +73,22 @@ func _build_diagnostics_report() -> String:
 		"GODOT VER : %s (%s)" % [version_str, os_name],
 		"RENDERER  : %s (%s)" % [render_method, render_driver],
 		"GPU       : %s" % gpu_name,
-		"MONITOR   : %dx%d @ %.1f Hz (480x270 scale: %.2fx / %.2fx)" % [
+		"MONITOR   : %dx%d @ %.1f Hz (640x360 scale: %.2fx / %.2fx)" % [
 			screen_size.x,
 			screen_size.y,
 			refresh_hz,
 			scale_x,
 			scale_y,
 		],
-		"WINDOW    : %dx%d | Viewport: %dx%d | Tile: %dpx" % [
+		"WINDOW    : %dx%d | Viewport: %dx%d (Integer Pixel-Perfect)" % [
 			window_size.x,
 			window_size.y,
 			viewport_size.x,
 			viewport_size.y,
-			GameState.BASE_TILE_SIZE_PX,
 		],
 		"AUDIO BUS : %s" % bus_status,
 		"ART GATE  : %s" % art_status,
-		"NEXT STEP : Press [ENTER] or [SPACE] to launch Milestone 01 Prototype",
+		"NEXT STEP : Press [ENTER] or [SPACE] to enter VERDANT SIGNAL Living World",
 	])
 	return "\n".join(lines)
 

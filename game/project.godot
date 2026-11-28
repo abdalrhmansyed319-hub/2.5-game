@@ -6,8 +6,9 @@
 ;   Renderer: GL Compatibility (OpenGL 3 with automatic ANGLE fallback on OpenGL 3.1 GPUs).
 ;   Note: Do not force Vulkan or D3D12; HD Graphics 3000 hardware caps at D3D10.1 / OpenGL 3.1.
 ;
-; Conservative Pixel-Art Baseline:
-;   Native viewport 480x270 (16x16 tiles, 16x24 Mara), 960x540 (2x) preview window,
+; Approved V8.0 Living World Pixel-Art Baseline:
+;   Native viewport 640x360 (1:1 unmodified 88x88 character & handcrafted living forest),
+;   1280x720 (2x exact integer scale on 1366x768 Intel HD 3000; 3x = 1920x1080),
 ;   Nearest filtering, MSAA 2D off, HDR 2D off, pixel-snapped transforms/vertices.
 
 config_version=5
@@ -39,10 +40,10 @@ gdscript/warnings/unsafe_cast=1
 
 [display]
 
-window/size/viewport_width=480
-window/size/viewport_height=270
-window/size/window_width_override=960
-window/size/window_height_override=540
+window/size/viewport_width=640
+window/size/viewport_height=360
+window/size/window_width_override=1280
+window/size/window_height_override=720
 window/stretch/mode="viewport"
 window/stretch/aspect="keep"
 window/stretch/scale_mode="integer"

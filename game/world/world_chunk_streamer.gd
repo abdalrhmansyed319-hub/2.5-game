@@ -11,6 +11,12 @@ const TILE_PX: int = 16
 const CHUNK_PX: int = CHUNK_TILES * TILE_PX
 const STREAM_RADIUS: int = 1
 
+# Handcrafted V8.0 Living Forest Sanctuary tile footprint ([0..2304] x [0..1536] px)
+const SANCTUARY_MIN_TX: int = 0
+const SANCTUARY_MAX_TX: int = 144
+const SANCTUARY_MIN_TY: int = 0
+const SANCTUARY_MAX_TY: int = 96
+
 const TREE_SCENE: PackedScene = preload("res://world/props/singing_reedwood_tree.tscn")
 const FLORA_SCENE: PackedScene = preload("res://world/flora/flora_prop.tscn")
 const DROP_POD_SCENE: PackedScene = preload("res://world/landmarks/drop_pod_clearing.tscn")
@@ -192,6 +198,12 @@ func _populate_tile(tx: int, ty: int) -> void:
 	if not _tileset.has_source(coast_src) or not _tileset.has_source(canopy_src):
 		return
 
+	# Inside the handcrafted V8.0 Living Forest Sanctuary, keep chunk streaming active
+	# on collision-free moss floor tiles so zero legacy water/cliff barriers block the forest!
+	if _in_living_forest_sanctuary(tx, ty):
+		_ground_layer.set_cell(cell, canopy_src, Vector2i(0, 0))
+		return
+
 	# Base animated water layer everywhere beneath coastline & deep shelf
 	var elev: float = _sample_elevation(tx, ty)
 	if elev < -0.35:
@@ -230,9 +242,9 @@ func _populate_tile(tx: int, ty: int) -> void:
 		_decal_layer.set_cell(cell, canopy_src, trail_coord)
 		return
 
-	# Sparse coastal rock outcrops & forest decals (outside Drop-Pod Clearing)
+	# Sparse coastal rock outcrops & forest decals (outside Drop-Pod Clearing & V8.0 Living Forest Sanctuary)
 	var h: int = _hash_2d(tx, ty, 911)
-	if not _in_spawn_clearing(tx, ty):
+	if not _in_spawn_clearing(tx, ty) and not _in_living_forest_sanctuary(tx, ty):
 		if sand_mask == 15 and moss_mask == 0 and (h % 97) == 0:
 			_cliff_layer.set_cell(cell, coast_src, Vector2i(5, 3))
 		elif sand_mask == 15 and moss_mask == 0 and (h % 29) == 0:
@@ -247,13 +259,13 @@ func _populate_chunk_props(
 	origin_y: int,
 	bucket: Node2D
 ) -> void:
-	# Spaced Singing Reedwood trees on 4x4 tile cells (Poisson-like spacing)
+	# Spaced Singing Reedwood trees on 4x4 tile cells (outside handcrafted V8.0 Living Forest Sanctuary)
 	for gy: int in range(0, CHUNK_TILES, 4):
 		for gx: int in range(0, CHUNK_TILES, 4):
 			var h: int = _hash_2d(chunk_coord.x * 8 + gx, chunk_coord.y * 8 + gy, 307)
 			var tx: int = origin_x + gx + (h % 3)
 			var ty: int = origin_y + gy + ((h >> 3) % 3)
-			if _in_spawn_clearing(tx, ty) or _is_trail_tile(tx, ty):
+			if _in_spawn_clearing(tx, ty) or _is_trail_tile(tx, ty) or _in_living_forest_sanctuary(tx, ty):
 				continue
 			if _sample_elevation(tx, ty) > 0.42 and (h % 100) < 42:
 				var tree: SingingReedwoodTree = (
@@ -267,7 +279,7 @@ func _populate_chunk_props(
 					tree.set_variant((h >> 6) & 1)
 					bucket.add_child(tree)
 
-	# Starter Flora Props (AST-005)
+	# Starter Flora Props (AST-005; inside sanctuary handled by VerdantLivingForest embedded flora)
 	for gy: int in range(0, CHUNK_TILES, 3):
 		for gx: int in range(0, CHUNK_TILES, 3):
 			var hf: int = _hash_2d(origin_x + gx, origin_y + gy, 733)
@@ -275,7 +287,7 @@ func _populate_chunk_props(
 				continue
 			var tx: int = origin_x + gx + (hf & 1)
 			var ty: int = origin_y + gy + ((hf >> 2) & 1)
-			if _in_spawn_clearing(tx, ty) or _is_trail_tile(tx, ty):
+			if _in_spawn_clearing(tx, ty) or _is_trail_tile(tx, ty) or _in_living_forest_sanctuary(tx, ty):
 				continue
 			var elev: float = _sample_elevation(tx, ty)
 			var species: int = -1
@@ -349,6 +361,15 @@ func _is_trail_tile(tx: int, ty: int) -> bool:
 
 func _in_spawn_clearing(tx: int, ty: int) -> bool:
 	return absf(float(tx)) <= 6.0 and absf(float(ty)) <= 5.0
+
+
+func _in_living_forest_sanctuary(tx: int, ty: int) -> bool:
+	return (
+		tx >= SANCTUARY_MIN_TX
+		and tx <= SANCTUARY_MAX_TX
+		and ty >= SANCTUARY_MIN_TY
+		and ty <= SANCTUARY_MAX_TY
+	)
 
 
 func _hash_2d(x: int, y: int, seed_val: int) -> int:

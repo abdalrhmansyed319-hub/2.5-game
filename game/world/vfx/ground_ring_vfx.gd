@@ -21,7 +21,7 @@ func configure(vfx_row: int, world_pos: Vector2, fps: float = DEFAULT_FPS) -> vo
 	centered = true
 	offset = Vector2.ZERO
 	region_enabled = true
-	z_index = -1
+	z_index = 0
 	_apply_frame(0)
 
 
