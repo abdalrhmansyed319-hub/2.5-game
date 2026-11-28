@@ -35,6 +35,33 @@ const V80_REQUIRED_PATHS: PackedStringArray = [
 	MARA_ORIG_RUN_PATH,
 ]
 
+const V90_REQUIRED_PATHS: PackedStringArray = [
+	"res://assets/world/broken_shore/v90_broken_shore_floor_2304x1536.png",
+	"res://assets/world/broken_shore/broken_shore_ecosystem_data.json",
+	"res://assets/world/broken_shore/broken_shore_asset_catalog.json",
+	"res://assets/world/broken_shore/sprites/meridian_wreck_hull.png",
+	"res://assets/world/broken_shore/sprites/meridian_interior_bay.png",
+	"res://assets/world/broken_shore/sprites/meridian_debris_cowling.png",
+	"res://assets/world/broken_shore/sprites/meridian_cargo_crate.png",
+	"res://assets/world/broken_shore/sprites/meridian_rescue_beacon.png",
+	"res://assets/world/broken_shore/sprites/basalt_cliff_monolith.png",
+	"res://assets/world/broken_shore/sprites/basalt_sea_stack.png",
+	"res://assets/world/broken_shore/sprites/basalt_sea_stack_med.png",
+	"res://assets/world/broken_shore/sprites/coastal_boulder_cluster.png",
+	"res://assets/world/broken_shore/sprites/coastal_boulder_sm.png",
+	"res://assets/world/broken_shore/sprites/coastal_driftwood_log.png",
+	"res://assets/world/broken_shore/sprites/coastal_salt_shrub.png",
+	"res://assets/world/broken_shore/sprites/coastal_salt_shrub_sm.png",
+	"res://assets/world/broken_shore/sprites/coastal_succulent.png",
+	"res://assets/world/broken_shore/sprites/coastal_succulent_sm.png",
+	"res://assets/world/broken_shore/animated/coastal_grass_tufts_24x24_6x8.png",
+	"res://assets/world/broken_shore/animated/amber_tide_kelp_48x40_4f.png",
+	"res://assets/world/broken_shore/animated/ocean_surf_foam_64x48_8f.png",
+	"res://assets/world/broken_shore/animated/coastal_fauna_24x20_4x2.png",
+	"res://assets/world/broken_shore/animated/coastal_fx_decals_16x16_4x3.png",
+	"res://shaders/coastal_ocean.gdshader",
+]
+
 
 static func get_production_path(asset_id: String) -> String:
 	match asset_id:
@@ -126,6 +153,14 @@ static func load_texture_path(res_path: String) -> Texture2D:
 static func verify_v80_living_world_assets() -> PackedStringArray:
 	var missing: PackedStringArray = PackedStringArray()
 	for res_path: String in V80_REQUIRED_PATHS:
+		if not ResourceLoader.exists(res_path) and not FileAccess.file_exists(res_path):
+			missing.append(res_path)
+	return missing
+
+
+static func verify_v90_broken_shore_assets() -> PackedStringArray:
+	var missing: PackedStringArray = PackedStringArray()
+	for res_path: String in V90_REQUIRED_PATHS:
 		if not ResourceLoader.exists(res_path) and not FileAccess.file_exists(res_path):
 			missing.append(res_path)
 	return missing

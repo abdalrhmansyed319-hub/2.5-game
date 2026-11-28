@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://world/rimlands_prototype.gd" id="1_proto"]
 [ext_resource type="Script" path="res://world/world_chunk_streamer.gd" id="2_streamer"]
 [ext_resource type="PackedScene" path="res://characters/player/player.tscn" id="3_player"]
 [ext_resource type="PackedScene" path="res://ui/prototype_hud.tscn" id="4_hud"]
 [ext_resource type="PackedScene" path="res://world/living_forest/verdant_living_forest.tscn" id="5_living_forest"]
+[ext_resource type="PackedScene" path="res://world/broken_shore/verdant_broken_shore.tscn" id="6_broken_shore"]
 
 [node name="RimlandsPrototype" type="Node2D"]
 script = ExtResource("1_proto")
@@ -34,9 +35,11 @@ z_index = -3
 y_sort_enabled = true
 
 [node name="Player" parent="WorldChunkStreamer/YSortWorldLayer" instance=ExtResource("3_player")]
-position = Vector2(1024, 822)
+position = Vector2(748, 2288)
 
 [node name="VerdantLivingForest" parent="." instance=ExtResource("5_living_forest")]
+
+[node name="VerdantBrokenShore" parent="." instance=ExtResource("6_broken_shore")]
 
 [node name="VfxLayer" type="Node2D" parent="."]
 z_index = -1

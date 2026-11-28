@@ -57,15 +57,18 @@ func _build_diagnostics_report() -> String:
 	var placeholder_count: int = AssetPaths.get_placeholder_count()
 	var total_assets: int = AssetPaths.get_total_tracked_assets()
 	var missing_v80: PackedStringArray = AssetPaths.verify_v80_living_world_assets()
+	var missing_v90: PackedStringArray = AssetPaths.verify_v90_broken_shore_assets()
 	var art_status: String = (
-		"M01 Art OK (0/%d placeholders) | V8.0 Living World + 88x88 Mara OK (%d/%d)"
+		"V9.0 Broken Shore (%d/%d) + V8.0 Forest (%d/%d) + 88x88 Mara OK (0/%d placeholders)"
 		% [
-			total_assets,
+			AssetPaths.V90_REQUIRED_PATHS.size() - missing_v90.size(),
+			AssetPaths.V90_REQUIRED_PATHS.size(),
 			AssetPaths.V80_REQUIRED_PATHS.size() - missing_v80.size(),
 			AssetPaths.V80_REQUIRED_PATHS.size(),
+			total_assets,
 		]
-		if placeholder_count == 0 and missing_v80.is_empty()
-		else "WARNING: M01 placeholders=%d | V8.0 missing=%d" % [placeholder_count, missing_v80.size()]
+		if placeholder_count == 0 and missing_v80.is_empty() and missing_v90.is_empty()
+		else "WARNING: M01=%d | V8.0 missing=%d | V9.0 missing=%d" % [placeholder_count, missing_v80.size(), missing_v90.size()]
 	)
 
 	var lines: PackedStringArray = PackedStringArray([

@@ -11,11 +11,12 @@ const TILE_PX: int = 16
 const CHUNK_PX: int = CHUNK_TILES * TILE_PX
 const STREAM_RADIUS: int = 1
 
-# Handcrafted V8.0 Living Forest Sanctuary tile footprint ([0..2304] x [0..1536] px)
+# Unified continuous V8.0 Living Forest ([0..96]) + V9.0 Broken Shore ([84..182]) tile footprint ([0..2304] x [0..2880] px)
 const SANCTUARY_MIN_TX: int = 0
 const SANCTUARY_MAX_TX: int = 144
 const SANCTUARY_MIN_TY: int = 0
 const SANCTUARY_MAX_TY: int = 96
+const BROKEN_SHORE_MAX_TY: int = 182
 
 const TREE_SCENE: PackedScene = preload("res://world/props/singing_reedwood_tree.tscn")
 const FLORA_SCENE: PackedScene = preload("res://world/flora/flora_prop.tscn")
@@ -368,7 +369,7 @@ func _in_living_forest_sanctuary(tx: int, ty: int) -> bool:
 		tx >= SANCTUARY_MIN_TX
 		and tx <= SANCTUARY_MAX_TX
 		and ty >= SANCTUARY_MIN_TY
-		and ty <= SANCTUARY_MAX_TY
+		and ty <= maxi(SANCTUARY_MAX_TY, BROKEN_SHORE_MAX_TY)
 	)
 
 

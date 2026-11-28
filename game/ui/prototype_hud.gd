@@ -15,7 +15,7 @@ var _show_telemetry: bool = true
 func _ready() -> void:
 	_refresh_banner()
 	_controls_label.text = (
-		"WASD Move | Shift Run | C Crouch | Q/RMB Lens | E Sample | T/F5 Mood | F6 Gust | F3 HUD | F4 Col | Esc Boot"
+		"WASD Move | Shift Run | C Crouch | Q/RMB Lens | E Sample | 1-8 Zones | T/F5 Mood | F6 Gust | F4 Col | Esc Boot"
 	)
 
 
@@ -51,10 +51,11 @@ func _refresh_banner() -> void:
 	var missing_m01: int = AssetPaths.get_placeholder_count()
 	var total_m01: int = AssetPaths.get_total_tracked_assets()
 	var missing_v80: PackedStringArray = AssetPaths.verify_v80_living_world_assets()
-	if missing_m01 > 0 or not missing_v80.is_empty():
+	var missing_v90: PackedStringArray = AssetPaths.verify_v90_broken_shore_assets()
+	if missing_m01 > 0 or not missing_v80.is_empty() or not missing_v90.is_empty():
 		_banner_label.text = (
-			"ASSET WARNING: M01 placeholders=%d/%d | V8.0 missing=%d"
-			% [missing_m01, total_m01, missing_v80.size()]
+			"ASSET WARNING: M01 placeholders=%d/%d | V8.0 missing=%d | V9.0 missing=%d"
+			% [missing_m01, total_m01, missing_v80.size(), missing_v90.size()]
 		)
 		return
-	_banner_label.text = "VERDANT SIGNAL — V8.0 LIVING WORLD INTEGRATED (640x360 GL COMPATIBILITY)"
+	_banner_label.text = "VERDANT SIGNAL — V9.0 THE BROKEN SHORE + V8.0 LIVING FOREST (640x360 GL COMPATIBILITY)"

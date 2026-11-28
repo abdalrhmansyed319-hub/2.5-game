@@ -15,12 +15,12 @@ extends Node2D
 const WORLD_MIN_X: float = 330.0
 const WORLD_MAX_X: float = 1974.0
 const WORLD_MIN_Y: float = 290.0
-const WORLD_MAX_Y: float = 1236.0
+const WORLD_MAX_Y: float = 2520.0
 
 const CAM_LIMIT_LEFT: int = 240
 const CAM_LIMIT_RIGHT: int = 2064
 const CAM_LIMIT_TOP: int = 200
-const CAM_LIMIT_BOTTOM: int = 1336
+const CAM_LIMIT_BOTTOM: int = 2860
 
 const DEFAULT_SPAWN_POS: Vector2 = Vector2(1024.0, 822.0)
 
@@ -430,10 +430,13 @@ func step_living_ecosystem(delta: float, player: PlayerController) -> void:
 		)
 		cs.frame_coords = Vector2i(int(_time_sec * 9.5 + ph * 4.0) % 4, _critter_kind[ci])
 
-	# Update player natural lighting & foliage occlusion peek
-	player.set_terrain_speed_multiplier(compute_terrain_speed_multiplier(p_pos))
-	player.set_lighting_tint(_compute_player_lighting_tint(p_pos))
-	player.set_occluded_peek(_compute_player_occluded(p_pos))
+	# Update player natural lighting & foliage occlusion peek (forest interior only; RimlandsPrototype coordinates unified speed!)
+	if p_pos.y < 1420.0:
+		player.set_lighting_tint(_compute_player_lighting_tint(p_pos))
+		player.set_occluded_peek(_compute_player_occluded(p_pos))
+	else:
+		player.set_lighting_tint(Color(1.0, 1.0, 1.0, 1.0))
+		player.set_occluded_peek(false)
 
 	if _debug_collision:
 		_debug_drawer.queue_redraw()

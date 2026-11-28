@@ -1984,7 +1984,7 @@ polygon = PackedVector2Array(-38, -40, 38, -40, 58, -18, 38, 4, -38, 4, -58, -18
 metadata/role = "solid_thicket"
 
 [node name="perim_s_bush_4" type="StaticBody2D" parent="YSortWorld"]
-position = Vector2(1038, 1340)
+position = Vector2(968, 1332)
 collision_layer = 1
 collision_mask = 0
 
@@ -1998,7 +1998,7 @@ polygon = PackedVector2Array(-38, -40, 38, -40, 58, -18, 38, 4, -38, 4, -58, -18
 metadata/role = "solid_thicket"
 
 [node name="perim_s_bush_5" type="StaticBody2D" parent="YSortWorld"]
-position = Vector2(1247, 1364)
+position = Vector2(1322, 1348)
 collision_layer = 1
 collision_mask = 0
 
@@ -2677,12 +2677,12 @@ texture = ExtResource("23_tex_crown_wide_b_flip")
 
 [node name="perim_s_canopy_4" type="Sprite2D" parent="PerimeterCanopyLayer"]
 material = SubResource("mat_sway_perim_s_canopy_4")
-position = Vector2(1082, 1388)
+position = Vector2(978, 1378)
 texture = ExtResource("10_tex_crown_dome_a")
 
 [node name="perim_s_canopy_5" type="Sprite2D" parent="PerimeterCanopyLayer"]
 material = SubResource("mat_sway_perim_s_canopy_5")
-position = Vector2(1291, 1406)
+position = Vector2(1334, 1390)
 texture = ExtResource("20_tex_crown_wide_b")
 
 [node name="perim_s_canopy_6" type="Sprite2D" parent="PerimeterCanopyLayer"]

@@ -1,16 +1,17 @@
 class_name RimlandsPrototype
 extends Node2D
-## VERDANT SIGNAL — Production Playable World (V8.0 Living World Integrated).
+## VERDANT SIGNAL — Unified Production Playable World (V9.0 The Broken Shore + V8.0 Living Forest).
 ##
-## Integrates the approved V8.0 Living Forest Sanctuary directly into the main
-## Milestone 01 production architecture (GL Compatibility / Intel HD Graphics 3000):
+## Directly connects the V9.0 Broken Shore crash-site opening region (Zones A-F, y=1344..2880)
+## continuously north into the approved V8.0 Living Forest Sanctuary (y=0..1536) in a single
+## seamless 2304x2880 Y-sorted world with zero loading screens or teleport cuts:
 ##   - Preserves deterministic 3x3 WorldChunkStreamer (9/9 active chunks)
-##   - Hosts unified Y-sorted PlayerController (unmodified 88x88 character strips)
-##   - Runs all 718 pooled animated living grass tufts, wind waves, gusts & footstep bending
-##   - Synchronizes all 3 V8.0 cinematic lighting moods (T / F5) with TimeModulate & night flora
-##   - Preserves Acoustic Field Lens scanning (Q/RMB), Field Sampling (E), crouch-stealth (C/Ctrl),
-##     sprint/run (Shift/Space), Telemetry HUD (F3), Collision Debug (F4), Wind Gust (F6/G),
-##     and automated Windows Godot 4.7.2 proof capture (--capture-production-proofs).
+##   - Hosts unified Y-sorted PlayerController (bit-for-bit unmodified 88x88 Mara artwork)
+##   - Runs V9.0 vast 8-depth animated alien ocean, surf wash, tidepools, crashed ICV Meridian
+##     with explorable breached aft interior, footprints, wade splashes, 815 coastal tufts & 8 fauna
+##   - Runs all 718 V8.0 Living Forest tufts, 7 woodland critters, sunbeams & bioluminescence
+##   - Synchronizes 3 coastal-to-forest cinematic lighting moods (T / F5), gusts (F6 / G),
+##     Acoustic Field Lens (Q / RMB), Field Sampling (E), Collision Debug (F4) & Proof Capture.
 
 const BOOT_SCENE_PATH: String = "res://scenes/boot/main.tscn"
 const HUD_REFRESH_INTERVAL: float = 0.15
@@ -18,10 +19,11 @@ const HUD_REFRESH_INTERVAL: float = 0.15
 var _mood_index: int = 0
 var _hud_timer: float = 0.0
 var _adapter_short: String = "unknown"
-var _last_scan_text: String = "hold Q/RMB to scan | press E to sample"
+var _last_scan_text: String = "hold Q/RMB to scan | press E to sample | walk north to Forest"
 
 @onready var _world_streamer: WorldChunkStreamer = $WorldChunkStreamer
 @onready var _living_forest: VerdantLivingForest = $VerdantLivingForest
+@onready var _broken_shore: VerdantBrokenShore = $VerdantBrokenShore
 @onready var _player: PlayerController = $WorldChunkStreamer/YSortWorldLayer/Player
 @onready var _vfx_layer: Node2D = $VfxLayer
 @onready var _time_modulate: CanvasModulate = $TimeModulate
@@ -29,17 +31,19 @@ var _last_scan_text: String = "hold Q/RMB to scan | press E to sample"
 
 
 func _ready() -> void:
-	GameState.set_phase(&"verdant_living_world")
+	GameState.set_phase(&"verdant_broken_shore_world")
 	_adapter_short = _build_adapter_label()
 
-	# Mount production Player inside VerdantLivingForest/YSortWorld so Mara,
-	# all 115 embedded forest structures, 144 pooled animated grass tufts,
-	# and scannable FloraProps share a single unified Y-sorted space.
+	# Mount Player AND all V9.0 Broken Shore Y-sorted landmarks/props/tufts into the
+	# shared unified YSortWorld so Mara transitions seamlessly from Waking Shore ->
+	# Crashed ICV Meridian -> Inland Gateway -> V8.0 Living Forest in one continuous space!
 	var ysort_target: Node2D = _living_forest.get_ysort_world()
+	_broken_shore.mount_into_unified_ysort(ysort_target)
 	if _player.get_parent() != ysort_target:
 		_player.reparent(ysort_target, false)
 
-	_player.position = VerdantLivingForest.DEFAULT_SPAWN_POS
+	_player.position = VerdantBrokenShore.DEFAULT_SPAWN_POS
+	_player.set_facing_row(PlayerController.DIR_RIGHT)
 	_living_forest.bind_player(_player)
 
 	_player.acoustic_pulse_emitted.connect(_on_player_acoustic_pulse)
@@ -48,6 +52,7 @@ func _ready() -> void:
 
 	_world_streamer.update_around_world_pos(_player.global_position)
 	_apply_lighting_mood()
+	_broken_shore.step_broken_shore(0.016, _player)
 	_living_forest.step_living_ecosystem(0.016, _player)
 
 	if "--capture-production-proofs" in OS.get_cmdline_user_args():
@@ -66,8 +71,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_F3:
 				_hud.toggle_telemetry()
 			KEY_F4:
-				_living_forest.toggle_collision_debug()
+				var dbg_on: bool = _broken_shore.toggle_collision_debug()
+				_living_forest.set_collision_debug(dbg_on)
 			KEY_F6, KEY_G:
+				_broken_shore.trigger_wind_gust(3.0)
 				_living_forest.trigger_wind_gust(3.0)
 			KEY_1:
 				_warp_to_zone(0)
@@ -85,8 +92,12 @@ func _unhandled_input(event: InputEvent) -> void:
 				_warp_to_zone(6)
 			KEY_8:
 				_warp_to_zone(7)
+			KEY_9:
+				_warp_to_forest_zone(4)
+			KEY_0:
+				_warp_to_forest_zone(3)
 			KEY_F9:
-				_save_production_capture("prod_v80_manual_640x360.png")
+				_save_production_capture("prod_v90_manual_640x360.png")
 			KEY_ESCAPE:
 				var err: Error = get_tree().change_scene_to_file(BOOT_SCENE_PATH)
 				if err != OK:
@@ -97,30 +108,52 @@ func _physics_process(delta: float) -> void:
 	_player.position = _living_forest.clamp_player_to_world(_player.position)
 	_world_streamer.update_around_world_pos(_player.global_position)
 
-	var surf: String = _living_forest.get_surface_type_at(_player.global_position)
+	var ppos: Vector2 = _player.global_position
+	var in_shore: bool = _broken_shore.is_position_in_broken_shore(ppos)
+	var surf: String = (
+		_broken_shore.get_surface_type_at(ppos)
+		if in_shore
+		else _living_forest.get_surface_type_at(ppos)
+	)
+	var speed_mul: float = (
+		_broken_shore.compute_terrain_speed_multiplier(ppos)
+		if in_shore
+		else _living_forest.compute_terrain_speed_multiplier(ppos)
+	)
 	_player.set_surface_type(surf)
+	_player.set_terrain_speed_multiplier(speed_mul)
+
+	_broken_shore.step_broken_shore(delta, _player)
 	_living_forest.step_living_ecosystem(delta, _player)
 
 	_hud_timer += delta
 	if _hud_timer >= HUD_REFRESH_INTERVAL:
 		_hud_timer = 0.0
-		_refresh_hud(delta, surf)
+		_refresh_hud(delta, surf, in_shore)
 
 
-func _refresh_hud(delta: float, surf: String) -> void:
+func _refresh_hud(delta: float, surf: String, in_shore: bool) -> void:
 	var fps: float = Engine.get_frames_per_second()
 	var frame_ms: float = delta * 1000.0
 	var chunk_c: Vector2i = _world_streamer.get_center_chunk()
-	var world_line: String = "CHUNK:(%d,%d)[%d/9] | TUFTS:%d/%d (bent:%d) | ZONE:%s" % [
+	var vis_tufts: int = _broken_shore.get_visible_tuft_count() + _living_forest.get_visible_tuft_count()
+	var tot_tufts: int = _broken_shore.get_total_tuft_count() + _living_forest.get_total_tuft_count()
+	var bent_tufts: int = _broken_shore.get_active_bent_tuft_count() + _living_forest.get_active_bent_tuft_count()
+	var zone_label: String = (
+		_broken_shore.get_zone_status_label(_player.global_position)
+		if in_shore
+		else ("Living Forest: " + _living_forest.get_zone_status_label(_player.global_position))
+	)
+	var world_line: String = "CHUNK:(%d,%d)[%d/9] | TUFTS:%d/%d (bent:%d) | %s" % [
 		chunk_c.x,
 		chunk_c.y,
 		_world_streamer.get_active_chunk_count(),
-		_living_forest.get_visible_tuft_count(),
-		_living_forest.get_total_tuft_count(),
-		_living_forest.get_active_bent_tuft_count(),
-		_living_forest.get_zone_status_label(_player.global_position),
+		vis_tufts,
+		tot_tufts,
+		bent_tufts,
+		zone_label,
 	]
-	var gust_tag: String = "GUST" if _living_forest.get_current_gust_strength() > 0.35 else "calm"
+	var gust_tag: String = "GUST" if _living_forest.get_current_gust_strength() > 0.35 else "breeze"
 	var actor_line: String = "MARA:%s(%s) | SURF:%s | MOOD:%s | WIND:%s | SAMPLES:%d" % [
 		_player.get_state_label(),
 		_player.get_facing_label(),
@@ -141,13 +174,31 @@ func _refresh_hud(delta: float, surf: String) -> void:
 
 func _apply_lighting_mood() -> void:
 	var modulate_tint: Color = _living_forest.apply_lighting_mood(_mood_index)
+	_broken_shore.apply_lighting_mood(_mood_index)
 	_time_modulate.color = modulate_tint
 	var is_twilight: bool = _living_forest.is_twilight_biolum_mood()
 	_world_streamer.set_night_mode(is_twilight)
 
 
 func _warp_to_zone(zone_idx: int) -> void:
-	var warp: Dictionary = _living_forest.get_warp_point(zone_idx)
+	var warp: Dictionary = _broken_shore.get_warp_point(zone_idx)
+	if warp.is_empty():
+		return
+	var pos_v: Variant = warp.get("pos", VerdantBrokenShore.DEFAULT_SPAWN_POS)
+	var dir_v: Variant = warp.get("dir", 2)
+	if pos_v is Vector2:
+		_player.position = pos_v as Vector2
+	if dir_v is int:
+		_player.set_facing_row(dir_v as int)
+	var cam: Camera2D = _player.get_camera()
+	if cam != null:
+		cam.reset_smoothing()
+	_broken_shore.step_broken_shore(0.016, _player)
+	_living_forest.step_living_ecosystem(0.016, _player)
+
+
+func _warp_to_forest_zone(forest_idx: int) -> void:
+	var warp: Dictionary = _living_forest.get_warp_point(forest_idx)
 	if warp.is_empty():
 		return
 	var pos_v: Variant = warp.get("pos", VerdantLivingForest.DEFAULT_SPAWN_POS)
@@ -159,6 +210,7 @@ func _warp_to_zone(zone_idx: int) -> void:
 	var cam: Camera2D = _player.get_camera()
 	if cam != null:
 		cam.reset_smoothing()
+	_broken_shore.step_broken_shore(0.016, _player)
 	_living_forest.step_living_ecosystem(0.016, _player)
 
 
@@ -167,7 +219,11 @@ func _on_player_acoustic_pulse(world_pos: Vector2, scan_radius: float) -> void:
 	_vfx_layer.add_child(ring)
 	ring.configure(2, world_pos, 8.0)
 
-	var hits: PackedStringArray = _living_forest.scan_ecological_sites(world_pos, scan_radius)
+	var hits: PackedStringArray = _broken_shore.scan_coastal_sites(world_pos, scan_radius)
+	var forest_hits: PackedStringArray = _living_forest.scan_ecological_sites(world_pos, scan_radius)
+	for fh: String in forest_hits:
+		if not hits.has(fh):
+			hits.append(fh)
 	var radius_sq: float = scan_radius * scan_radius
 	for node: Node in get_tree().get_nodes_in_group("scannable_flora"):
 		if node is FloraProp:
@@ -177,15 +233,17 @@ func _on_player_acoustic_pulse(world_pos: Vector2, scan_radius: float) -> void:
 				if not hits.has(species_name):
 					hits.append(species_name)
 	if hits.is_empty():
-		_last_scan_text = "no resonant flora within %d px" % int(scan_radius)
+		_last_scan_text = "no resonant features within %d px" % int(scan_radius)
 		return
 	_last_scan_text = ", ".join(hits)
 
 
 func _on_player_field_sample(world_pos: Vector2) -> void:
-	var feature_name: String = _living_forest.sample_nearest_feature(world_pos)
+	var feature_name: String = _broken_shore.sample_nearest_coastal_feature(world_pos)
 	if feature_name.is_empty():
-		_last_scan_text = "move closer to flora or landmarks to sample [E]"
+		feature_name = _living_forest.sample_nearest_feature(world_pos)
+	if feature_name.is_empty():
+		_last_scan_text = "move closer to wreckage, flora or tidepools to sample [E]"
 		return
 	var newly_logged: bool = GameState.record_field_sample(feature_name)
 	if newly_logged:
@@ -215,46 +273,54 @@ func _save_production_capture(filename: String) -> void:
 	var img: Image = get_viewport().get_texture().get_image()
 	var full_path: String = out_dir.path_join(filename)
 	img.save_png(full_path)
-	print("[PROD-V80] Captured runtime screenshot: " + full_path)
+	print("[PROD-V90] Captured runtime screenshot: " + full_path)
 
 
 func _run_automated_production_capture() -> void:
 	_hud.set_telemetry_visible(false)
 	var shots: Array[Dictionary] = [
-		{"name": "prod_v80_01_hub_afternoon.png", "zone": 0, "mood": 0, "dbg": false, "hud": true},
-		{"name": "prod_v80_02_root_arch_afternoon.png", "zone": 2, "mood": 0, "dbg": false, "hud": false},
-		{"name": "prod_v80_03_clearing_afternoon.png", "zone": 4, "mood": 0, "dbg": false, "hud": false},
-		{"name": "prod_v80_04_clearing_dawn.png", "zone": 4, "mood": 1, "dbg": false, "hud": false},
-		{"name": "prod_v80_05_waystone_twilight.png", "zone": 3, "mood": 2, "dbg": false, "hud": false},
-		{"name": "prod_v80_06_fallen_log_dawn.png", "zone": 7, "mood": 1, "dbg": false, "hud": false},
-		{"name": "prod_v80_07_collision_debug_hub.png", "zone": 0, "mood": 0, "dbg": true, "hud": true},
+		{"name": "prod_v90_01_zoneA_waking_shore.png", "zone": 0, "mood": 0, "dbg": false, "hud": true},
+		{"name": "prod_v90_02_zoneB_meridian_crash.png", "zone": 1, "mood": 0, "dbg": false, "hud": false},
+		{"name": "prod_v90_03_zoneB2_meridian_interior.png", "zone": 2, "mood": 0, "dbg": false, "hud": false},
+		{"name": "prod_v90_04_zoneC_tidepool_coast.png", "zone": 3, "mood": 0, "dbg": false, "hud": false},
+		{"name": "prod_v90_05_zoneD_basalt_ocean.png", "zone": 4, "mood": 0, "dbg": false, "hud": false},
+		{"name": "prod_v90_06_zoneF_inland_gateway.png", "zone": 6, "mood": 0, "dbg": false, "hud": false},
+		{"name": "prod_v90_07_meridian_twilight.png", "zone": 1, "mood": 2, "dbg": false, "hud": false},
+		{"name": "prod_v90_08_collision_debug_crash.png", "zone": 1, "mood": 0, "dbg": true, "hud": true},
+		{"name": "prod_v90_09_v80_forest_hub.png", "zone": 7, "mood": 0, "dbg": false, "hud": false},
 	]
 	for shot: Dictionary in shots:
 		var mood_v: Variant = shot.get("mood", 0)
 		var dbg_v: Variant = shot.get("dbg", false)
 		var hud_v: Variant = shot.get("hud", false)
 		var zone_v: Variant = shot.get("zone", 0)
-		var name_v: Variant = shot.get("name", "prod_v80_shot.png")
+		var name_v: Variant = shot.get("name", "prod_v90_shot.png")
 		_mood_index = mood_v as int if mood_v is int else 0
 		_apply_lighting_mood()
-		_living_forest.set_collision_debug(dbg_v as bool if dbg_v is bool else false)
+		var dbg_b: bool = dbg_v as bool if dbg_v is bool else false
+		_broken_shore.set_collision_debug(dbg_b)
+		_living_forest.set_collision_debug(dbg_b)
 		_hud.set_telemetry_visible(hud_v as bool if hud_v is bool else false)
 		_warp_to_zone(zone_v as int if zone_v is int else 0)
+		await get_tree().physics_frame
 		await get_tree().process_frame
 		await get_tree().process_frame
 		await RenderingServer.frame_post_draw
-		var fname: String = name_v as String if name_v is String else "prod_v80_shot.png"
+		var fname: String = name_v as String if name_v is String else "prod_v90_shot.png"
 		_save_production_capture(fname)
 	var fps_sample: float = Engine.get_frames_per_second()
 	var draws_sample: int = int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
 	print(
-		"[PROD-V80] RUNTIME TELEMETRY | Adapter=%s | FPS=%.1f | Draws=%d | Tufts=%d/%d"
+		"[PROD-V90] RUNTIME TELEMETRY | Adapter=%s | FPS=%.1f | Draws=%d | ShoreTufts=%d/%d | ForestTufts=%d/%d | ShoreFauna=%d"
 		% [
 			_adapter_short,
 			fps_sample,
 			draws_sample,
+			_broken_shore.get_visible_tuft_count(),
+			_broken_shore.get_total_tuft_count(),
 			_living_forest.get_visible_tuft_count(),
 			_living_forest.get_total_tuft_count(),
+			_broken_shore.get_fauna_count(),
 		]
 	)
 	get_tree().quit(0)
