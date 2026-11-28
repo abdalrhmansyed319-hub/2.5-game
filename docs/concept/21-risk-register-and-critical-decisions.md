@@ -1,0 +1,29 @@
+# Deliverable U — Risk Register and Critical Design Questions
+
+---
+
+## 1. Studio Risk Register (Top 10 Most Dangerous Production & Design Risks)
+
+| Risk ID | Risk Description | Likelihood / Impact | Concrete Studio Mitigation |
+| --- | --- | :---: | --- |
+| **R-01** | **Painterly Pixel-Art Bottleneck**: Hand-painting 12 biomes + 44 animated species archetypes burns out the art pipeline or drags schedule past 24 months. | **High / Critical** | Lock `480×270` canvas (`16×16` tiles), 1D LUT day/night grading (paint once per biome!), 4–6 frame readable ambient loops, and prove exact art hours-per-chunk inside the 8–12 week Vertical Slice BEFORE committing to all 12 biomes! |
+| **R-02** | **Grid-Tile Look Destroying "Living Painting" Feel**: Tiled maps accidentally look rigid/boxy like generic RPG tilesets instead of organic painted landscapes. | **High / High** | Enforce `35%` stamped Hero Landmarks + overlapping curved shoreline/grass-tuft decals + irregular multi-tile cliffs/trees + `tools/asset_inspector.py` & `read_file` visual seam audits on every tileset! |
+| **R-03** | **Tiny Character (`16×24`) Lost in Dense Lush Foliage**: Player loses sight of Mara beneath tall trees, rain, or glowing spores. | **Medium / High** | Hard-gate every biome via `tools/palette_director.py` (`>= 4.5:1` Actor/BG contrast in grayscale!), automatic translucent canopy cutaways on `CanopyWeatherOverlayLayer`, and subtle warm visor rim glow in dark biomes. |
+| **R-04** | **Autonomous Fauna Missing When Needed (*Rain World* Problem)**: Players wander looking for a rare creature required for a Hypothesis unlock while AI migrated 4 chunks away! | **Medium / High** | Implement Videocult's verified **"Room Attractiveness" home-range gravity** + subtle Acoustic Field Lens distant directional hints + multiple valid synthesis pathways so wildlife feels alive without soft-locking progress! |
+| **R-05** | **Chunk Streaming Frame Hitches in Godot 4**: Instancing `64×64` `TileMapLayer` chunks + collision polygons causes 40–80 ms micro-freezes when crossing borders. | **Medium / High** | Load chunk scenes asynchronously (`ResourceLoader.load_threaded_request`), pre-bake collision polygons (`physics_quadrant_size = 16`), pool creature nodes, and profile live `p99` frame times at Stage 06 (`L5`)! |
+| **R-06** | **Non-Lethal Exploration Feeling Too Passive / Low-Stakes**: Without firearms or rapid hunger timers, action-oriented players might feel under-stimulated. | **Medium / Medium** | Maintain crisp physical tension via dynamic lethal weather (Ion Tempests, Acid Mist, Polar Whiteouts), territorial ambush predators demanding smart stealth/decoy timing, and thrilling timed tidal/storm harvests! |
+| **R-07** | **Hypothesis Synthesis Board Becoming Moon-Logic Puzzles**: Players fail to guess which 2 samples combine to unlock a needed suit filter. | **Medium / High** | Every required synthesis pair is explicitly foreshadowed by a **visible natural ecological event** (e.g., watching *Lichen-Newts* eat *Breath-Sponge* in mist!) and Mara's Journal hints clearly without spoiling the "aha!" moment. |
+| **R-08** | **Scope Creep Back Toward 30 Bespoke Biomes & 400 Species**: Adding unplanned regions/creatures mid-production stalls completion indefinitely. | **High / Critical** | Treat `12 Core + 24 Sub-Biomes` and `24 Flora / 20 Fauna` Shipping v1 counts as a hard ceiling; route extra ideas cleanly into post-1.0 JSON expansion backlog! |
+| **R-09** | **No Live Godot Runtime in Current Sandbox**: All GDScript & streaming designs are `L4` static/simulated until executed on the user's host Godot install. | **Certain / Medium** | Pair Stage 05 kickoff with an immediate Godot version lock (`project.godot`), automated live `p99` profiler overlay, and structured user test runs. |
+| **R-10** | **Audio Repetition Over 15–25 Hours of Quiet Exploration**: Looping footsteps, wind, or ambient melodies become grating during slow contemplation. | **Medium / Medium** | Enforce `AudioStreamRandomizer` (`NO_REPEATS`), surface-specific footsteps, and **40–50% musical silence ratio** letting layered nature acoustics breathe! |
+
+---
+
+## 2. Pre-Production Lock Status — Strategic Defaults Approved vs. Remaining User Inputs
+
+> **Revision Note (Pre-Production Lock — see [`Deliverable X: Design Decision Log`](24-design-decision-log.md))**: Earlier this section listed 6 open questions. Strategic defaults (Working Title ***VERDANT SIGNAL***, **Dr. Mara Lin**, **Oura-IV**, **The Mycelial Choir & *Surveyor-01***, **Oblique 3/4 Top-Down Painterly Pixel Art**, **Science-Driven Progression**, **36 Long-Term Biome Identities**, **3 Endings**) are now **LOCKED AS RECOMMENDED DEFAULTS (`DDL-001`)**, and `13` structural/design refinements (`DDL-002`–`DDL-014`) were resolved autonomously!
+
+Only **3 genuine factual/strategic inputs** remain unresolved before starting Windows Stage 04/05 validation:
+1. **Windows Machine Godot & Display Verification (`DDL-015`)**: What exact Godot build/version is installed (or will be installed) on your Windows machine, and what primary display resolution (`1080p` vs `1440p`) & GPU will we profile on? *(We never assume a Godot version until verified directly on the Windows host!)*
+2. **Art Creation Reality & Existing Visual References (`DDL-016`)**: Do you have visual reference images or pixel art assets to inspect before Stage 04, and what is your realistic pixel-art bandwidth (solo, pixel-artist collaborator, or phased Early Access)?
+3. **Veto Check on Autonomous Revisions (`DDL-002`–`DDL-014`)**: Confirm whether you veto any major autonomous refinement — notably the **slower 4-Hypothesis mystery reveal**, **Lagoon & Low-Tide Reef redesign** (Biome 08), **non-inflated v1.0 catalog counts (`42` flora / `30` fauna)**, or **Windows Visual Prototype A/B Gate (`480×270` vs `640×360`)**. *(Absent any veto, all autonomous decisions stand locked!)*

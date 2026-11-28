@@ -1,0 +1,70 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://lab_08_responsive_ui_architecture/responsive_menu_view.gd" id="1_menu"]
+
+[node name="ResponsiveMenuView" type="Control" node_paths=PackedStringArray("default_focus_control", "focusable_buttons")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_menu")
+default_focus_control = NodePath("SafeMargin/CenterAnchor/PanelCard/CardPadding/ActionList/PrimaryAction")
+focusable_buttons = [NodePath("SafeMargin/CenterAnchor/PanelCard/CardPadding/ActionList/PrimaryAction"), NodePath("SafeMargin/CenterAnchor/PanelCard/CardPadding/ActionList/SecondaryAction"), NodePath("SafeMargin/CenterAnchor/PanelCard/CardPadding/ActionList/CloseAction")]
+
+[node name="SafeMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="CenterAnchor" type="CenterContainer" parent="SafeMargin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="PanelCard" type="PanelContainer" parent="SafeMargin/CenterAnchor"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+
+[node name="CardPadding" type="MarginContainer" parent="SafeMargin/CenterAnchor/PanelCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="ActionList" type="VBoxContainer" parent="SafeMargin/CenterAnchor/PanelCard/CardPadding"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="SafeMargin/CenterAnchor/PanelCard/CardPadding/ActionList"]
+layout_mode = 2
+text = "Responsive Menu Harness"
+horizontal_alignment = 1
+
+[node name="PrimaryAction" type="Button" parent="SafeMargin/CenterAnchor/PanelCard/CardPadding/ActionList"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+accessibility_name = "Primary Action"
+text = "Primary Action"
+
+[node name="SecondaryAction" type="Button" parent="SafeMargin/CenterAnchor/PanelCard/CardPadding/ActionList"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+accessibility_name = "Secondary Action"
+text = "Secondary Action"
+
+[node name="CloseAction" type="Button" parent="SafeMargin/CenterAnchor/PanelCard/CardPadding/ActionList"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+accessibility_name = "Close Menu"
+text = "Close"

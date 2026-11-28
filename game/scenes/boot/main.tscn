@@ -1,0 +1,73 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/boot/main.gd" id="1_boot"]
+
+[node name="BootDiagnostics" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_boot")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0705882, 0.0862745, 0.109804, 1)
+
+[node name="SafeMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 14
+
+[node name="FramePanel" type="PanelContainer" parent="SafeMargin"]
+layout_mode = 2
+
+[node name="ContentPad" type="MarginContainer" parent="SafeMargin/FramePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="Layout" type="VBoxContainer" parent="SafeMargin/FramePanel/ContentPad"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="SafeMargin/FramePanel/ContentPad/Layout"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.423529, 0.94902, 0.698039, 1)
+theme_override_font_sizes/font_size = 13
+text = "VERDANT SIGNAL — PRODUCTION PROJECT BOOTSTRAP"
+
+[node name="SubtitleLabel" type="Label" parent="SafeMargin/FramePanel/ContentPad/Layout"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.745098, 0.831373, 0.784314, 1)
+theme_override_font_sizes/font_size = 9
+text = "Oura-IV (K-419b) | Oblique 3/4 Top-Down Pixel Art | Environment & Pipeline Verification"
+
+[node name="DiagnosticsLabel" type="Label" parent="SafeMargin/FramePanel/ContentPad/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.956863, 0.937255, 0.886275, 1)
+theme_override_font_sizes/font_size = 9
+text = "Collecting runtime diagnostics..."
+autowrap_mode = 3
+
+[node name="FooterHint" type="Label" parent="SafeMargin/FramePanel/ContentPad/Layout"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.721569, 0.219608, 1)
+theme_override_font_sizes/font_size = 8
+text = "Check Godot Output Log for copy-pasteable telemetry (DDL-015 Windows Verification)."

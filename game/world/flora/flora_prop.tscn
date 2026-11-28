@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://world/flora/flora_prop.gd" id="1_flora"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_scan"]
+radius = 8.0
+
+[node name="FloraProp" type="Node2D"]
+script = ExtResource("1_flora")
+
+[node name="ShadowSprite" type="Sprite2D" parent="."]
+z_index = -1
+
+[node name="PlantSprite" type="Sprite2D" parent="."]
+offset = Vector2(0, -14)
+region_enabled = true
+
+[node name="InteractArea" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+monitorable = true
+
+[node name="ScanShape" type="CollisionShape2D" parent="InteractArea"]
+position = Vector2(0, -4)
+shape = SubResource("CircleShape2D_scan")

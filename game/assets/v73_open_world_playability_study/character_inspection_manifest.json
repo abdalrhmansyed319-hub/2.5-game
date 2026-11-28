@@ -1,0 +1,34 @@
+{
+  "sourceZip": "character_source_original/A_highly_detailed_full-body_pixel_121240.zip",
+  "preservedVerbatim": true,
+  "animationFrameSize": "88x88",
+  "staticRotationFrameSize": "64x64",
+  "staticRotationDirections": [
+    "south",
+    "south-east",
+    "east",
+    "north-east",
+    "north",
+    "north-west",
+    "west",
+    "south-west"
+  ],
+  "animatedDirectionsPresent": [
+    "south",
+    "north",
+    "east",
+    "west"
+  ],
+  "missingAnimatedDirections": [
+    "south-east",
+    "north-east",
+    "north-west",
+    "south-west"
+  ],
+  "movementAnimationsIntegrated": [
+    "Idle (8f x 4 dirs)",
+    "Walking (8f x 4 dirs)",
+    "Running (8f x 4 dirs)"
+  ],
+  "additionalArchivedActionAnimations": 10
+}

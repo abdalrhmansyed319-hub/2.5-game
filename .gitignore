@@ -1,0 +1,55 @@
+# ==============================================================================
+# VERDANT SIGNAL — Git Ignore Rules (Godot 4 + Windows/Linux Studio Workflow)
+# ==============================================================================
+# IMPORTANT: Do NOT ignore *.import or *.uid files!
+# Godot 4 stores critical texture import flags (Filter=Nearest, Mipmaps=Off)
+# and stable uid:// references in *.import / *.uid sidecars that MUST stay
+# tracked in Git so Arena Agent and Windows Godot stay 100% synchronized.
+
+# Godot 4 generated local caches & editor metadata (regenerated automatically)
+.godot/
+.import/
+*.translation
+*.tmp
+
+# Local Godot export presets & build outputs (machine-specific / regenerable)
+export_presets.cfg
+exports/
+builds/
+game/exports/
+game/builds/
+*.pck
+*.exe
+*.app/
+*.apk
+*.aab
+*.dmg
+
+# Android / C# / Mono build artifacts (if ever enabled)
+android/
+.mono/
+data_*/
+mono_crash.*.json
+
+# Python studio tooling caches
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node / Web Studio build artifacts (VERDANT PIXEL FORGE)
+node_modules/
+tools/verdant-pixel-forge/dist/
+tools/verdant-pixel-forge/.vite/
+*.tsbuildinfo
+
+# OS & external editor clutter (Windows / macOS / Linux)
+.DS_Store
+Thumbs.db
+desktop.ini
+*.bak
+*~
+*.swp
+.vscode/
+.idea/

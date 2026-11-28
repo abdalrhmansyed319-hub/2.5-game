@@ -1,0 +1,72 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://world/landmarks/drop_pod_clearing.gd" id="1_pod"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pod"]
+size = Vector2(48, 18)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_crate"]
+size = Vector2(12, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tent"]
+size = Vector2(24, 12)
+
+[node name="DropPodClearing" type="Node2D"]
+y_sort_enabled = true
+script = ExtResource("1_pod")
+
+[node name="SkidDecalSprite" type="Sprite2D" parent="."]
+z_index = -1
+position = Vector2(-42, 4)
+region_enabled = true
+
+[node name="DropPodBody" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="PodSprite" type="Sprite2D" parent="DropPodBody"]
+offset = Vector2(0, -18)
+region_enabled = true
+
+[node name="PodCollider" type="CollisionShape2D" parent="DropPodBody"]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_pod")
+
+[node name="CrateA" type="StaticBody2D" parent="."]
+position = Vector2(40, 12)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CrateASprite" type="Sprite2D" parent="CrateA"]
+offset = Vector2(0, -6)
+region_enabled = true
+
+[node name="CrateACollider" type="CollisionShape2D" parent="CrateA"]
+position = Vector2(0, -2)
+shape = SubResource("RectangleShape2D_crate")
+
+[node name="CrateB" type="StaticBody2D" parent="."]
+position = Vector2(-30, 22)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CrateBSprite" type="Sprite2D" parent="CrateB"]
+offset = Vector2(0, -6)
+region_enabled = true
+
+[node name="CrateBCollider" type="CollisionShape2D" parent="CrateB"]
+position = Vector2(0, -2)
+shape = SubResource("RectangleShape2D_crate")
+
+[node name="CampTentBody" type="StaticBody2D" parent="."]
+position = Vector2(54, -18)
+collision_layer = 1
+collision_mask = 0
+
+[node name="TentSprite" type="Sprite2D" parent="CampTentBody"]
+offset = Vector2(0, -12)
+region_enabled = true
+
+[node name="TentCollider" type="CollisionShape2D" parent="CampTentBody"]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_tent")

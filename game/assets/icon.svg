@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="18" fill="#12161C"/>
+  <!-- Outer harmonic pulse rings (The Mycelial Choir signal) -->
+  <circle cx="64" cy="64" r="50" fill="none" stroke="#2D423E" stroke-width="4"/>
+  <circle cx="64" cy="64" r="38" fill="none" stroke="#47695E" stroke-width="3" stroke-dasharray="10 6"/>
+  <!-- Twin moons of Oura-IV: Sela (pearl) & Vesh (rust-amber) -->
+  <circle cx="94" cy="30" r="10" fill="#D8E2E6"/>
+  <circle cx="107" cy="44" r="4.5" fill="#FF6B3D"/>
+  <!-- Stylized Singing Reedwood / acoustic horizon emblem -->
+  <path d="M24 88 Q64 70 104 88 L104 104 Q64 112 24 104 Z" fill="#367E8A"/>
+  <path d="M52 92 L58 34 L64 92 Z" fill="#6CF2B2"/>
+  <path d="M64 92 L72 44 L78 92 Z" fill="#FFB838"/>
+  <path d="M40 92 L46 54 L52 92 Z" fill="#4CE8E0"/>
+  <!-- Subtle golden signal dot -->
+  <circle cx="64" cy="28" r="4" fill="#FFE047"/>
+</svg>
