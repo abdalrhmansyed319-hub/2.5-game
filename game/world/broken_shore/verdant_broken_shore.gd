@@ -42,6 +42,9 @@ const TEX_SURF_FOAM: Texture2D = preload("res://assets/world/broken_shore/animat
 const TEX_COASTAL_FAUNA: Texture2D = preload("res://assets/world/broken_shore/animated/coastal_fauna_24x20_4x2.png")
 const TEX_SPORE_MOTHS: Texture2D = preload("res://assets/world/broken_shore/animated/coastal_spore_moths_16x16_4x2.png")
 const TEX_COASTAL_FX: Texture2D = preload("res://assets/world/broken_shore/animated/coastal_fx_decals_16x16_4x3.png")
+const TEX_SURVEYOR_PEG: Texture2D = preload("res://assets/world/immersion/sprites/surveyor01_peg.png")
+const TEX_BLIGHT_CRUST: Texture2D = preload("res://assets/world/immersion/sprites/metallic_blight_crust.png")
+const TEX_MYCELIAL_SEAM: Texture2D = preload("res://assets/world/immersion/sprites/mycelial_luminous_seam.png")
 
 const SPRITE_PATHS: Dictionary = {
 	"meridian_wreck_hull": "res://assets/world/broken_shore/sprites/meridian_wreck_hull.png",
@@ -126,6 +129,9 @@ var _moth_nodes: Array[Sprite2D] = []
 var _moth_meta: Array[Dictionary] = []
 var _coastal_occluders: Array[Rect2] = []
 var _interior_zone_poly: PackedVector2Array = PackedVector2Array()
+var _v110_mycelial_seam: Sprite2D = null
+var _glider_interest_timer: float = 0.0
+var _glider_interest_pos: Vector2 = Vector2.ZERO
 
 var _decal_pool: Array[Sprite2D] = []
 var _decal_life: PackedFloat32Array = PackedFloat32Array()
@@ -220,6 +226,31 @@ func get_fauna_count() -> int:
 
 func get_current_gust_strength() -> float:
 	return _current_gust_strength
+
+
+func get_harmonic_landmark_proximity(world_pos: Vector2) -> float:
+	# Smooth spatialized piezo-harmonic proximity for Pre-Arrival Waymarker, Surge Channel & Relay
+	var best: float = 0.0
+	var landmarks: PackedVector2Array = PackedVector2Array([
+		Vector2(1032.0, 1528.0), # Pre-Arrival Harmonic Waymarker
+		Vector2(1892.0, 2212.0), # Resonant Tidal Surge Channel
+		Vector2(1098.0, 2144.0), # Meridian Field Telemetry Relay
+	])
+	for pt: Vector2 in landmarks:
+		var d: float = world_pos.distance_to(pt)
+		if d < 220.0:
+			best = maxf(best, clampf(1.0 - d / 220.0, 0.0, 1.0))
+	return best
+
+
+func trigger_glider_acoustic_response(world_pos: Vector2) -> bool:
+	_scan_glow_boost = maxf(_scan_glow_boost, 1.35)
+	for sp: Sprite2D in _glider_nodes:
+		if sp.position.distance_to(world_pos) <= 390.0:
+			_glider_interest_timer = 4.2
+			_glider_interest_pos = world_pos
+			return true
+	return false
 
 
 func compute_coastal_player_occlusion(world_pos: Vector2) -> bool:
@@ -341,6 +372,22 @@ func get_zone_status_label(world_pos: Vector2) -> String:
 	return "Zone A: The Waking Shore"
 
 
+func get_region_display_name(world_pos: Vector2) -> String:
+	if _in_meridian_interior:
+		return "ICV MERIDIAN — AFT BAY"
+	if world_pos.y < 1600.0:
+		return "INLAND GATEWAY"
+	if world_pos.y < 1960.0:
+		return "COASTAL MEADOW RIDGE"
+	if world_pos.x < 680.0:
+		return "THE BASALT HEADLAND"
+	if world_pos.x > 1590.0:
+		return "THE TIDEPOOL COAST"
+	if world_pos.x > 1000.0 and world_pos.x < 1560.0:
+		return "ICV MERIDIAN — CRASH SITE"
+	return "THE WAKING SHORE"
+
+
 func scan_coastal_sites(world_pos: Vector2, scan_radius: float) -> PackedStringArray:
 	var hits: PackedStringArray = PackedStringArray()
 	for site: Dictionary in _scan_sites:
@@ -381,6 +428,8 @@ func step_broken_shore(delta: float, player: PlayerController) -> void:
 		_manual_gust_timer = maxf(0.0, _manual_gust_timer - delta)
 	if _scan_glow_boost > 0.0:
 		_scan_glow_boost = maxf(0.0, _scan_glow_boost - delta * 1.1)
+	if _glider_interest_timer > 0.0:
+		_glider_interest_timer = maxf(0.0, _glider_interest_timer - delta)
 
 	# Asynchronous sea-breeze + periodic gusts
 	var periodic_gust: float = maxf(0.0, sin(_time_sec * 0.48 - 0.8) - 0.62) / 0.38
@@ -406,7 +455,7 @@ func step_broken_shore(delta: float, player: PlayerController) -> void:
 		_meridian_interior_sprite.visible = _interior_blend > 0.01
 		_meridian_interior_sprite.modulate = Color(1.0, 1.0, 1.0, _interior_blend)
 
-	_update_ocean_surf_and_kelp()
+	_update_ocean_surf_and_kelp(player_pos)
 	_update_crash_fx_and_atmosphere()
 	_update_coastal_tufts(delta, player)
 	_update_coastal_fauna(delta, player)
@@ -463,6 +512,7 @@ func _load_and_build_broken_shore() -> void:
 	_build_shoreline_surf_ribbons()
 	_build_amber_kelp(data.get("amber_kelp", []))
 	_build_props_and_interior(data.get("props", []))
+	_spawn_v110_mystery_traces()
 	_build_walkable_zones(data.get("walkable_zones", []))
 	_build_tuft_pool(data.get("tufts", []))
 	_build_coastal_fauna(data.get("fauna", []))
@@ -779,7 +829,37 @@ func _init_footprint_pool() -> void:
 		_decal_kind.append(0)
 
 
-func _update_ocean_surf_and_kelp() -> void:
+func _spawn_v110_mystery_traces() -> void:
+	# 1. Weathered 19-year-old SRV-01 titanium survey peg tucked in Western Basalt lee
+	var peg := Sprite2D.new()
+	peg.name = "V110_Surveyor01Peg"
+	peg.texture = TEX_SURVEYOR_PEG
+	peg.centered = true
+	peg.offset = Vector2(0.0, -12.0)
+	peg.position = Vector2(468.0, 2224.0)
+	_mounted_ysort.add_child(peg)
+
+	# 2. Ash-grey Metallic Blight mineralized root crust along Western basalt-ecotone edge
+	var blight := Sprite2D.new()
+	blight.name = "V110_CoastalBlightCrust"
+	blight.texture = TEX_BLIGHT_CRUST
+	blight.centered = true
+	blight.offset = Vector2(0.0, -7.0)
+	blight.position = Vector2(478.0, 1796.0)
+	_mounted_ysort.add_child(blight)
+
+	# 3. Delicate turquoise bioluminescent mycelial seam beside Eastern Outer Surge Channel
+	var seam := Sprite2D.new()
+	seam.name = "V110_OuterSurgeMycelium"
+	seam.texture = TEX_MYCELIAL_SEAM
+	seam.centered = true
+	seam.offset = Vector2(0.0, -10.0)
+	seam.position = Vector2(1892.0, 2212.0)
+	_mounted_ysort.add_child(seam)
+	_v110_mycelial_seam = seam
+
+
+func _update_ocean_surf_and_kelp(player_pos: Vector2) -> void:
 	var surf_rate: float = 3.2 + _current_gust_strength * 1.4
 	for i: int in range(_surf_sprites.size()):
 		var f: int = int(floor(_time_sec * surf_rate + _surf_phases[i])) % 8
@@ -788,8 +868,20 @@ func _update_ocean_surf_and_kelp() -> void:
 		var f: int = int(floor(_time_sec * (surf_rate * 0.9) + _break_phases[i])) % 8
 		_break_sprites[i].frame_coords = Vector2i(f, 1)
 	for i: int in range(_kelp_sprites.size()):
+		var kp: Sprite2D = _kelp_sprites[i]
 		var f: int = int(floor(_time_sec * 2.4 + _kelp_phases[i])) % 4
-		_kelp_sprites[i].frame_coords = Vector2i(f, 0)
+		kp.frame_coords = Vector2i(f, 0)
+		# V11.0: Amber Tide-Kelp bladders glow gently warmer when Mara wades close or scans nearby!
+		var d_sq: float = kp.position.distance_squared_to(player_pos)
+		var wade_warmth: float = clampf(1.0 - sqrt(d_sq) / 56.0, 0.0, 1.0) if d_sq < 3136.0 else 0.0
+		var scan_warmth: float = _scan_glow_boost * 0.24 if d_sq < 32400.0 else 0.0
+		var lift: float = minf(0.42, wade_warmth * 0.28 + scan_warmth)
+		kp.modulate = Color(1.0 + lift * 0.85, 1.0 + lift * 0.58, 1.0 + lift * 0.16, 1.0)
+
+	if _v110_mycelial_seam != null:
+		var pulse: float = 0.88 + 0.12 * sin(_time_sec * 2.2) + _scan_glow_boost * 0.28
+		var tw: float = 1.24 if _mood_idx == 2 else 1.0
+		_v110_mycelial_seam.modulate = Color(pulse * tw, pulse * tw, pulse * tw, 1.0)
 
 
 func _update_crash_fx_and_atmosphere() -> void:
@@ -920,9 +1012,10 @@ func _update_coastal_tufts(delta: float, player: PlayerController) -> void:
 func _update_coastal_fauna(delta: float, player: PlayerController) -> void:
 	var player_pos: Vector2 = player.global_position
 	var player_fast: bool = player.velocity.length_squared() > 6400.0
+	var player_crouching: bool = player.is_crouching
 	var player_scanning: bool = player.is_scanning
 
-	# 4 Soaring Chime-Wing Gliders (fa_03) riding thermal gusts across ocean & cliffs!
+	# 4 Soaring Chime-Wing Gliders (fa_03) riding thermal gusts & banking curiously on [Q] scans!
 	for i: int in range(_glider_nodes.size()):
 		var m: Dictionary = _glider_meta[i]
 		var spd: float = _dict_float(m, "speed", 0.4) * (1.0 + _current_gust_strength * 0.25)
@@ -931,21 +1024,22 @@ func _update_coastal_fauna(delta: float, player: PlayerController) -> void:
 		var cy: float = _dict_float(m, "y", 2300.0)
 		var rx: float = _dict_float(m, "rx", 120.0)
 		var ry: float = _dict_float(m, "ry", 50.0)
-		var nx: float = cx + cos(ang) * rx
-		var ny: float = cy + sin(ang * 1.5) * ry - 52.0
+		var target := Vector2(cx + cos(ang) * rx, cy + sin(ang * 1.5) * ry - 52.0)
+		if _glider_interest_timer > 0.0 and target.distance_squared_to(_glider_interest_pos) < 176400.0:
+			var pull: float = clampf(_glider_interest_timer / 4.2, 0.0, 1.0) * 0.26
+			target = target.lerp(_glider_interest_pos + Vector2(0.0, -58.0), pull)
 		var sp: Sprite2D = _glider_nodes[i]
 		sp.flip_h = (-sin(ang) < 0.0)
-		sp.position = Vector2(nx, ny)
+		sp.position = sp.position.lerp(target, minf(1.0, delta * 3.8)) if sp.position != Vector2.ZERO else target
 		# Glide quietly on down-breeze, flap naturally on climb!
 		var flap_rate: float = 2.6 if sin(ang * 1.5) > 0.2 else 5.8
 		sp.frame_coords = Vector2i(int(floor(_time_sec * flap_rate + float(i))) % 4, 0)
 
-	# 4 Mirror-Shell Crabs (fa_02) — natural pause-and-forage cadence + alert scuttle away from Mara!
+	# 4 Mirror-Shell Crabs (fa_02) — respect Mara's crouch-stealth, scuttle sharply if sprinting!
 	for i: int in range(_crab_nodes.size()):
 		var m: Dictionary = _crab_meta[i]
 		var phase: float = _dict_float(m, "phase", 0.0)
 		var cyc: float = _time_sec * _dict_float(m, "speed", 0.9) + phase
-		# Natural start-stop foraging rhythm (smooth plateau steps instead of robotic continuous circle!)
 		var step_wave: float = cyc - 0.35 * sin(cyc * 2.0)
 		var cx: float = _dict_float(m, "x", 1742.0)
 		var cy: float = _dict_float(m, "y", 2182.0)
@@ -953,12 +1047,13 @@ func _update_coastal_fauna(delta: float, player: PlayerController) -> void:
 		var ry: float = _dict_float(m, "ry", 10.0)
 		var pos := Vector2(cx + sin(step_wave) * rx, cy + cos(step_wave * 2.0) * ry)
 		var to_crab: Vector2 = pos - player_pos
-		var alert_r: float = 68.0 if player_fast else 52.0
+		var alert_r: float = 24.0 if player_crouching else (72.0 if player_fast else 52.0)
 		var scuttling: bool = false
 		if to_crab.length_squared() < alert_r * alert_r and to_crab.length_squared() > 1.0:
 			var dist: float = to_crab.length()
-			pos += to_crab.normalized() * ((22.0 if player_fast else 15.0) * (1.0 - dist / alert_r))
-			scuttling = true
+			var flee_px: float = 10.0 if player_crouching else (26.0 if player_fast else 15.0)
+			pos += to_crab.normalized() * (flee_px * (1.0 - dist / alert_r))
+			scuttling = not player_crouching
 		var sp: Sprite2D = _crab_nodes[i]
 		sp.position = pos
 		var moving_now: bool = scuttling or (cos(cyc * 2.0) > -0.35)

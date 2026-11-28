@@ -18,6 +18,7 @@ const SCRIPTS_TO_CHECK: PackedStringArray = [
 	"res://resources/fauna_species_data.gd",
 	"res://resources/weather_event_data.gd",
 	"res://systems/asset_paths.gd",
+	"res://systems/field_codex.gd",
 	"res://scenes/boot/main.gd",
 	"res://characters/player/player.gd",
 	"res://world/rimlands_tileset_builder.gd",
@@ -29,6 +30,7 @@ const SCRIPTS_TO_CHECK: PackedStringArray = [
 	"res://world/flora/flora_prop.gd",
 	"res://world/landmarks/drop_pod_clearing.gd",
 	"res://world/vfx/ground_ring_vfx.gd",
+	"res://world/vfx/acoustic_echo_vfx.gd",
 	"res://ui/prototype_hud.gd",
 ]
 
@@ -53,6 +55,7 @@ const REQUIRED_INPUT_ACTIONS: PackedStringArray = [
 	"sprint_dodge",
 	"interact_sample",
 	"toggle_acoustic_lens",
+	"open_field_codex",
 	"pause_menu",
 ]
 
@@ -155,6 +158,12 @@ func _check_assets_and_tileset() -> void:
 		_record_fail("Missing V10.0 Living World assets/audio: " + ", ".join(missing_v100))
 	else:
 		print("[SMOKE] V10.0 Living World storytelling assets & audio verified (%d paths)" % AssetPaths.V100_REQUIRED_PATHS.size())
+
+	var missing_v110: PackedStringArray = AssetPaths.verify_v110_immersion_assets()
+	if not missing_v110.is_empty():
+		_record_fail("Missing V11.0 Art of Immersion assets/audio: " + ", ".join(missing_v110))
+	else:
+		print("[SMOKE] V11.0 Art of Immersion micro-storytelling sprites & audio verified (%d paths)" % AssetPaths.V110_REQUIRED_PATHS.size())
 
 	var char_paths: PackedStringArray = PackedStringArray([
 		AssetPaths.MARA_ORIG_IDLE_PATH,
@@ -275,8 +284,44 @@ func _finish_smoke_run() -> void:
 				_record_fail("V10.0 Acoustic scan near Ancient Harmonic Waymarker returned zero hits")
 
 			AudioDirector.update_biome_ambience(2288.0, 0.25, false)
-			AudioDirector.play_footstep("sand", false)
+			AudioDirector.set_interior_reverb(true)
+			AudioDirector.set_interior_reverb(false)
+			AudioDirector.update_landmark_resonance(0.6, false)
+			AudioDirector.play_footstep("sand", false, false)
+			AudioDirector.play_footstep("metal", false, true)
 			AudioDirector.play_acoustic_lens_chime(true)
+			AudioDirector.play_sample_confirm(true)
+			AudioDirector.play_blight_static()
+			AudioDirector.play_insight_discovery()
+			AudioDirector.play_glider_mimic_call()
+
+			# V11.0: Verify FieldCodex discovery, Emergent Insights & Region/Landmark APIs
+			var codex_all: Array[Dictionary] = FieldCodex.get_all_entries()
+			if codex_all.size() != 27:
+				_record_fail("Expected 27 FieldCodex entries, got %d" % codex_all.size())
+			var near_peg: Dictionary = FieldCodex.find_nearest_interactable(Vector2(468.0, 2224.0), false)
+			if str(near_peg.get("id", "")) != "surveyor01_peg":
+				_record_fail("Expected surveyor01_peg near (468, 2224), got " + str(near_peg.get("id", "")))
+			var ins_check: Array[Dictionary] = FieldCodex.evaluate_new_insights(
+				PackedStringArray(["surveyor01_peg", "meridian_nav_console"]),
+				PackedStringArray()
+			)
+			if ins_check.is_empty():
+				_record_fail("Expected Emergent Insight unlock for surveyor01_peg + meridian_nav_console")
+			if vbs.get_region_display_name(Vector2(748.0, 2288.0)).is_empty():
+				_record_fail("Expected non-empty coastal region display name")
+			if vbs.get_harmonic_landmark_proximity(Vector2(1032.0, 1524.0)) <= 0.5:
+				_record_fail("Expected strong harmonic landmark proximity at Ancient Waymarker Stone")
+			var hud_n: Node = _prototype_instance.get_node_or_null("PrototypeHud")
+			if hud_n is PrototypeHud:
+				var ph: PrototypeHud = hud_n as PrototypeHud
+				ph.announce_region("THE BROKEN SHORE — Waking Sand")
+				ph.update_proximity_prompt("[Q] Acoustic Scan • [E] Sample")
+				ph.show_field_observation("BIO-SCAN", "Test", "Smoke check note")
+				ph.toggle_field_journal()
+				ph.set_journal_open(false)
+			else:
+				_record_fail("PrototypeHud missing from RimlandsPrototype")
 		else:
 			_record_fail("VerdantBrokenShore missing from RimlandsPrototype")
 

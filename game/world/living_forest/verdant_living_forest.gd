@@ -31,6 +31,8 @@ const FOOTSTEP_BEND_RELEASE: float = 0.14
 const ECOSYSTEM_DATA_PATH: String = "res://assets/world/living_forest/data/living_ecosystem_data.json"
 const TEX_TUFTS: Texture2D = preload("res://assets/world/living_forest/sprites/living_grass_tufts_24x24_6x8.png")
 const TEX_CRITTERS: Texture2D = preload("res://assets/world/living_forest/sprites/living_critters_12x12_4x3.png")
+const TEX_BLIGHT_CRUST: Texture2D = preload("res://assets/world/immersion/sprites/metallic_blight_crust.png")
+const TEX_MYCELIAL_SEAM: Texture2D = preload("res://assets/world/immersion/sprites/mycelial_luminous_seam.png")
 const FLORA_SCENE: PackedScene = preload("res://world/flora/flora_prop.tscn")
 
 const MOOD_NAMES: PackedStringArray = [
@@ -139,6 +141,8 @@ var _critter_speed: PackedFloat32Array = PackedFloat32Array()
 var _critter_phase: PackedFloat32Array = PackedFloat32Array()
 var _critter_kind: PackedInt32Array = PackedInt32Array()
 var _critter_nodes: Array[Sprite2D] = []
+var _embedded_flora: Array[FloraProp] = []
+var _v110_nw_mycelium: Sprite2D = null
 
 @onready var _forest_floor: Sprite2D = $ForestFloor
 @onready var _ysort_world: Node2D = $YSortWorld
@@ -156,6 +160,7 @@ func _ready() -> void:
 	_index_scene_geometry()
 	_load_living_ecosystem_data()
 	_spawn_embedded_scannable_flora()
+	_spawn_v110_forest_traces()
 	_debug_drawer.draw.connect(_on_debug_draw)
 	apply_lighting_mood(0)
 
@@ -242,6 +247,39 @@ func get_zone_status_label(player_pos: Vector2) -> String:
 	if is_in_shallow_pool(player_pos):
 		return "shallow_pool (0.90x)"
 	return "living_meadow"
+
+
+func is_under_root_arch() -> bool:
+	return _in_arch_count > 0
+
+
+func get_harmonic_landmark_proximity(world_pos: Vector2) -> float:
+	var best: float = 0.0
+	var landmarks: PackedVector2Array = PackedVector2Array([
+		Vector2(1694.0, 466.0), # Waystone Spiral Conduit
+		Vector2(1712.0, 774.0), # Chime-Reed Outcrop
+		Vector2(1088.0, 796.0), # Colossal Buttress Reedwood
+		Vector2(596.0, 568.0),  # Sub-Bark Luminous Mycelium
+	])
+	for pt: Vector2 in landmarks:
+		var d: float = world_pos.distance_to(pt)
+		if d < 220.0:
+			best = maxf(best, clampf(1.0 - d / 220.0, 0.0, 1.0))
+	return best
+
+
+func get_region_display_name(world_pos: Vector2) -> String:
+	if world_pos.x > 1480.0 and world_pos.y < 640.0:
+		return "WAYSTONE SHRINE"
+	if world_pos.x > 1420.0 and world_pos.y >= 640.0 and world_pos.y < 1040.0:
+		return "SUNLIT CHIME CLEARING"
+	if world_pos.x < 820.0 and world_pos.y < 760.0:
+		return "SHADED WESTERN GROVE"
+	if world_pos.x < 860.0 and world_pos.y >= 760.0:
+		return "MOSSY HOLLOW CANOPY"
+	if world_pos.y < 590.0:
+		return "EXPOSED ROOT ARCHWAY"
+	return "THE SINGING CANOPY"
 
 
 func is_in_shallow_pool(world_pos: Vector2) -> bool:
@@ -418,17 +456,53 @@ func step_living_ecosystem(delta: float, player: PlayerController) -> void:
 	for r: int in range(pool_idx, GRASS_POOL_SIZE):
 		_tuft_pool[r].visible = false
 
-	# Animate woodland butterflies & glowing twilight moths
+	# Animate reactive woodland butterflies & glowing twilight moths (V11.0 stealth/sprint/lens aware!)
 	var critter_total: int = _critter_nodes.size()
+	var p_fast: bool = player.velocity.length_squared() > 6400.0
+	var p_crouch: bool = player.is_crouching
+	var p_scan: bool = player.is_scanning
+	var twilight_glow: float = 1.24 if _mood_idx == 2 else 1.0
 	for ci: int in range(critter_total):
 		var cs: Sprite2D = _critter_nodes[ci]
 		var spd: float = _critter_speed[ci]
 		var ph: float = _critter_phase[ci]
-		cs.position = Vector2(
+		var target := Vector2(
 			_critter_x[ci] + cos(_time_sec * spd + ph) * _critter_rx[ci] + sin(_time_sec * 1.7 + ph) * 9.0,
 			_critter_y[ci] + sin(_time_sec * spd * 1.3 + ph) * _critter_ry[ci] + cos(_time_sec * 2.8 + ph) * 5.0
 		)
-		cs.frame_coords = Vector2i(int(_time_sec * 9.5 + ph * 4.0) % 4, _critter_kind[ci])
+		var to_crit: Vector2 = target - p_pos
+		var d_sq: float = to_crit.length_squared()
+		var flutter_rate: float = 9.5
+		if p_fast and d_sq < 6084.0 and d_sq > 1.0:
+			# Startled burst upward & outward when Mara sprints past!
+			var d: float = sqrt(d_sq)
+			target += to_crit.normalized() * (34.0 * (1.0 - d / 78.0)) + Vector2(0.0, -18.0)
+			flutter_rate = 16.0
+		elif p_scan and d_sq < 27225.0:
+			# Curious harmonic drift toward Mara's Acoustic Field Lens!
+			target = target.lerp(p_pos + Vector2(0.0, -34.0), 0.26)
+			flutter_rate = 11.5
+		elif p_crouch and d_sq < 5184.0:
+			# Calm curiosity when Mara crouches softly nearby!
+			target = target.lerp(p_pos + Vector2(0.0, -28.0), 0.22)
+			flutter_rate = 7.5
+		cs.position = cs.position.lerp(target, minf(1.0, delta * 5.0)) if cs.position != Vector2.ZERO else target
+		cs.frame_coords = Vector2i(int(_time_sec * flutter_rate + ph * 4.0) % 4, _critter_kind[ci])
+		if _critter_kind[ci] == 2:
+			var glow: float = (0.86 + 0.14 * sin(_time_sec * 3.8 + ph)) * twilight_glow
+			cs.modulate = Color(glow, glow, glow, 0.96)
+
+	# Gentle proximity rustle when Mara brushes past embedded scannable flora!
+	if is_moving:
+		for fp: FloraProp in _embedded_flora:
+			if fp != null and is_instance_valid(fp):
+				var fd_sq: float = fp.global_position.distance_squared_to(p_pos)
+				if fd_sq < 676.0: # 26 px
+					fp.trigger_proximity_rustle(fp.global_position.x - p_pos.x)
+
+	if _v110_nw_mycelium != null:
+		var mp: float = (0.86 + 0.14 * sin(_time_sec * 2.1) + _biolum_scan_boost * 0.25) * twilight_glow
+		_v110_nw_mycelium.modulate = Color(mp, mp, mp, 1.0)
 
 	# V10.0: RimlandsPrototype blends lighting tint & occlusion seamlessly across Forest <-> Broken Shore!
 	if p_pos.y < 1360.0:
@@ -573,6 +647,28 @@ func _spawn_embedded_scannable_flora() -> void:
 				is_twilight_biolum_mood()
 			)
 			_ysort_world.add_child(flora)
+			_embedded_flora.append(flora)
+
+
+func _spawn_v110_forest_traces() -> void:
+	# 1. Sub-Bark Luminous Mycelium in quiet NW Shaded Grove
+	var seam := Sprite2D.new()
+	seam.name = "V110_NwMycelialSeam"
+	seam.texture = TEX_MYCELIAL_SEAM
+	seam.centered = true
+	seam.offset = Vector2(0.0, -10.0)
+	seam.position = Vector2(596.0, 568.0)
+	_ysort_world.add_child(seam)
+	_v110_nw_mycelium = seam
+
+	# 2. Choked Root-Nerve Tendril (Metallic Blight trace) tucked in SW Deep Canopy
+	var blight := Sprite2D.new()
+	blight.name = "V110_SwBlightTrace"
+	blight.texture = TEX_BLIGHT_CRUST
+	blight.centered = true
+	blight.offset = Vector2(0.0, -7.0)
+	blight.position = Vector2(668.0, 1108.0)
+	_ysort_world.add_child(blight)
 
 
 func _on_zone_entered(body: Node2D, role: String) -> void:

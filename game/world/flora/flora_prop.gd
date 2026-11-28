@@ -26,6 +26,8 @@ const SPECIES_NAMES: PackedStringArray = [
 var _anim_time: float = 0.0
 var _is_night: bool = false
 var _scan_highlight_timer: float = 0.0
+var _rustle_timer: float = 0.0
+var _rustle_dir: float = 1.0
 
 @onready var _shadow_sprite: Sprite2D = $ShadowSprite
 @onready var _plant_sprite: Sprite2D = $PlantSprite
@@ -49,6 +51,14 @@ func _process(delta: float) -> void:
 			CELL_HEIGHT
 		)
 
+	if _rustle_timer > 0.0:
+		_rustle_timer = maxf(0.0, _rustle_timer - delta)
+		var r_frac: float = _rustle_timer / 0.45
+		var sway_px: float = sin(r_frac * 15.0) * 2.0 * r_frac * _rustle_dir
+		_plant_sprite.offset = Vector2(roundf(sway_px), -14.0)
+	elif _plant_sprite.offset.x != 0.0:
+		_plant_sprite.offset = Vector2(0.0, -14.0)
+
 	if _scan_highlight_timer > 0.0:
 		_scan_highlight_timer = maxf(0.0, _scan_highlight_timer - delta)
 		var pulse: float = _scan_highlight_timer / SCAN_HIGHLIGHT_DURATION
@@ -58,6 +68,13 @@ func _process(delta: float) -> void:
 			1.0 + 0.25 * pulse,
 			1.0
 		)
+
+
+func trigger_proximity_rustle(push_dir: float) -> void:
+	if _rustle_timer > 0.22:
+		return
+	_rustle_dir = 1.0 if push_dir >= 0.0 else -1.0
+	_rustle_timer = 0.45
 
 
 func configure(species_index: int, variant_index: int, night_state: bool = false) -> void:

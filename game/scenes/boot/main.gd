@@ -2,8 +2,8 @@ extends Control
 ## VERDANT SIGNAL — Production Bootstrap & Windows Environment Diagnostics.
 ##
 ## Verifies Godot version, active renderer (GL Compatibility / ANGLE), GPU adapter,
-## 640x360 integer scaling ratio, 5-tier AudioBusLayout, and integrated V8.0 Living
-## World + unmodified Mara assets before launching the playable production world.
+## 640x360 integer scaling ratio, 5-tier AudioBusLayout, and integrated V8.0–V11.0
+## Living World + Immersion + unmodified Mara assets before launching the playable world.
 
 const PROTOTYPE_SCENE_PATH: String = "res://world/rimlands_prototype.tscn"
 
@@ -58,17 +58,30 @@ func _build_diagnostics_report() -> String:
 	var total_assets: int = AssetPaths.get_total_tracked_assets()
 	var missing_v80: PackedStringArray = AssetPaths.verify_v80_living_world_assets()
 	var missing_v90: PackedStringArray = AssetPaths.verify_v90_broken_shore_assets()
+	var missing_v100: PackedStringArray = AssetPaths.verify_v100_living_world_assets()
+	var missing_v110: PackedStringArray = AssetPaths.verify_v110_immersion_assets()
 	var art_status: String = (
-		"V9.0 Broken Shore (%d/%d) + V8.0 Forest (%d/%d) + 88x88 Mara OK (0/%d placeholders)"
+		"V11 (%d/%d) + V10 (%d/%d) + V9 (%d/%d) + V8 (%d/%d) | 0/%d placeholders"
 		% [
+			AssetPaths.V110_REQUIRED_PATHS.size() - missing_v110.size(),
+			AssetPaths.V110_REQUIRED_PATHS.size(),
+			AssetPaths.V100_REQUIRED_PATHS.size() - missing_v100.size(),
+			AssetPaths.V100_REQUIRED_PATHS.size(),
 			AssetPaths.V90_REQUIRED_PATHS.size() - missing_v90.size(),
 			AssetPaths.V90_REQUIRED_PATHS.size(),
 			AssetPaths.V80_REQUIRED_PATHS.size() - missing_v80.size(),
 			AssetPaths.V80_REQUIRED_PATHS.size(),
 			total_assets,
 		]
-		if placeholder_count == 0 and missing_v80.is_empty() and missing_v90.is_empty()
-		else "WARNING: M01=%d | V8.0 missing=%d | V9.0 missing=%d" % [placeholder_count, missing_v80.size(), missing_v90.size()]
+		if (
+			placeholder_count == 0
+			and missing_v80.is_empty()
+			and missing_v90.is_empty()
+			and missing_v100.is_empty()
+			and missing_v110.is_empty()
+		)
+		else "WARNING: M01=%d/%d | V8=%d | V9=%d | V10=%d | V11=%d"
+		% [placeholder_count, total_assets, missing_v80.size(), missing_v90.size(), missing_v100.size(), missing_v110.size()]
 	)
 
 	var lines: PackedStringArray = PackedStringArray([

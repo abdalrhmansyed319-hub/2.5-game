@@ -78,6 +78,20 @@ const V100_REQUIRED_PATHS: PackedStringArray = [
 	"res://audio/sfx/acoustic_lens_chime.wav",
 ]
 
+const V110_REQUIRED_PATHS: PackedStringArray = [
+	"res://systems/field_codex.gd",
+	"res://world/vfx/acoustic_echo_vfx.gd",
+	"res://assets/world/immersion/sprites/surveyor01_peg.png",
+	"res://assets/world/immersion/sprites/metallic_blight_crust.png",
+	"res://assets/world/immersion/sprites/mycelial_luminous_seam.png",
+	"res://audio/sfx/step_metal.wav",
+	"res://audio/sfx/sample_confirm.wav",
+	"res://audio/sfx/insight_discovery.wav",
+	"res://audio/sfx/blight_static.wav",
+	"res://audio/sfx/glider_mimic_call.wav",
+	"res://audio/ambient/waymarker_resonance.wav",
+]
+
 
 static func get_production_path(asset_id: String) -> String:
 	match asset_id:
@@ -185,6 +199,14 @@ static func verify_v90_broken_shore_assets() -> PackedStringArray:
 static func verify_v100_living_world_assets() -> PackedStringArray:
 	var missing: PackedStringArray = PackedStringArray()
 	for res_path: String in V100_REQUIRED_PATHS:
+		if not ResourceLoader.exists(res_path) and not FileAccess.file_exists(res_path):
+			missing.append(res_path)
+	return missing
+
+
+static func verify_v110_immersion_assets() -> PackedStringArray:
+	var missing: PackedStringArray = PackedStringArray()
+	for res_path: String in V110_REQUIRED_PATHS:
 		if not ResourceLoader.exists(res_path) and not FileAccess.file_exists(res_path):
 			missing.append(res_path)
 	return missing
