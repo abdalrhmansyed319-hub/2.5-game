@@ -62,6 +62,22 @@ const V90_REQUIRED_PATHS: PackedStringArray = [
 	"res://shaders/coastal_ocean.gdshader",
 ]
 
+const V100_REQUIRED_PATHS: PackedStringArray = [
+	"res://assets/world/broken_shore/sprites/meridian_field_relay.png",
+	"res://assets/world/broken_shore/sprites/meridian_specimen_pod.png",
+	"res://assets/world/broken_shore/sprites/ancient_waymarker_stone.png",
+	"res://assets/world/broken_shore/sprites/ecotone_moss_boulder.png",
+	"res://assets/world/broken_shore/sprites/coastal_biolum_coral.png",
+	"res://assets/world/broken_shore/sprites/coastal_canopy_fern_clump.png",
+	"res://assets/world/broken_shore/animated/coastal_spore_moths_16x16_4x2.png",
+	"res://audio/ambient/coastal_surf_breeze.wav",
+	"res://audio/ambient/living_forest_canopy.wav",
+	"res://audio/sfx/step_sand.wav",
+	"res://audio/sfx/step_grass.wav",
+	"res://audio/sfx/step_water.wav",
+	"res://audio/sfx/acoustic_lens_chime.wav",
+]
+
 
 static func get_production_path(asset_id: String) -> String:
 	match asset_id:
@@ -161,6 +177,14 @@ static func verify_v80_living_world_assets() -> PackedStringArray:
 static func verify_v90_broken_shore_assets() -> PackedStringArray:
 	var missing: PackedStringArray = PackedStringArray()
 	for res_path: String in V90_REQUIRED_PATHS:
+		if not ResourceLoader.exists(res_path) and not FileAccess.file_exists(res_path):
+			missing.append(res_path)
+	return missing
+
+
+static func verify_v100_living_world_assets() -> PackedStringArray:
+	var missing: PackedStringArray = PackedStringArray()
+	for res_path: String in V100_REQUIRED_PATHS:
 		if not ResourceLoader.exists(res_path) and not FileAccess.file_exists(res_path):
 			missing.append(res_path)
 	return missing

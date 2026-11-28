@@ -150,6 +150,12 @@ func _check_assets_and_tileset() -> void:
 	else:
 		print("[SMOKE] V9.0 Broken Shore assets verified (%d paths)" % AssetPaths.V90_REQUIRED_PATHS.size())
 
+	var missing_v100: PackedStringArray = AssetPaths.verify_v100_living_world_assets()
+	if not missing_v100.is_empty():
+		_record_fail("Missing V10.0 Living World assets/audio: " + ", ".join(missing_v100))
+	else:
+		print("[SMOKE] V10.0 Living World storytelling assets & audio verified (%d paths)" % AssetPaths.V100_REQUIRED_PATHS.size())
+
 	var char_paths: PackedStringArray = PackedStringArray([
 		AssetPaths.MARA_ORIG_IDLE_PATH,
 		AssetPaths.MARA_ORIG_WALK_PATH,
@@ -235,12 +241,12 @@ func _finish_smoke_run() -> void:
 					vbs.get_surface_type_at(player_ctrl.global_position),
 				]
 			)
-			if shore_tufts < 700:
-				_record_fail("Expected >= 700 Broken Shore coastal tufts, got %d" % shore_tufts)
+			if shore_tufts < 900:
+				_record_fail("Expected >= 900 V10.0 Broken Shore coastal tufts, got %d" % shore_tufts)
 			if shore_vis <= 0 or shore_vis > VerdantBrokenShore.GRASS_POOL_SIZE:
 				_record_fail("Broken Shore visible culled tufts out of pool range: %d" % shore_vis)
-			if shore_fauna != 8:
-				_record_fail("Expected 8 coastal fauna (4 Gliders + 4 Crabs), got %d" % shore_fauna)
+			if shore_fauna != 14:
+				_record_fail("Expected 14 coastal fauna (4 Gliders + 4 Crabs + 6 Spore-Moths), got %d" % shore_fauna)
 
 			var surf_dry: String = vbs.get_surface_type_at(Vector2(748.0, 2288.0))
 			var surf_shallow: String = vbs.get_surface_type_at(Vector2(1756.0, 2196.0))
@@ -255,6 +261,22 @@ func _finish_smoke_run() -> void:
 			var crash_sample: String = vbs.sample_nearest_coastal_feature(Vector2(1300.0, 2168.0))
 			if crash_sample.is_empty():
 				_record_fail("Field sample near ICV Meridian hull returned empty feature")
+
+			# V10.0: Verify breached ICV Meridian cutaway interior settle & V10.0 Waymarker scan
+			vbs.force_settle_interior_state(Vector2(1384.0, 2212.0))
+			if not vbs.is_in_meridian_interior():
+				_record_fail("Expected force_settle_interior_state at Zone B2 (1384, 2212) to enter Meridian interior")
+			vbs.force_settle_interior_state(Vector2(748.0, 2288.0))
+			if vbs.is_in_meridian_interior():
+				_record_fail("Expected force_settle_interior_state at Zone A (748, 2288) to exit Meridian interior")
+
+			var waymarker_scan: PackedStringArray = vbs.scan_coastal_sites(Vector2(1032.0, 1524.0), 112.0)
+			if waymarker_scan.is_empty():
+				_record_fail("V10.0 Acoustic scan near Ancient Harmonic Waymarker returned zero hits")
+
+			AudioDirector.update_biome_ambience(2288.0, 0.25, false)
+			AudioDirector.play_footstep("sand", false)
+			AudioDirector.play_acoustic_lens_chime(true)
 		else:
 			_record_fail("VerdantBrokenShore missing from RimlandsPrototype")
 
