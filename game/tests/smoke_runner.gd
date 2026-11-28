@@ -1,14 +1,14 @@
 extends Node
-## Automated Production Smoke & V8.0 Integration Verification Runner for Godot 4.7.2.
+## Automated Production Smoke & V9.0 + V8.0 Unified Integration Verification Runner for Godot 4.7.2.
 ##
 ## Run via:
 ##   Godot_v4.7.2-stable_win64_console.exe --headless --path game res://tests/smoke_runner.tscn
 ##
 ## Executes inside the real production project.godot environment (autoloads, InputMap,
-## physics layers, AudioBusLayout, strict GDScript warnings), verifies ALL Milestone 01
-## AND integrated V8.0 Living World scripts/scenes/shaders/resources, steps live
-## BootDiagnostics + integrated RimlandsPrototype frames, tests moods/gusts/lens/sampling,
-## and exits cleanly with 0 on pass or 1 on any failure.
+## physics layers, AudioBusLayout, strict GDScript warnings), verifies ALL Milestone 01,
+## V8.0 Living Forest, AND V9.0 The Broken Shore scripts/scenes/shaders/resources,
+## steps live unified RimlandsPrototype frames across BOTH The Broken Shore AND Living
+## Forest, tests moods/gusts/lens/sampling/breached interior, and exits 0 on pass or 1 on fail.
 
 const SCRIPTS_TO_CHECK: PackedStringArray = [
 	"res://autoload/game_state.gd",
@@ -23,6 +23,7 @@ const SCRIPTS_TO_CHECK: PackedStringArray = [
 	"res://world/rimlands_tileset_builder.gd",
 	"res://world/world_chunk_streamer.gd",
 	"res://world/living_forest/verdant_living_forest.gd",
+	"res://world/broken_shore/verdant_broken_shore.gd",
 	"res://world/rimlands_prototype.gd",
 	"res://world/props/singing_reedwood_tree.gd",
 	"res://world/flora/flora_prop.gd",
@@ -38,6 +39,7 @@ const SCENES_TO_CHECK: PackedStringArray = [
 	"res://world/flora/flora_prop.tscn",
 	"res://world/landmarks/drop_pod_clearing.tscn",
 	"res://world/living_forest/verdant_living_forest.tscn",
+	"res://world/broken_shore/verdant_broken_shore.tscn",
 	"res://ui/prototype_hud.tscn",
 	"res://world/rimlands_prototype.tscn",
 ]
@@ -62,7 +64,7 @@ var _prototype_instance: Node = null
 
 
 func _ready() -> void:
-	print("[SMOKE] === VERDANT SIGNAL Production V8.0 Godot 4.7.2 Headless Smoke Runner ===")
+	print("[SMOKE] === VERDANT SIGNAL Production V9.0 + V8.0 Godot 4.7.2 Headless Smoke Runner ===")
 	_check_autoloads_and_inputs()
 	_check_scripts_and_scenes()
 	_check_assets_and_tileset()
@@ -142,6 +144,12 @@ func _check_assets_and_tileset() -> void:
 	else:
 		print("[SMOKE] V8.0 Living World & Unmodified Mara assets verified (%d paths)" % AssetPaths.V80_REQUIRED_PATHS.size())
 
+	var missing_v90: PackedStringArray = AssetPaths.verify_v90_broken_shore_assets()
+	if not missing_v90.is_empty():
+		_record_fail("Missing V9.0 Broken Shore production assets: " + ", ".join(missing_v90))
+	else:
+		print("[SMOKE] V9.0 Broken Shore assets verified (%d paths)" % AssetPaths.V90_REQUIRED_PATHS.size())
+
 	var char_paths: PackedStringArray = PackedStringArray([
 		AssetPaths.MARA_ORIG_IDLE_PATH,
 		AssetPaths.MARA_ORIG_WALK_PATH,
@@ -200,36 +208,85 @@ func _finish_smoke_run() -> void:
 			_record_fail("WorldChunkStreamer missing from RimlandsPrototype")
 
 		var forest_n: Node = _prototype_instance.get_node_or_null("VerdantLivingForest")
+		var shore_n: Node = _prototype_instance.get_node_or_null("VerdantBrokenShore")
+		var player_ctrl: PlayerController = null
+
 		if forest_n is VerdantLivingForest:
 			var vlf: VerdantLivingForest = forest_n as VerdantLivingForest
-			var total_tufts: int = vlf.get_total_tuft_count()
-			var visible_tufts: int = vlf.get_visible_tuft_count()
-			var critters: int = vlf.get_critter_count()
+			var p_in_ysort: Node = vlf.get_ysort_world().get_node_or_null("Player")
+			if p_in_ysort is PlayerController:
+				player_ctrl = p_in_ysort as PlayerController
+			else:
+				_record_fail("PlayerController was not reparented into unified YSortWorld")
+
+		# 1. Verify V9.0 The Broken Shore (spawned on Zone A Waking Shore)
+		if shore_n is VerdantBrokenShore and player_ctrl != null:
+			var vbs: VerdantBrokenShore = shore_n as VerdantBrokenShore
+			var shore_tufts: int = vbs.get_total_tuft_count()
+			var shore_vis: int = vbs.get_visible_tuft_count()
+			var shore_fauna: int = vbs.get_fauna_count()
 			print(
-				"[SMOKE] VerdantLivingForest stepped %d ticks | tufts=%d/%d | critters=%d | mood=%s"
-				% [FRAMES_TO_STEP, visible_tufts, total_tufts, critters, vlf.get_mood_name()]
+				"[SMOKE] VerdantBrokenShore stepped %d ticks | tufts=%d/%d | fauna=%d | surface=%s"
+				% [
+					FRAMES_TO_STEP,
+					shore_vis,
+					shore_tufts,
+					shore_fauna,
+					vbs.get_surface_type_at(player_ctrl.global_position),
+				]
+			)
+			if shore_tufts < 700:
+				_record_fail("Expected >= 700 Broken Shore coastal tufts, got %d" % shore_tufts)
+			if shore_vis <= 0 or shore_vis > VerdantBrokenShore.GRASS_POOL_SIZE:
+				_record_fail("Broken Shore visible culled tufts out of pool range: %d" % shore_vis)
+			if shore_fauna != 8:
+				_record_fail("Expected 8 coastal fauna (4 Gliders + 4 Crabs), got %d" % shore_fauna)
+
+			var surf_dry: String = vbs.get_surface_type_at(Vector2(748.0, 2288.0))
+			var surf_shallow: String = vbs.get_surface_type_at(Vector2(1756.0, 2196.0))
+			if surf_dry != "dry_sand":
+				_record_fail("Expected dry_sand at Zone A spawn, got " + surf_dry)
+			if surf_shallow != "shallow_water":
+				_record_fail("Expected shallow_water inside eastern tidepool, got " + surf_shallow)
+
+			var crash_scan: PackedStringArray = vbs.scan_coastal_sites(Vector2(1300.0, 2168.0), 112.0)
+			if crash_scan.is_empty():
+				_record_fail("Acoustic scan near ICV Meridian hull returned zero hits")
+			var crash_sample: String = vbs.sample_nearest_coastal_feature(Vector2(1300.0, 2168.0))
+			if crash_sample.is_empty():
+				_record_fail("Field sample near ICV Meridian hull returned empty feature")
+		else:
+			_record_fail("VerdantBrokenShore missing from RimlandsPrototype")
+
+		# 2. Verify continuous transition into V8.0 Living Forest Sanctuary
+		if forest_n is VerdantLivingForest and player_ctrl != null:
+			var vlf2: VerdantLivingForest = forest_n as VerdantLivingForest
+			player_ctrl.position = VerdantLivingForest.DEFAULT_SPAWN_POS
+			if player_ctrl.get_camera() != null:
+				player_ctrl.get_camera().reset_smoothing()
+			vlf2.step_living_ecosystem(0.016, player_ctrl)
+			var total_tufts: int = vlf2.get_total_tuft_count()
+			var visible_tufts: int = vlf2.get_visible_tuft_count()
+			var critters: int = vlf2.get_critter_count()
+			print(
+				"[SMOKE] VerdantLivingForest continuity verified | tufts=%d/%d | critters=%d | mood=%s"
+				% [visible_tufts, total_tufts, critters, vlf2.get_mood_name()]
 			)
 			if total_tufts < 600:
-				_record_fail("Expected >= 600 living grass tufts, got %d" % total_tufts)
+				_record_fail("Expected >= 600 living forest tufts, got %d" % total_tufts)
 			if visible_tufts <= 0 or visible_tufts > VerdantLivingForest.GRASS_POOL_SIZE:
-				_record_fail("Visible culled tufts out of pool range: %d" % visible_tufts)
+				_record_fail("Living Forest visible culled tufts out of pool range: %d" % visible_tufts)
 			if critters != 7:
 				_record_fail("Expected 7 living woodland critters, got %d" % critters)
 
-			# Verify Player is unified inside VerdantLivingForest/YSortWorld
-			var player_in_ysort: Node = vlf.get_ysort_world().get_node_or_null("Player")
-			if not (player_in_ysort is PlayerController):
-				_record_fail("PlayerController was not reparented into VerdantLivingForest/YSortWorld")
-
-			# Exercise all 3 lighting moods, wind gust & ecological acoustic scan
 			for m_idx: int in range(3):
-				vlf.apply_lighting_mood(m_idx)
-			vlf.apply_lighting_mood(0)
-			vlf.trigger_wind_gust(2.0)
-			var scan_hits: PackedStringArray = vlf.scan_ecological_sites(Vector2(1694.0, 466.0), 112.0)
+				vlf2.apply_lighting_mood(m_idx)
+			vlf2.apply_lighting_mood(0)
+			vlf2.trigger_wind_gust(2.0)
+			var scan_hits: PackedStringArray = vlf2.scan_ecological_sites(Vector2(1694.0, 466.0), 112.0)
 			if scan_hits.is_empty():
 				_record_fail("Acoustic scan near Waystone Spiral returned zero hits")
-			var sample_name: String = vlf.sample_nearest_feature(Vector2(1694.0, 466.0))
+			var sample_name: String = vlf2.sample_nearest_feature(Vector2(1694.0, 466.0))
 			if sample_name.is_empty():
 				_record_fail("Field sample near Waystone Spiral returned empty feature")
 		else:
